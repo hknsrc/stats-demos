@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>EFA Motion Demo</title>
+<style>
+  :root { color-scheme: dark; }
+  body{
+    margin:0;
+    font-family: Arial, sans-serif;
+    background:#0f0f10;
+    color:#fff;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+  }
+
+  header{
+    width:min(1280px, 96vw);
+    margin:18px 0 6px;
+  }
+
+  h1{
+    font-size:20px;
+    margin:0 0 8px;
+    font-weight:700;
+    letter-spacing:.2px;
+  }
+
+  .sub{
+    opacity:.8;
+    font-size:13px;
+    margin:0 0 14px;
+    line-height:1.35;
+  }
+
+  .controls{
+    width:min(1280px, 96vw);
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    align-items:center;
+    background:#151518;
+    border:1px solid #242428;
+    border-radius:12px;
+    padding:12px;
+  }
+
+  button{
+    border:1px solid #2a2a2f;
+    background:#1e1e23;
+    color:#fff;
+    padding:10px 12px;
+    border-radius:10px;
+    cursor:pointer;
+    font-size:14px;
+    transition: background .18s ease, transform .12s ease, border-color .18s ease;
+  }
+
+  button:hover{ background:#25252b; }
+  button:active{ transform:translateY(1px); }
+  button.active{
+    border-color:#7aa2ff;
+    box-shadow:0 0 0 2px rgba(122,162,255,.15) inset;
+  }
+
+  .spacer{ flex:1; }
+
+  .sliderWrap{
+    display:flex;
+    gap:10px;
+    align-items:center;
+  }
+
+  input[type="range"]{ width:190px; }
+
+  .badge{
+    font-size:12px;
+    opacity:.88;
+    padding:6px 10px;
+    border:1px solid #2a2a2f;
+    border-radius:999px;
+    background:#121216;
+    user-select:none;
+  }
+
+  .stage{
+    width:min(1280px, 96vw);
+    display:grid;
+    grid-template-columns: 1fr 340px;
+    gap:12px;
+    margin:14px 0 26px;
+  }
+
+  canvas{
+    width:100%;
+    height:580px;
+    background:radial-gradient(1200px 650px at 45% 40%, #1b1b20 0%, #111114 55%, #0d0d0f 100%);
+    border:1px solid #242428;
+    border-radius:16px;
+    box-shadow: 0 12px 35px rgba(0,0,0,.35);
+    display:block;
+  }
+
+  .panel{
+    height:580px;
+    background:#121216;
+    border:1px solid #242428;
+    border-radius:16px;
+    box-shadow: 0 12px 35px rgba(0,0,0,.25);
+    padding:14px 14px 10px;
+    overflow:hidden;
+  }
+
+  .panel h2{
+    margin:0 0 8px;
+    font-size:14px;
+    opacity:.95;
+  }
+
+  .panel .hint{
+    font-size:12px;
+    opacity:.75;
+    line-height:1.35;
+    margin-bottom:10px;
+  }
+
+  .matrix{
+    width:100%;
+    border-collapse:collapse;
+    font-size:12px;
+    table-layout:fixed;
+  }
+
+  .matrix th, .matrix td{
+    border-bottom:1px solid #23232a;
+    padding:6px 6px;
+    text-align:right;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+
+  .matrix th:first-child, .matrix td:first-child{
+    text-align:left;
+    width:52px;
+  }
+
+  .bar{
+    height:10px;
+    border-radius:999px;
+    background:rgba(255,255,255,0.08);
+    overflow:hidden;
+  }
+
+  .barFill{
+    height:100%;
+    width:0%;
+    border-radius:999px;
+    transition:width .18s ease-out;
+  }
+
+  .cell{
+    display:grid;
+    grid-template-columns: 1fr 42px;
+    gap:8px;
+    align-items:center;
+  }
+
+  .num{ opacity:.9; }
+  .crossText{ color:#F9A8D4; }
+
+  .legend{
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+    margin-top:10px;
+  }
+
+  .legItem{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    font-size:12px;
+    opacity:.85;
+  }
+
+  .swatch{
+    width:14px;
+    height:14px;
+    border-radius:4px;
+    border:1px solid rgba(255,255,255,.18);
+  }
+
+  .foot{
+    margin-top:10px;
+    font-size:11px;
+    opacity:.65;
+    line-height:1.35;
+  }
+
+  @media (max-width: 980px){
+    .stage{ grid-template-columns: 1fr; }
+    .panel{ height:auto; }
+    canvas{ height:520px; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>EFA Motion Demo</h1>
+  <p class="sub">
+    Items move independently or in shared patterns to build intuition for factor emergence.
+  </p>
+</header>
+
+<div class="controls">
+  <button id="btn0">1) Independent</button>
+  <button id="btn1">2) One group</button>
+  <button id="btn2">3) Two groups</button>
+
+  <button id="pauseBtn">Pause</button>
+  <button id="resetBtn">Reset</button>
+  <button id="linksBtn">Correlations: OFF</button>
+  <button id="crossBtn">Show cross-loadings: OFF</button>
+
+  <div class="spacer"></div>
+
+  <div class="sliderWrap">
+    <span class="badge">Speed</span>
+    <input id="speed" type="range" min="0.0" max="3.0" step="0.1" value="0.0" />
+    <span id="speedVal" class="badge">0.0×</span>
+  </div>
+
+  <div class="sliderWrap">
+    <span class="badge">Noise</span>
+    <input id="noise" type="range" min="0.0" max="2.0" step="0.1" value="0.0" />
+    <span id="noiseVal" class="badge">0.0</span>
+  </div>
+
+  <div class="sliderWrap">
+    <span class="badge">Link sensitivity</span>
+    <input id="sens" type="range" min="0.6" max="2.0" step="0.1" value="1.1" />
+    <span id="sensVal" class="badge">1.1</span>
+  </div>
+</div>
+
+<div class="stage">
+  <canvas id="c"></canvas>
+
+  <aside class="panel">
+    <h2>Pattern Matrix (Simulated)</h2>
+    <div class="hint">
+      Rows are items (A–L). Columns are factors. Values reflect scenario-based loadings with small live adjustments.
+      Cross-loadings can be displayed separately in the two-group condition.
+    </div>
+
+    <table class="matrix">
+      <thead>
+        <tr><th>Item</th><th>F1</th><th>F2</th></tr>
+      </thead>
+      <tbody id="matrixBody"></tbody>
+    </table>
+
+    <div class="legend">
+      <div class="legItem"><span class="swatch" style="background:#6EE7B7"></span>Factor 1 group</div>
+      <div class="legItem"><span class="swatch" style="background:#93C5FD"></span>Factor 2 group</div>
+      <div class="legItem"><span class="swatch" style="background:#F9A8D4"></span>Cross-loading</div>
+      <div class="legItem"><span class="swatch" style="background:#b9b9be"></span>Independent / weak</div>
+    </div>
+
+    <div class="foot">
+      Developed by Hakan Sarac for educational purposes.
+    </div>
+  </aside>
+</div>
+
+<script>
+(() => {
+  const canvas = document.getElementById("c");
+  const ctx = canvas.getContext("2d");
+
+  const labels = "ABCDEFGHIJKL".split("");
+  const boxSize = 40;
+
+  const colors = {
+    ind: "#b9b9be",
+    g0: "#6EE7B7",
+    g1: "#93C5FD",
+    cross: "#F9A8D4"
+  };
+
+  const btn0 = document.getElementById("btn0");
+  const btn1 = document.getElementById("btn1");
+  const btn2 = document.getElementById("btn2");
+  const pauseBtn = document.getElementById("pauseBtn");
+  const resetBtn = document.getElementById("resetBtn");
+  const linksBtn = document.getElementById("linksBtn");
+  const crossBtn = document.getElementById("crossBtn");
+
+  const speedEl = document.getElementById("speed");
+  const noiseEl = document.getElementById("noise");
+  const sensEl  = document.getElementById("sens");
+  const speedVal = document.getElementById("speedVal");
+  const noiseVal = document.getElementById("noiseVal");
+  const sensVal  = document.getElementById("sensVal");
+
+  const matrixBody = document.getElementById("matrixBody");
+
+  let paused = false;
+  let scenario = 0;
+  let showLinks = false;
+  let showCross = false;
+  let vars = [];
+  let matrixRefs = [];
+
+  speedEl.addEventListener("input", () => speedVal.textContent = `${Number(speedEl.value).toFixed(1)}×`);
+  noiseEl.addEventListener("input", () => noiseVal.textContent = `${Number(noiseEl.value).toFixed(1)}`);
+  sensEl.addEventListener("input", () => sensVal.textContent = `${Number(sensEl.value).toFixed(1)}`);
+
+  function rand(min, max){ return min + Math.random() * (max - min); }
+  function clamp(x, lo, hi){ return Math.max(lo, Math.min(hi, x)); }
+  function clamp01(x){ return clamp(x, 0, 0.99); }
+  function lerp(a, b, t){ return a + (b - a) * t; }
+
+  function resizeCanvasToDisplaySize() {
+    const dpr = window.devicePixelRatio || 1;
+    const rect = canvas.getBoundingClientRect();
+    const w = Math.max(300, Math.floor(rect.width * dpr));
+    const h = Math.max(300, Math.floor(rect.height * dpr));
+    if (canvas.width !== w || canvas.height !== h) {
+      canvas.width = w;
+      canvas.height = h;
+    }
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+
+  window.addEventListener("resize", resizeCanvasToDisplaySize);
+
+  function groupOf(i){
+    if (scenario === 0) return -1;
+    if (scenario === 1) return (i <= 3) ? 0 : -1;
+    if (scenario === 2) return (i <= 5) ? 0 : 1;
+    return -1;
+  }
+
+  function crossSet(){
+    return [2, 7]; // C and H only
+  }
+
+  function isCrossLoadingItem(i){
+    return scenario === 2 && showCross && crossSet().includes(i);
+  }
+
+  function colorForGroup(g, i = null){
+    if (i !== null && isCrossLoadingItem(i)) return colors.cross;
+    if (g === 0) return colors.g0;
+    if (g === 1) return colors.g1;
+    return colors.ind;
+  }
+
+  function initPositions(){
+    resizeCanvasToDisplaySize();
+    const W = canvas.getBoundingClientRect().width;
+    const H = canvas.getBoundingClientRect().height;
+
+    vars = labels.map(() => ({
+      x: rand(80, W - 80),
+      y: rand(90, H - 80),
+
+      // independent motion seeds
+      vx: rand(-0.7, 0.7),
+      vy: rand(-0.7, 0.7),
+      ax: 0,
+      ay: 0,
+
+      driftX: rand(-1, 1),
+      driftY: rand(-1, 1),
+      driftTargetX: rand(-1, 1),
+      driftTargetY: rand(-1, 1),
+
+      baseF1: 0,
+      baseF2: 0
+    }));
+
+    seedBaseLoadings();
+
+    shock0.dx = rand(-1.0, 1.0);
+    shock0.dy = rand(-1.0, 1.0);
+    shock0.tx = shock0.dx;
+    shock0.ty = shock0.dy;
+
+    shock1.dx = rand(-1.0, 1.0);
+    shock1.dy = rand(-1.0, 1.0);
+    shock1.tx = shock1.dx;
+    shock1.ty = shock1.dy;
+
+    rebuildMatrix();
+  }
+
+  function seedBaseLoadings(){
+    for (let i = 0; i < vars.length; i++){
+      const g = groupOf(i);
+
+      if (scenario === 0){
+        vars[i].baseF1 = rand(0.00, 0.14);
+        vars[i].baseF2 = rand(0.00, 0.14);
+      }
+
+      if (scenario === 1){
+        if (g === 0){
+          vars[i].baseF1 = rand(0.68, 0.86);
+          vars[i].baseF2 = rand(0.02, 0.10);
+        } else {
+          vars[i].baseF1 = rand(0.00, 0.16);
+          vars[i].baseF2 = rand(0.00, 0.16);
+        }
+      }
+
+      if (scenario === 2){
+        if (g === 0){
+          vars[i].baseF1 = rand(0.64, 0.86);
+          vars[i].baseF2 = rand(0.03, 0.10);
+        } else {
+          vars[i].baseF1 = rand(0.03, 0.10);
+          vars[i].baseF2 = rand(0.64, 0.86);
+        }
+
+        if (showCross){
+          if (i === 2) vars[i].baseF2 = rand(0.20, 0.30); // C
+          if (i === 7) vars[i].baseF1 = rand(0.20, 0.30); // H
+        }
+      }
+    }
+  }
+
+  function rebuildMatrix(){
+    matrixBody.innerHTML = "";
+    matrixRefs = [];
+
+    for (let i = 0; i < labels.length; i++){
+      const tr = document.createElement("tr");
+
+      const tdItem = document.createElement("td");
+      tdItem.textContent = labels[i];
+      tdItem.style.fontWeight = "700";
+      tdItem.style.color = colorForGroup(groupOf(i), i);
+      tr.appendChild(tdItem);
+
+      const tdF1 = document.createElement("td");
+      tdF1.innerHTML = `
+        <div class="cell">
+          <div class="bar"><div class="barFill f1"></div></div>
+          <div class="num n1">0.00</div>
+        </div>`;
+      tr.appendChild(tdF1);
+
+      const tdF2 = document.createElement("td");
+      tdF2.innerHTML = `
+        <div class="cell">
+          <div class="bar"><div class="barFill f2"></div></div>
+          <div class="num n2">0.00</div>
+        </div>`;
+      tr.appendChild(tdF2);
+
+      matrixBody.appendChild(tr);
+
+      matrixRefs.push({
+        tdItem,
+        f1Fill: tdF1.querySelector(".barFill.f1"),
+        f2Fill: tdF2.querySelector(".barFill.f2"),
+        n1: tdF1.querySelector(".num.n1"),
+        n2: tdF2.querySelector(".num.n2"),
+      });
+
+      matrixRefs[i].f1Fill.style.background = colors.g0;
+      matrixRefs[i].f2Fill.style.background = colors.g1;
+    }
+
+    updatePatternMatrix();
+  }
+
+  function proximityWeight(i, j){
+    const dx = vars[i].x - vars[j].x;
+    const dy = vars[i].y - vars[j].y;
+    const d = Math.sqrt(dx * dx + dy * dy);
+    const sens = parseFloat(sensEl.value);
+    const maxD = 360 / sens;
+    return 1 - Math.min(d / maxD, 1);
+  }
+
+  function groupCohesionScore(i){
+    const g = groupOf(i);
+    if (g === -1) return 0;
+
+    let sum = 0, cnt = 0;
+    for (let j = 0; j < vars.length; j++){
+      if (j === i) continue;
+      if (groupOf(j) === g){
+        sum += proximityWeight(i, j);
+        cnt++;
+      }
+    }
+    return cnt ? (sum / cnt) : 0;
+  }
+
+  function setMatrixCell(i, f1, f2){
+    const r = matrixRefs[i];
+    r.tdItem.style.color = colorForGroup(groupOf(i), i);
+
+    r.f1Fill.style.width = `${Math.round(f1 * 100)}%`;
+    r.f2Fill.style.width = `${Math.round(f2 * 100)}%`;
+    r.n1.textContent = f1.toFixed(2);
+    r.n2.textContent = f2.toFixed(2);
+
+    r.n1.classList.toggle("crossText", isCrossLoadingItem(i) && f1 >= 0.18 && f1 < 0.50);
+    r.n2.classList.toggle("crossText", isCrossLoadingItem(i) && f2 >= 0.18 && f2 < 0.50);
+  }
+
+  function updatePatternMatrix(){
+    for (let i = 0; i < vars.length; i++){
+      const coh = groupCohesionScore(i);
+      const g = groupOf(i);
+
+      let f1 = vars[i].baseF1;
+      let f2 = vars[i].baseF2;
+
+      if (scenario === 2 && showCross){
+        const tweak = (coh - 0.45) * 0.08;
+
+        if (g === 0){
+          f1 = clamp01(f1 + tweak);
+          f2 = clamp01(f2 + tweak * 0.18);
+        }
+        if (g === 1){
+          f2 = clamp01(f2 + tweak);
+          f1 = clamp01(f1 + tweak * 0.18);
+        }
+      } else if (scenario === 1){
+        const tweak = (coh - 0.45) * 0.08;
+        if (g === 0){
+          f1 = clamp01(f1 + tweak);
+          f2 = clamp01(f2 + tweak * 0.08);
+        }
+      } else {
+        const weakTweak = rand(-0.01, 0.01);
+        f1 = clamp01(f1 + weakTweak);
+        f2 = clamp01(f2 + weakTweak);
+      }
+
+      setMatrixCell(i, f1, f2);
+    }
+  }
+
+  function linkPairs(){
+    const pairs = [];
+    if (!showLinks) return pairs;
+
+    if (scenario === 0){
+      for (let k = 0; k < 10; k++){
+        const a = Math.floor(Math.random() * vars.length);
+        let b = Math.floor(Math.random() * vars.length);
+        if (b === a) b = (b + 1) % vars.length;
+        pairs.push({ a: Math.min(a, b), b: Math.max(a, b), type: "weak" });
+      }
+      return pairs;
+    }
+
+    for (let i = 0; i < vars.length; i++){
+      for (let j = i + 1; j < vars.length; j++){
+        const gi = groupOf(i);
+        const gj = groupOf(j);
+
+        if (gi !== -1 && gi === gj){
+          pairs.push({ a: i, b: j, type: "primary" });
+        }
+
+        if (scenario === 2 && showCross){
+          const iCross = isCrossLoadingItem(i);
+          const jCross = isCrossLoadingItem(j);
+
+          if ((iCross || jCross) && gi !== -1 && gj !== -1 && gi !== gj){
+            pairs.push({ a: i, b: j, type: "cross" });
+          }
+        }
+      }
+    }
+
+    return pairs;
+  }
+
+  function roundRect(ctx, x, y, w, h, r){
+    const rr = Math.min(r, w / 2, h / 2);
+    ctx.beginPath();
+    ctx.moveTo(x + rr, y);
+    ctx.arcTo(x + w, y, x + w, y + h, rr);
+    ctx.arcTo(x + w, y + h, x, y + h, rr);
+    ctx.arcTo(x, y + h, x, y, rr);
+    ctx.arcTo(x, y, x + w, y, rr);
+    ctx.closePath();
+  }
+
+  let shock0 = { dx:0, dy:0, tx:0, ty:0 };
+  let shock1 = { dx:0, dy:0, tx:0, ty:0 };
+
+  function updateShocks(){
+    const sp = parseFloat(speedEl.value);
+    const activeScale = Math.max(sp, 0.30);
+
+    shock0.tx = lerp(shock0.tx, rand(-1.5, 1.5) * activeScale, 0.08);
+    shock0.ty = lerp(shock0.ty, rand(-1.5, 1.5) * activeScale, 0.08);
+    shock1.tx = lerp(shock1.tx, rand(-1.5, 1.5) * activeScale, 0.08);
+    shock1.ty = lerp(shock1.ty, rand(-1.5, 1.5) * activeScale, 0.08);
+
+    shock0.dx = lerp(shock0.dx, shock0.tx, 0.12);
+    shock0.dy = lerp(shock0.dy, shock0.ty, 0.12);
+    shock1.dx = lerp(shock1.dx, shock1.tx, 0.12);
+    shock1.dy = lerp(shock1.dy, shock1.ty, 0.12);
+  }
+
+  function updateIndependentDrift(v){
+    v.driftTargetX = lerp(v.driftTargetX, rand(-1, 1), 0.03);
+    v.driftTargetY = lerp(v.driftTargetY, rand(-1, 1), 0.03);
+
+    v.driftX = lerp(v.driftX, v.driftTargetX, 0.05);
+    v.driftY = lerp(v.driftY, v.driftTargetY, 0.05);
+  }
+
+  function draw(){
+    resizeCanvasToDisplaySize();
+    const W = canvas.getBoundingClientRect().width;
+    const H = canvas.getBoundingClientRect().height;
+
+    ctx.clearRect(0, 0, W, H);
+
+    ctx.save();
+    ctx.globalAlpha = 0.92;
+    ctx.fillStyle = "rgba(255,255,255,0.07)";
+    ctx.fillRect(18, 18, 500, 62);
+    ctx.globalAlpha = 1;
+    ctx.fillStyle = "rgba(255,255,255,0.94)";
+    ctx.font = "15px Arial";
+
+    const txt = [
+      "Independent motion",
+      "One latent group",
+      showCross ? "Two latent groups with cross-loadings" : "Two latent groups"
+    ][scenario];
+
+    ctx.fillText(txt, 32, 42);
+    ctx.font = "12px Arial";
+    ctx.fillStyle = "rgba(255,255,255,0.72)";
+    ctx.fillText(showLinks ? "Correlations ON" : "Correlations OFF", 32, 63);
+    ctx.restore();
+
+    if (showLinks){
+      const pairs = linkPairs();
+      for (const pair of pairs){
+        const i = pair.a;
+        const j = pair.b;
+        const w = proximityWeight(i, j);
+        if (w <= 0.05) continue;
+
+        let stroke = "rgba(185,185,190,0.14)";
+        let lw = 0.4 + w * 1.0;
+
+        if (pair.type === "primary"){
+          const gi = groupOf(i);
+          const base = gi === 0 ? "110,231,183" : "147,197,253";
+          stroke = `rgba(${base}, ${0.05 + w * 0.28})`;
+          lw = 0.45 + w * 2.0;
+        }
+
+        if (pair.type === "cross"){
+          stroke = `rgba(249,168,212, ${0.03 + w * 0.15})`;
+          lw = 0.28 + w * 0.9;
+        }
+
+        if (pair.type === "weak"){
+          stroke = `rgba(185,185,190, ${0.02 + w * 0.09})`;
+          lw = 0.25 + w * 0.8;
+        }
+
+        ctx.save();
+        if (pair.type === "cross"){
+          ctx.setLineDash([5, 6]);
+        } else {
+          ctx.setLineDash([]);
+        }
+        ctx.beginPath();
+        ctx.moveTo(vars[i].x, vars[i].y);
+        ctx.lineTo(vars[j].x, vars[j].y);
+        ctx.strokeStyle = stroke;
+        ctx.lineWidth = lw;
+        ctx.stroke();
+        ctx.restore();
+      }
+    }
+
+    for (let i = 0; i < vars.length; i++){
+      const v = vars[i];
+      const g = groupOf(i);
+      const col = colorForGroup(g, i);
+      const x = v.x - boxSize / 2;
+      const y = v.y - boxSize / 2;
+
+      ctx.save();
+      ctx.shadowColor = "rgba(0,0,0,0.35)";
+      ctx.shadowBlur = 10;
+      ctx.shadowOffsetY = 4;
+
+      ctx.fillStyle = col;
+      ctx.globalAlpha = 0.95;
+      roundRect(ctx, x, y, boxSize, boxSize, 10);
+      ctx.fill();
+
+      ctx.shadowBlur = 0;
+      ctx.shadowOffsetY = 0;
+      ctx.globalAlpha = 1;
+      ctx.fillStyle = "#0b0b0d";
+      ctx.font = "bold 16px Arial";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText(labels[i], v.x, v.y + 1);
+      ctx.restore();
+    }
+  }
+
+  function step(){
+    if (!paused){
+      updateShocks();
+
+      const sp = parseFloat(speedEl.value);
+      const noise = parseFloat(noiseEl.value);
+      const W = canvas.getBoundingClientRect().width;
+      const H = canvas.getBoundingClientRect().height;
+
+      for (let i = 0; i < vars.length; i++){
+        const v = vars[i];
+        const g = groupOf(i);
+
+        let ax = 0, ay = 0;
+
+        if (scenario === 0){
+          updateIndependentDrift(v);
+
+          const movementScale = Math.max(sp, 0.35);
+
+          ax += v.driftX * 0.08 * movementScale;
+          ay += v.driftY * 0.08 * movementScale;
+
+          ax += rand(-0.03, 0.03);
+          ay += rand(-0.03, 0.03);
+
+          ax += v.vx * 0.004;
+          ay += v.vy * 0.004;
+        } else {
+          const movementScale = Math.max(sp, 0.18);
+
+          if (g === 0){
+            ax += shock0.dx * 0.08 * movementScale;
+            ay += shock0.dy * 0.08 * movementScale;
+          }
+          if (g === 1){
+            ax += shock1.dx * 0.08 * movementScale;
+            ay += shock1.dy * 0.08 * movementScale;
+          }
+
+          ax += v.vx * 0.010 * (0.5 + movementScale);
+          ay += v.vy * 0.010 * (0.5 + movementScale);
+        }
+
+        ax += rand(-noise, noise) * 0.02;
+        ay += rand(-noise, noise) * 0.02;
+
+        v.ax = ax;
+        v.ay = ay;
+
+        v.vx += v.ax;
+        v.vy += v.ay;
+
+        if (scenario === 0){
+          v.vx *= 0.975;
+          v.vy *= 0.975;
+        } else {
+          v.vx *= 0.968;
+          v.vy *= 0.968;
+        }
+
+        v.x += v.vx;
+        v.y += v.vy;
+
+        const pad = 28;
+
+        if (v.x < pad){
+          v.x = pad;
+          v.vx *= -0.85;
+        }
+        if (v.x > W - pad){
+          v.x = W - pad;
+          v.vx *= -0.85;
+        }
+        if (v.y < pad){
+          v.y = pad;
+          v.vy *= -0.85;
+        }
+        if (v.y > H - pad){
+          v.y = H - pad;
+          v.vy *= -0.85;
+        }
+      }
+
+      updatePatternMatrix();
+    }
+
+    draw();
+    requestAnimationFrame(step);
+  }
+
+  function setScenario(n){
+    scenario = n;
+    [btn0, btn1, btn2].forEach((b, idx) => b.classList.toggle("active", idx === n));
+    initPositions();
+  }
+
+  btn0.addEventListener("click", () => setScenario(0));
+  btn1.addEventListener("click", () => setScenario(1));
+  btn2.addEventListener("click", () => setScenario(2));
+
+  pauseBtn.addEventListener("click", () => {
+    paused = !paused;
+    pauseBtn.textContent = paused ? "Resume" : "Pause";
+  });
+
+  resetBtn.addEventListener("click", () => initPositions());
+
+  linksBtn.addEventListener("click", () => {
+    showLinks = !showLinks;
+    linksBtn.textContent = `Correlations: ${showLinks ? "ON" : "OFF"}`;
+  });
+
+  crossBtn.addEventListener("click", () => {
+    showCross = !showCross;
+    crossBtn.textContent = `Show cross-loadings: ${showCross ? "ON" : "OFF"}`;
+    seedBaseLoadings();
+    rebuildMatrix();
+  });
+
+  setScenario(0);
+  requestAnimationFrame(step);
+})();
+</script>
+</body>
+</html>
