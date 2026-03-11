@@ -1,100 +1,127 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Statistics Visualization Demos</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Statistical Visualization Demos</title>
+  <style>
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Arial, sans-serif;
+      background: #0f172a;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px;
+      box-sizing: border-box;
+    }
 
-<style>
+    .wrapper {
+      max-width: 1000px;
+      width: 100%;
+      text-align: center;
+    }
 
-body{
-font-family: Arial, sans-serif;
-background:#0f172a;
-color:white;
-display:flex;
-flex-direction:column;
-align-items:center;
-justify-content:center;
-height:100vh;
-margin:0;
-}
+    h1 {
+      font-size: 2.2rem;
+      margin-bottom: 12px;
+    }
 
-h1{
-margin-bottom:10px;
-}
+    .subtitle {
+      color: #cbd5e1;
+      font-size: 1.05rem;
+      margin-bottom: 40px;
+    }
 
-p{
-color:#cbd5f5;
-margin-bottom:40px;
-}
+    .container {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
 
-.container{
-display:flex;
-gap:20px;
-flex-wrap:wrap;
-justify-content:center;
-}
+    .card {
+      background: #1e293b;
+      padding: 24px;
+      border-radius: 14px;
+      width: 280px;
+      box-sizing: border-box;
+      transition: transform 0.2s ease, background 0.2s ease;
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.2);
+    }
 
-.card{
-background:#1e293b;
-padding:25px;
-border-radius:12px;
-width:260px;
-text-align:center;
-transition:0.2s;
-}
+    .card:hover {
+      transform: translateY(-6px);
+      background: #334155;
+    }
 
-.card:hover{
-transform:scale(1.05);
-background:#334155;
-}
+    .card h2 {
+      margin-top: 0;
+      margin-bottom: 12px;
+      font-size: 1.25rem;
+    }
 
-a{
-text-decoration:none;
-color:white;
-font-weight:bold;
-}
+    .card p {
+      color: #cbd5e1;
+      font-size: 0.96rem;
+      line-height: 1.5;
+      min-height: 66px;
+    }
 
-.button{
-margin-top:15px;
-display:inline-block;
-padding:10px 15px;
-border-radius:8px;
-background:#3b82f6;
-}
+    .button {
+      display: inline-block;
+      margin-top: 16px;
+      padding: 10px 16px;
+      border-radius: 8px;
+      background: #3b82f6;
+      color: white;
+      text-decoration: none;
+      font-weight: bold;
+      transition: background 0.2s ease;
+    }
 
-.button:hover{
-background:#2563eb;
-}
+    .button:hover {
+      background: #2563eb;
+    }
 
-</style>
+    @media (max-width: 700px) {
+      h1 {
+        font-size: 1.8rem;
+      }
+
+      .card {
+        width: 100%;
+        max-width: 340px;
+      }
+    }
+  </style>
 </head>
-
 <body>
+  <div class="wrapper">
+    <h1>Statistical Visualization Demos</h1>
+    <p class="subtitle">Interactive visual tools for understanding quantitative methods</p>
 
-<h1>Statistical Visualization Demos</h1>
-<p>Interactive teaching tools for factor analysis concepts</p>
+    <div class="container">
+      <div class="card">
+        <h2>Rotation Intuition</h2>
+        <p>Visualize core rotation concepts and build intuition for factor orientation.</p>
+        <a class="button" href="Rotation.html">Open Demo</a>
+      </div>
 
-<div class="container">
+      <div class="card">
+        <h2>EFA Motion Demo</h2>
+        <p>See an animated illustration of how factors emerge and organize observed variables.</p>
+        <a class="button" href="EFA-Motion-Demo.html">Open Demo</a>
+      </div>
 
-<div class="card">
-<h2>Rotation Intuition</h2>
-<p>Understand orthogonal and oblique rotation visually.</p>
-<a class="button" href="Rotation.html">Open Demo</a>
-</div>
-
-<div class="card">
-<h2>EFA Motion Demo</h2>
-<p>Animated explanation of how factors emerge.</p>
-<a class="button" href="EFA-Motion-Demo.html">Open Demo</a>
-</div>
-
-<div class="card">
-<h2>ESEM Visualization</h2>
-<p>Interactive representation of cross-loadings.</p>
-<a class="button" href="ESEM-Visual-Representation.html">Open Demo</a>
-</div>
-
-</div>
-
+      <div class="card">
+        <h2>ESEM Visualization</h2>
+        <p>Explore an interactive representation of cross-loadings and ESEM structure.</p>
+        <a class="button" href="ESEM-Visual-Representation.html">Open Demo</a>
+      </div>
+    </div>
+  </div>
 </body>
 </html>
