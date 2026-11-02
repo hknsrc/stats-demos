@@ -1,0 +1,269 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="An open educational module on Bonferroni and Benjamini–Hochberg procedures. Explore family-wise error, false discovery rate, and appropriate interpretation through interactive animation.">
+<meta name="theme-color" content="#102b2c">
+<title>Bonferroni &amp; FDR | An Interactive Learning Module</title>
+<style>
+:root{color-scheme:light;--paper:#f5f3ed;--panel:#fffef9;--ink:#183435;--muted:#576968;--line:#d9dfd7;--green:#087c69;--green-soft:#e2f2e9;--amber:#a96013;--amber-soft:#fff0d8;--blue:#386da3;--blue-soft:#e7eef7;--red:#ac4050;--shadow:0 18px 60px #193a3410;--serif:Georgia,'Times New Roman',serif;--sans:ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
+*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.65}button,input,select{font:inherit}button,a,input,select{-webkit-tap-highlight-color:transparent}button{cursor:pointer}button:disabled{cursor:default;opacity:.35}button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible{outline:3px solid var(--blue);outline-offset:4px}button{color:inherit}a{color:var(--green);text-underline-offset:3px}strong{font-weight:650}[hidden]{display:none!important}.wrap{width:min(1160px,calc(100% - 64px));margin:auto}.topbar{display:flex;justify-content:space-between;align-items:center;padding:23px 0;border-bottom:1px solid var(--line);gap:20px}.brand{display:flex;gap:10px;align-items:center;font-weight:650;letter-spacing:.02em}.brand-mark{display:flex;gap:3px;align-items:end;height:23px}.brand-mark i{display:block;width:5px;border-radius:3px;background:var(--green)}.brand-mark i:nth-child(1){height:10px}.brand-mark i:nth-child(2){height:22px}.brand-mark i:nth-child(3){height:16px}.topnote{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}.hero{display:grid;grid-template-columns:1fr 300px;align-items:end;gap:32px;padding:42px 0 30px}.eyebrow{font-size:11px;letter-spacing:.16em;text-transform:uppercase;font-weight:700;color:var(--green);margin:0 0 12px}h1{font-family:var(--serif);font-size:clamp(36px,4.8vw,62px);line-height:1.08;font-weight:400;letter-spacing:-.045em;margin:0}h1 em{color:var(--green);font-weight:400}.intro{color:var(--muted);max-width:580px;margin:16px 0 0;font-size:15px}.hero-aside{padding:0 0 5px}.hero-aside .small-rule{width:40px;height:2px;background:var(--green);margin-bottom:14px}.hero-aside p{font-size:13px;color:var(--muted);margin:0}.hero-aside strong{color:var(--ink)}.chapters{display:flex;gap:6px;margin:4px 0 18px;flex-wrap:wrap}.chapter{border:1px solid transparent;background:none;padding:9px 15px;border-radius:25px;font-size:13px;color:var(--muted);transition:background .25s,color .25s}.chapter span{font-size:11px;opacity:.65;margin-right:7px}.chapter[aria-current="step"]{background:var(--ink);color:var(--panel)}.chapter:hover{border-color:var(--line)}.studio{background:var(--panel);border:1px solid var(--line);border-radius:24px;overflow:hidden;box-shadow:var(--shadow)}.studio-top{display:flex;justify-content:space-between;align-items:center;padding:16px 25px;border-bottom:1px solid var(--line);gap:15px}.live-label{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted)}.live-label i{width:6px;height:6px;border-radius:50%;background:var(--green)}.counter{font-size:12px;font-variant-numeric:tabular-nums;color:var(--muted)}.stage{display:grid;grid-template-columns:300px minmax(0,1fr);min-height:490px}.narrative{padding:30px 25px 26px;border-right:1px solid var(--line);display:flex;flex-direction:column;align-items:flex-start}.stage-number{font-family:var(--serif);font-size:40px;color:var(--green);line-height:1;margin-bottom:20px}.narrative h2{font-family:var(--serif);font-size:30px;line-height:1.15;letter-spacing:-.025em;font-weight:400;margin:0 0 16px}.narrative p{font-size:14px;color:var(--muted);margin:0 0 18px}.formula{background:var(--paper);border-radius:12px;padding:12px 14px;width:100%;font-size:15px;font-variant-numeric:tabular-nums;margin:0 0 18px;white-space:normal}.narrative .takeaway{margin-top:auto;padding-top:16px;border-top:1px solid var(--line);font-size:13px;color:var(--ink);width:100%}.board{min-width:0;position:relative;padding:26px 26px 18px;display:flex;flex-direction:column}.board-heading{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;margin-bottom:14px}.board-heading h3{margin:0;font-size:14px;font-weight:650}.board-heading .tag{border:1px solid var(--line);padding:2px 9px;border-radius:14px;font-size:11px;white-space:nowrap;color:var(--muted)}.legend{display:flex;gap:16px;flex-wrap:wrap;font-size:11px;color:var(--muted);min-height:24px}.legend span{display:flex;align-items:center;gap:5px}.key-dot{width:7px;height:7px;border-radius:50%;background:var(--ink)}.key-line{width:19px;border-top:2px solid var(--blue)}.key-line.dashed{border-top-style:dashed}.key-line.bon{border-color:var(--amber)}.key-line.bh{border-color:var(--green)}#chart{display:block;width:100%;height:305px;overflow:visible}#chart text{font-family:var(--sans);fill:var(--muted);font-size:11px}#chart .p-label{font-variant-numeric:tabular-nums;fill:var(--ink);font-weight:600}#chart .point{transition:transform 900ms cubic-bezier(.22,.68,.1,1)}#chart .point circle{transition:fill .5s,stroke .5s,opacity .5s}#chart .point text{transition:opacity .35s}#chart .point .hit{cursor:pointer}#chart .chart-axis-title{font-size:11px}#chart .halo{fill:none;stroke:var(--green);stroke-width:2.5}#chart .scan-guide{stroke:var(--green);stroke-width:1;stroke-dasharray:4 5}#chart .grid{stroke:var(--line);stroke-width:1}#chart .raw-line{stroke:var(--blue);stroke-width:1.5;stroke-dasharray:5 5;fill:none}#chart .bon-line{stroke:var(--amber);stroke-width:2;fill:none}#chart .bh-line{stroke:var(--green);stroke-width:2.5;fill:none}.chart-note{min-height:39px;font-size:12px;line-height:1.5;color:var(--muted);margin-top:5px;padding:10px 12px;background:var(--paper);border-radius:10px}.chart-note strong{color:var(--ink)}.point-picks{display:flex;gap:5px;flex-wrap:wrap;margin-top:10px}.pick{background:none;border:1px solid var(--line);border-radius:7px;padding:4px 7px;font-size:11px;min-width:33px}.pick[aria-pressed="true"]{background:var(--green-soft);border-color:var(--green);color:var(--green)}.budget{display:flex;gap:4px;height:12px;margin-bottom:8px}.budget span{flex:1;background:var(--amber);border-radius:2px;transform-origin:left;animation:budget-in .8s both}.budget-label{font-size:11px;color:var(--amber);margin-bottom:9px}@keyframes budget-in{from{transform:scaleX(0)}to{transform:scaleX(1)}}.results{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:13px 0 0}.result{padding:9px 12px;background:var(--paper);border-radius:10px}.result span{display:block;font-size:11px;color:var(--muted)}.result b{font-size:23px;line-height:1.3;font-weight:500;font-variant-numeric:tabular-nums}.result small{font-size:11px;color:var(--muted);margin-left:4px}.result.bon b{color:var(--amber)}.result.bh b{color:var(--green)}.player{border-top:1px solid var(--line);padding:17px 25px 18px;background:var(--panel)}.progress-steps{display:flex;gap:5px;margin-bottom:16px}.progress-step{flex:1;height:5px;background:var(--line);border-radius:4px;overflow:hidden;border:0;padding:0}.progress-step i{height:100%;width:0;display:block;background:var(--green)}.progress-step:focus-visible{outline-offset:5px}.controls{display:flex;align-items:center;gap:9px;flex-wrap:wrap}.btn{border:1px solid var(--line);background:none;border-radius:30px;min-height:42px;padding:9px 17px;font-size:13px;display:inline-flex;align-items:center;justify-content:center;gap:9px;transition:background .2s,transform .2s}.btn:hover:not(:disabled){background:var(--paper)}.btn.main{background:var(--ink);color:var(--panel);border-color:var(--ink);min-width:133px}.btn.main:hover{background:var(--green);border-color:var(--green)}.btn.icon{width:42px;padding:9px}.btn svg{width:15px;height:15px;fill:currentColor}.player-tail{margin-left:auto;display:flex;align-items:center;gap:16px;color:var(--muted);font-size:11px}.speed{display:flex;gap:6px;align-items:center}.speed select{font-size:12px;border:1px solid var(--line);border-radius:7px;background:var(--panel);color:var(--ink);padding:5px}.keyboard{font-size:11px}.risk-panel{padding:8px 0 0;display:flex;flex-direction:column;align-items:center;flex:1}.risk-ring{width:min(100%,255px);height:auto;display:block}.risk-ring .track{stroke:var(--line)}.risk-ring .amount{stroke:var(--red);transition:stroke-dashoffset .7s ease}.risk-ring text{fill:var(--ink);font-family:var(--sans);text-anchor:middle}.risk-ring .pct{font-size:40px;letter-spacing:-2px;font-weight:500}.risk-ring .ring-label{font-size:11px;fill:var(--muted)}.risk-controls{width:min(100%,380px);padding:8px 0 0}.range-title{display:flex;justify-content:space-between;font-size:13px}.range-title output{font-weight:650;font-variant-numeric:tabular-nums}input[type=range]{width:100%;accent-color:var(--green);margin:12px 0 8px;height:23px;cursor:pointer}.risk-assumption{font-size:11px;text-align:center;max-width:390px;color:var(--muted)}.decision-panel{padding:8px 0;flex:1}.decisions{display:grid;grid-template-columns:1fr 1fr;gap:12px}.decision{display:flex;flex-direction:column;text-align:left;gap:12px;background:var(--panel);border:1px solid var(--line);padding:18px 16px;border-radius:15px;line-height:1.5}.decision[aria-pressed=true]{border-color:var(--green);box-shadow:0 0 0 1px var(--green);background:var(--green-soft)}.decision .d-label{font-size:10px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}.decision strong{font-family:var(--serif);font-size:22px;line-height:1.2;font-weight:400}.decision .d-example{font-size:12px;color:var(--muted)}.decision-answer{margin-top:20px;padding:18px;background:var(--paper);border-radius:14px}.decision-answer .answer-label{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--green)}.decision-answer h4{font-size:20px;line-height:1.2;margin:7px 0 10px;font-family:var(--serif);font-weight:400}.decision-answer p{font-size:13px;color:var(--muted);margin:0}.decision-small{font-size:11px;color:var(--muted);margin:16px 0 0}.below{display:grid;grid-template-columns:1fr 1fr;gap:32px;margin:30px 0 26px}.lesson{border-top:1px solid var(--line);padding-top:16px}.lesson .lesson-no{font-size:10px;letter-spacing:.14em;color:var(--green)}.lesson h3{font-family:var(--serif);font-weight:400;font-size:22px;line-height:1.2;margin:7px 0 10px}.lesson p{font-size:13px;color:var(--muted);margin:0}.lesson strong{color:var(--ink)}details{border-top:1px solid var(--line);padding:16px 0;font-size:13px}summary{cursor:pointer;font-weight:600;list-style-position:outside;margin-left:17px}details p{color:var(--muted);max-width:900px}.table-scroll{overflow-x:auto;margin-top:20px}table{width:100%;border-collapse:collapse;font-size:12px;font-variant-numeric:tabular-nums;text-align:right}caption{text-align:left;margin-bottom:10px;font-size:12px;color:var(--muted)}td,th{padding:9px 12px;border-bottom:1px solid var(--line);white-space:nowrap}td:first-child,th:first-child{text-align:left}th{font-weight:600}td.chosen{color:var(--green);font-weight:650}.sources{margin:15px 0;padding-left:20px;font-size:12px;color:var(--muted)}.sources li{margin:8px 0}footer{padding:23px 0 32px;display:flex;justify-content:space-between;gap:18px;border-top:1px solid var(--line);font-size:11px;color:var(--muted)}.visually-hidden{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}.fade-in{animation:fade-in .55s ease both}@keyframes fade-in{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}noscript{display:block;padding:20px;background:var(--amber-soft);color:var(--ink)}
+@media(max-width:1000px){.stage{grid-template-columns:260px minmax(0,1fr)}.narrative{padding:26px 20px}.narrative h2{font-size:27px}.board{padding:25px 20px 18px}.keyboard{display:none}.hero{grid-template-columns:1fr 250px}}
+@media(max-width:760px){.wrap{width:calc(100% - 32px)}.hero{grid-template-columns:1fr;padding:29px 0 22px;gap:20px}.hero-aside{display:none}h1{font-size:43px}.intro{font-size:14px}.topbar{padding:17px 0}.topnote{font-size:9px;max-width:105px;text-align:right}.stage{grid-template-columns:1fr}.narrative{border-right:0;border-bottom:1px solid var(--line);padding:23px 23px 20px;display:grid;grid-template-columns:36px 1fr;gap:0 12px}.stage-number{grid-row:1 / 3;font-size:32px;margin-top:2px}.narrative h2{font-size:27px;margin-bottom:10px}.narrative p{grid-column:2;margin-bottom:14px}.formula{grid-column:2;width:auto;font-size:14px;margin-bottom:12px}.narrative .takeaway{grid-column:2;font-size:12px;padding-top:11px}.board{padding:21px 20px 18px;min-height:420px}.chapter{padding:8px 10px;font-size:11px}.studio-top{padding:13px 21px}.player{padding:16px 20px}.studio{border-radius:20px}.below{gap:22px}.board-heading{margin-bottom:10px}.decisions{gap:9px}.decision{padding:17px 13px}.decision strong{font-size:21px}}
+@media(max-width:440px){.wrap{width:calc(100% - 24px)}h1{font-size:38px}.brand{font-size:13px}.chapter{padding:7px 9px}.chapter span{display:none}.chapters{gap:2px}.studio-top{padding:12px 16px}.narrative{padding:21px 16px;grid-template-columns:30px 1fr;gap:0 9px}.narrative h2{font-size:25px}.narrative p{font-size:13px}.board{padding:20px 12px 16px}.board-heading h3{font-size:12px}.board-heading .tag{font-size:10px}.legend{font-size:10px;gap:12px}.player{padding:15px 14px}.controls{gap:6px}.btn{padding:8px 13px}.btn.main{min-width:113px}.player-tail{margin-left:auto;gap:4px}.speed label{display:none}.below{grid-template-columns:1fr;gap:20px}.decision{padding:15px 12px}.decision strong{font-size:19px}.decision .d-example{font-size:11px}.results{gap:5px}.result{padding:8px}.result span{font-size:10px}.risk-panel{padding-top:5px}.risk-ring{max-width:230px}.board{min-height:418px}footer{flex-direction:column;gap:7px}}
+@media(max-width:760px){.narrative{display:block}.stage-number{font-size:24px;margin:0 0 12px}.narrative h2{margin-bottom:12px}.narrative p{margin-bottom:16px}.formula{width:100%;margin-bottom:15px}.narrative .takeaway{padding-top:13px}}
+html:not(.ready) #chart .point{transition:none}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
+@media print{.player,.chapters,.point-picks{display:none}.studio{box-shadow:none}.wrap{width:100%}.stage{display:block}.narrative{border:0}.board{break-inside:avoid}body{background:white}}
+
+.objectives{display:flex;flex-wrap:wrap;gap:12px 24px;padding:0 0 24px;font-size:12px;color:var(--muted)}.objectives span{display:flex;align-items:center;gap:8px}.objectives b{font-size:10px;color:var(--green);font-weight:650}.educational-label{display:inline-block;margin-top:13px;border:1px solid var(--line);border-radius:14px;padding:3px 10px;font-size:10px;color:var(--green);letter-spacing:.04em}.check-section{padding:25px 0;border-top:1px solid var(--line)}.check-section h2{font-family:var(--serif);font-size:24px;line-height:1.25;font-weight:400;margin:0 0 8px}.check-section p{font-size:13px;color:var(--muted);max-width:750px;margin:0 0 15px}.check-options{display:flex;gap:10px;flex-wrap:wrap}.check-options button[aria-pressed="true"]{border-color:var(--green);background:var(--green-soft)}.check-feedback{font-size:13px;max-width:800px;margin-top:14px;color:var(--ink);min-height:24px}.license-copy{font-family:var(--sans);white-space:pre-wrap;overflow-wrap:anywhere;font-size:11px;line-height:1.65;background:var(--paper);border:1px solid var(--line);padding:18px;border-radius:10px;max-width:900px}.license-note{font-size:12px;color:var(--muted)}.source-note{font-size:12px;color:var(--muted)}.footer-links{display:flex;gap:14px;flex-wrap:wrap}.skip-link{position:absolute;top:-80px;left:16px;background:var(--panel);color:var(--ink);padding:10px 16px;z-index:10}.skip-link:focus{top:12px}
+@media(max-width:760px){.objectives{gap:8px 18px;padding-bottom:20px}.hero{padding-bottom:23px}.objectives span{font-size:11px}}
+@media(max-width:440px){.objectives{display:grid;gap:8px}.topnote{max-width:110px}.board-heading{flex-wrap:wrap}.keyboard{display:none}.brand{font-size:12px}.check-options .btn{width:100%}}
+</style>
+</head>
+<body>
+<a class="skip-link" href="#module">Skip to the learning module</a>
+<noscript>Enable JavaScript to explore the animation. Bonferroni controls the probability of at least one false positive in a family of tests; FDR procedures control the expected proportion of false discoveries among rejected hypotheses.</noscript>
+<div class="wrap">
+<header class="topbar"><div class="brand"><span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span>Research Methods Studio</div><span class="topnote">Open educational module</span></header>
+<section class="hero" aria-labelledby="page-title"><div><p class="eyebrow">Understanding multiple testing</p><h1>Bonferroni &amp;<br><em>False Discovery Rate.</em></h1><p class="intro">One set of p-values. Two approaches to error control. Follow the decisions step by step, then connect the method to the research question.</p></div><aside class="hero-aside"><div class="small-rule"></div><p><strong>Designed for learning.</strong><br>For students, instructors, and researchers.<br>About 2 minutes · Explore at your own pace.</p><span class="educational-label">Illustrative data · No research findings</span></aside></section>
+<div class="objectives" aria-label="Learning objectives"><span><b>01</b> Distinguish FWER from FDR</span><span><b>02</b> Trace Bonferroni and BH decisions</span><span><b>03</b> Choose an error-control target</span></div>
+<nav class="chapters" aria-label="Learning module chapters"><button type="button" class="chapter" data-chapter="0" aria-current="step"><span>01</span>The problem</button><button type="button" class="chapter" data-chapter="2"><span>02</span>Bonferroni</button><button type="button" class="chapter" data-chapter="4"><span>03</span>FDR / BH</button><button type="button" class="chapter" data-chapter="8"><span>04</span>Compare</button><button type="button" class="chapter" data-chapter="9"><span>05</span>Choose a target</button></nav>
+<main class="studio" id="module" aria-label="Interactive Bonferroni and FDR learning module">
+  <div class="studio-top"><span class="live-label"><i aria-hidden="true"></i><span id="section-name">The multiple-testing problem</span></span><span class="counter" id="step-count">01 / 10</span></div>
+  <div class="stage">
+    <section class="narrative" aria-live="polite" aria-atomic="true"><div class="stage-number" id="scene-number">01</div><h2 id="scene-title"></h2><p id="scene-description"></p><div class="formula" id="scene-formula"></div><div class="takeaway" id="scene-takeaway"></div></section>
+    <div class="board">
+      <div class="board-heading"><h3 id="board-title">Ten tests in one family</h3><span class="tag" id="board-tag">Illustrative data</span></div>
+      <section id="chart-panel" aria-label="P-values compared with decision thresholds">
+        <div class="legend"><span><i class="key-dot"></i>Raw p</span><span id="legend-raw"><i class="key-line dashed"></i>Unadjusted 0.05</span><span id="legend-bon" hidden><i class="key-line bon"></i>Bonferroni</span><span id="legend-bh" hidden><i class="key-line bh"></i>BH threshold</span></div>
+        <div id="budget-panel" hidden><div class="budget" id="budget" aria-hidden="true"></div><div class="budget-label">Family α = 0.05 → 10 equal shares → per-test threshold = 0.005</div></div>
+        <svg id="chart" role="img" aria-labelledby="chart-title chart-desc"><title id="chart-title">Ten p-values and decision thresholds</title><desc id="chart-desc">Points show raw p-values; lines show decision thresholds. Select a test below the chart to inspect its values and decision.</desc><g id="chart-axes"></g><g id="chart-shading"></g><path id="raw-path" class="raw-line"></path><path id="bon-path" class="bon-line"></path><path id="bh-path" class="bh-line"></path><g id="chart-scan"></g><g id="chart-points"></g></svg>
+        <div class="point-picks" id="point-picks" aria-label="Select a test to inspect its values"></div>
+        <div class="chart-note" id="chart-note" aria-live="polite"></div>
+        <div class="results" id="results" hidden><div class="result"><span>Unadjusted</span><b>8</b><small>/ 10</small></div><div class="result bon"><span>Bonferroni</span><b>1</b><small>/ 10</small></div><div class="result bh"><span>BH · FDR</span><b>5</b><small>/ 10</small></div></div>
+      </section>
+      <section id="risk-panel" class="risk-panel" hidden aria-label="Theoretical false-positive risk with multiple tests">
+        <svg class="risk-ring" viewBox="0 0 260 250" role="img" aria-labelledby="risk-title"><title id="risk-title">Probability of at least one false positive</title><circle class="track" cx="130" cy="119" r="91" stroke-width="13" fill="none"></circle><circle class="amount" id="risk-amount" cx="130" cy="119" r="91" stroke-width="13" stroke-linecap="round" fill="none" transform="rotate(-90 130 119)" stroke-dasharray="571.77" stroke-dashoffset="571.77"></circle><text class="pct" x="130" y="122" id="risk-value">64.2%</text><text class="ring-label" x="130" y="148">at least one false positive</text><text class="ring-label" x="130" y="232" id="risk-ring-note">Unadjusted α = 0.05 per test</text></svg>
+        <div class="risk-controls"><label class="range-title" for="risk-m"><span>Number of tests (m)</span><output id="risk-m-value" for="risk-m">20</output></label><input id="risk-m" type="range" min="1" max="100" value="20" step="1"><div class="risk-assumption">All null hypotheses are true; tests are independent.<br>This is a theoretical calculation, not a simulation.</div></div>
+      </section>
+      <section id="decision-panel" class="decision-panel" hidden aria-label="Choose an error-control target for the research goal">
+        <div class="decisions"><button type="button" class="decision" data-goal="fwer" aria-pressed="true"><span class="d-label">Priority A</span><strong>Limit the chance of any false claim.</strong><span class="d-example">Example: a prespecified family of primary efficacy claims in a randomized trial.</span></button><button type="button" class="decision" data-goal="fdr" aria-pressed="false"><span class="d-label">Priority B</span><strong>Identify candidates for follow-up.</strong><span class="d-example">Example: screening many digital health indicators to prioritize future studies.</span></button></div>
+        <div class="decision-answer" aria-live="polite"><span class="answer-label" id="answer-label"></span><h4 id="answer-title"></h4><p id="answer-body"></p></div><p class="decision-small">Define the test family and error target in the analysis plan. Do not switch methods after seeing results simply to obtain significance.</p>
+      </section>
+    </div>
+  </div>
+  <div class="player"><div class="progress-steps" id="progress-steps" aria-label="Jump to a step"></div><div class="controls"><button type="button" class="btn main" id="play" aria-label="Play the animation"><svg viewBox="0 0 20 20" aria-hidden="true"><path id="play-icon" d="M5 3 L17 10 L5 17 Z"></path></svg><span id="play-text">Play</span></button><button type="button" class="btn icon" id="prev" aria-label="Previous step">←</button><button type="button" class="btn icon" id="next" aria-label="Next step">→</button><button type="button" class="btn icon" id="restart" aria-label="Restart from the first step">↺</button><div class="player-tail"><span class="keyboard">Space: play / pause · ← → steps</span><div class="speed"><label for="speed">Speed</label><select id="speed" aria-label="Playback speed"><option value="0.75">0.75×</option><option value="1" selected>1×</option><option value="1.5">1.5×</option><option value="2">2×</option></select></div></div></div></div>
+</main>
+<section class="below" aria-label="Two different error-control targets"><article class="lesson"><span class="lesson-no">FWER · FAMILY-WISE ERROR RATE</span><h3>“Could any rejection be false?”</h3><p>Bonferroni limits the probability of <strong>at least one false positive</strong> in the test family. With α = 0.05, that probability is at most 5%; it need not equal 5%.</p></article><article class="lesson"><span class="lesson-no">FDR · FALSE DISCOVERY RATE</span><h3>“What share of discoveries is false?”</h3><p>FDR is the <strong>expected proportion</strong> of false positives among rejected hypotheses. Under suitable assumptions, BH controls this expectation at q. The realized proportion in a single study can be higher.</p></article></section>
+<section class="check-section" aria-labelledby="check-title"><p class="eyebrow">Retrieval practice</p><h2 id="check-title">Check your understanding</h2><p>A BH procedure finds k = 5. The second-ranked p-value exceeds its own rank-specific threshold. Must that hypothesis be excluded?</p><div class="check-options" role="group" aria-labelledby="check-title"><button type="button" class="btn" data-check="yes" aria-pressed="false">Yes, because it exceeds its own threshold.</button><button type="button" class="btn" data-check="no" aria-pressed="false">No. All ranks up to k are selected.</button></div><div class="check-feedback" id="check-feedback" role="status" aria-live="polite">Choose an answer to see the explanation.</div></section>
+<details id="data-details"><summary>Inspect the calculations · raw and adjusted p-values</summary><p>These ten tests form one illustrative test family. They are constructed teaching values, not participant data or results from a published study. We do not specify which null hypotheses are true, so these p-values alone cannot reveal the realized false-positive count or proportion.</p><div class="table-scroll"><table><caption>α = q = 0.05 · A check mark indicates rejection of H₀ under that method.</caption><thead><tr><th scope="col">Rank / test</th><th scope="col">Raw p</th><th scope="col">Bonf. p</th><th scope="col">BH p</th><th scope="col">Bonf.</th><th scope="col">BH</th></tr></thead><tbody id="data-rows"></tbody></table></div><p>Bonferroni: p<sub>adj</sub> = min(1, m × p). BH: for sorted p-values, take the cumulative minimum from the largest rank backward: p<sub>adj,(i)</sub> = min(1, min<sub>j ≥ i</sub>[m × p<sub>(j)</sub> / j]). Compare adjusted p-values with 0.05.</p><p><strong>No qualifying BH rank?</strong> If no p<sub>(i)</sub> satisfies p<sub>(i)</sub> ≤ iq/m, reject none. The present example has k = 5.</p></details>
+<details id="references"><summary>Assumptions, interpretation, and references</summary><p><strong>Assumptions.</strong> With valid individual p-values, Bonferroni provides strong FWER control regardless of dependence among tests. Standard BH controls FDR under independence and specific positive-dependence conditions; arbitrary correlation does not automatically satisfy these conditions. Under more general dependence, procedures such as Benjamini–Yekutieli (BY) may be considered.</p><p><strong>Power.</strong> Stricter error control can increase missed effects. FDR control does not repair an underpowered design: sample size, effect size, and measurement quality still matter. When FWER control is the goal, Holm is an alternative that is at least as powerful as classical Bonferroni.</p><p><strong>The test family.</strong> A family groups tests considered together for an inferential purpose. Membership should follow the research claims and analysis plan, rather than merely the placement of tests in a table. Test count alone does not determine the appropriate error target.</p><p class="source-note">The explanations and diagrams in this module were created for teaching. The references below credit the statistical methods; their figures, article text, and publisher assets are not reproduced.</p><ol class="sources"><li>Benjamini, Y., &amp; Hochberg, Y. (1995). Controlling the false discovery rate: A practical and powerful approach to multiple testing. <em>Journal of the Royal Statistical Society: Series B, 57</em>(1), 289–300. <a href="https://doi.org/10.1111/j.2517-6161.1995.tb02031.x" target="_blank" rel="noopener noreferrer">Original method ↗</a></li><li>Benjamini, Y., &amp; Yekutieli, D. (2001). The control of the false discovery rate in multiple testing under dependency. <em>The Annals of Statistics, 29</em>(4), 1165–1188. <a href="https://doi.org/10.1214/aos/1013699998" target="_blank" rel="noopener noreferrer">Dependence conditions ↗</a></li><li>Holm, S. (1979). A simple sequentially rejective multiple test procedure. <em>Scandinavian Journal of Statistics, 6</em>(2), 65–70. <a href="https://www.jstor.org/stable/4615733" target="_blank" rel="noopener noreferrer">FWER alternative ↗</a></li><li>R Core Team. <a href="https://stat.ethz.ch/R-manual/R-devel/library/stats/html/p.adjust.html" target="_blank" rel="noopener noreferrer">p.adjust: Adjust P-values for Multiple Comparisons ↗</a></li></ol></details>
+<details id="reuse"><summary>Educational purpose, reuse, and licensing</summary><p><strong>Purpose.</strong> This independent educational resource supports classroom teaching and self-directed learning. It illustrates error-control procedures; it is not a data-analysis service or a report of empirical findings. No institutional or publisher endorsement is implied.</p><p><strong>Original educational content.</strong> The original explanatory text and diagrams in this module are made available under <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="license noopener noreferrer">Creative Commons Attribution 4.0 International (CC BY 4.0)</a>, to the extent applicable rights exist. You may share and adapt this content with appropriate credit, a link to the license, and an indication of changes. This notice does not relicense the referenced publications.</p><p><strong>Suggested attribution.</strong> Hakan Sarac (2026). <em>Bonferroni &amp; False Discovery Rate: An Interactive Learning Module.</em> Include the address of the hosted module, CC BY 4.0, and any changes made.</p><p><strong>Implementation.</strong> Original HTML, CSS, and JavaScript are licensed under the MIT License below. The module uses system fonts and original vector diagrams, with no bundled third-party images, logos, font files, or JavaScript libraries. It makes no analytics or tracking requests.</p><pre class="license-copy">MIT License
+
+Copyright (c) 2026 Hakan Sarac
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.</pre><p class="license-note">The code license applies to the original implementation; CC BY 4.0 applies to the original educational text and diagrams. Referenced works retain their respective rights. <a href="https://opensource.org/license/mit" target="_blank" rel="noopener noreferrer">MIT License reference ↗</a></p></details>
+<footer><span>Hakan Sarac · Educational module · 2026</span><span class="footer-links"><span>Illustrative data · Works offline</span><a href="#reuse">CC BY 4.0 content · MIT code</a></span></footer>
+</div>
+<script>
+
+'use strict';
+(()=>{
+const $=id=>document.getElementById(id), NS='http://www.w3.org/2000/svg';
+const reduced=window.matchMedia('(prefers-reduced-motion: reduce)');
+const values=[.041,.001,.09,.012,.048,.023,.08,.011,.034,.019];
+const tests=values.map((p,i)=>({id:'T'+(i+1),p,original:i}));
+const ordered=[...tests].sort((a,b)=>a.p-b.p),m=tests.length,alpha=.05,q=.05;
+let maxRank=0,minAdj=1;
+ordered.forEach((d,i)=>{d.rank=i+1;d.bon=Math.min(1,m*d.p);if(d.p<=q*d.rank/m)maxRank=d.rank;});
+for(let i=m-1;i>=0;i--){minAdj=Math.min(minAdj,m*ordered[i].p/(i+1));ordered[i].bh=Math.min(1,minAdj);}
+const scenes=[
+  {
+    "group": 0,
+    "title": "One family, ten tests.",
+    "description": "Suppose you test ten indicators for associations with physical activity. Using p ≤ 0.05 for each test makes eight results appear statistically significant before adjustment.",
+    "formula": "10 tests → 8 unadjusted rejections",
+    "takeaway": "Statistical significance does not establish that a finding is true, important, or causal.",
+    "board": "Ten tests in one family",
+    "note": "Points show raw p-values. Results <strong>on or below the dashed line</strong> meet the unadjusted 0.05 criterion.",
+    "duration": 8500
+  },
+  {
+    "group": 0,
+    "title": "More tests, more chances for error.",
+    "description": "Even when no effects exist, individual tests can produce false positives. With 20 independent tests at 0.05, the chance of at least one false positive is about 64%.",
+    "formula": "FWER = 1 − (1 − 0.05)ᵐ",
+    "takeaway": "Move the slider. A 5% per-test error rate does not keep the family-wise error rate at 5%.",
+    "board": "How does test count affect error risk?",
+    "note": "",
+    "duration": 11500
+  },
+  {
+    "group": 1,
+    "title": "Bonferroni divides the error budget.",
+    "description": "Set the family-wise error target to 5%. Bonferroni divides that budget equally across ten tests, lowering each decision threshold from 0.05 to 0.005.",
+    "formula": "α / m = 0.05 / 10 = 0.005",
+    "takeaway": "Target: at most a 5% chance of one or more false positives anywhere in this test family.",
+    "board": "One fixed threshold for every test",
+    "note": "The orange line is the <strong>0.005 Bonferroni threshold</strong>. It applies to every test.",
+    "duration": 9000
+  },
+  {
+    "group": 1,
+    "title": "A stricter threshold retains one result.",
+    "description": "Only T2 has p ≤ 0.005. One of the eight initial results remains significant. The other seven are not necessarily false; they do not meet this error-control criterion.",
+    "formula": "p = 0.001 ≤ 0.005 → reject H₀",
+    "takeaway": "Stricter error control can also increase the chance of missing real effects.",
+    "board": "Bonferroni: 1 of 10 hypotheses rejected",
+    "note": "<strong>T2 is selected.</strong> Failure to reject the other null hypotheses is not proof of no effect.",
+    "duration": 10500
+  },
+  {
+    "group": 2,
+    "title": "BH first orders the p-values.",
+    "description": "Apply Benjamini–Hochberg to the same values. The points move from their original positions into ascending order. Test identities and p-values remain unchanged.",
+    "formula": "p₍₁₎ ≤ p₍₂₎ ≤ … ≤ p₍₁₀₎",
+    "takeaway": "FDR is an error measure. Benjamini–Hochberg (BH) is a procedure designed to control it.",
+    "board": "The same tests, ordered by p-value",
+    "note": "The horizontal axis now shows <strong>p-value rank</strong>: T2 first, T8 second, T4 third, and so on.",
+    "duration": 8500
+  },
+  {
+    "group": 2,
+    "title": "The thresholds increase with rank.",
+    "description": "Set the FDR target to q = 0.05. Compare rank i with i × q / m. The thresholds are 0.005 at rank 1, 0.010 at rank 2, and 0.050 at rank 10.",
+    "formula": "Threshold at rank i = (i / 10) × 0.05",
+    "takeaway": "These comparisons are an intermediate step. They are not ten separate final decisions.",
+    "board": "BH thresholds rise with p-value rank",
+    "note": "The green line joins the <strong>i × q / m</strong> thresholds. Next, identify the largest qualifying rank.",
+    "duration": 10500
+  },
+  {
+    "group": 2,
+    "title": "Find the largest qualifying rank.",
+    "description": "Scan backward from rank 10. The first qualifying rank is 5: p₍₅₎ = 0.023 ≤ 0.025. Therefore, the largest qualifying rank is k = 5.",
+    "formula": "k = max{i : p₍ᵢ₎ ≤ i × q / m}",
+    "takeaway": "Do not stop at the first failure when reading from the smallest p-value upward. BH uses the largest qualifying rank.",
+    "board": "Backward scan: rank 10 → rank 5",
+    "note": "",
+    "duration": 12500
+  },
+  {
+    "group": 2,
+    "title": "Reject all hypotheses through k.",
+    "description": "Once k = 5 is identified, reject the null hypotheses at ranks 1–5. T8 has p = 0.011, above its own 0.010 threshold, but is selected because it falls within that prefix.",
+    "formula": "Selected ranks: 1, 2, 3, 4, 5",
+    "takeaway": "The p-values do not reveal which discoveries are false. FDR control concerns the expected false-discovery proportion.",
+    "board": "BH: 5 of 10 hypotheses rejected",
+    "note": "Key detail: <strong>rank 2 is above its own threshold but is still selected.</strong> BH selects every rank up to k.",
+    "duration": 13000
+  },
+  {
+    "group": 3,
+    "title": "Different targets, different decisions.",
+    "description": "The same ten p-values yield eight unadjusted rejections, one with Bonferroni, and five with BH. More BH rejections do not by themselves show that those findings are false.",
+    "formula": "FWER: P(V ≥ 1) · FDR: E[V / max(R, 1)]",
+    "takeaway": "V = false rejections; R = all rejections. When R = 0, the false-discovery proportion is defined as zero.",
+    "board": "Compare the decisions on the same data",
+    "note": "<strong>q = 0.05 does not guarantee that 5% of this study’s discoveries are false.</strong> Under appropriate assumptions, it bounds the expected proportion across repetitions.",
+    "duration": 14000
+  },
+  {
+    "group": 4,
+    "title": "Start with the inferential goal.",
+    "description": "Choose an error target by considering the research claims, the cost of false positives, and the cost of missed effects. Test count is relevant, but does not determine the target by itself.",
+    "formula": "Research goal → error target → procedure",
+    "takeaway": "Confirmatory work does not automatically require classical Bonferroni. A large number of tests does not automatically justify FDR.",
+    "board": "Which error-control target fits the goal?",
+    "note": "",
+    "duration": 15000
+  }
+];
+const groupLabels=['The multiple-testing problem','Bonferroni · FWER','Benjamini–Hochberg · FDR','Comparing decisions','Choosing an error-control target'];
+const state={scene:0,elapsed:0,playing:false,last:0,frame:0,scan:10,selected:null,speed:1};
+const pointEls=new Map(),progressEls=[];
+let width=600,height=305,coords=null,lineFrame=0,bonCurrent=null,bhCurrent=null;
+function svgEl(name,attrs={},content=''){const e=document.createElementNS(NS,name);for(const [k,v] of Object.entries(attrs))e.setAttribute(k,v);if(content)e.textContent=content;return e;}
+for(const d of tests){const g=svgEl('g',{'class':'point','data-test':d.id});g.append(svgEl('circle',{'class':'halo',r:13,opacity:0}),svgEl('circle',{'class':'mark',r:6,fill:'var(--ink)',stroke:'var(--panel)','stroke-width':2}),svgEl('text',{'class':'p-label','text-anchor':'middle',y:-14},d.p.toFixed(3)),svgEl('circle',{'class':'hit',r:18,fill:'transparent'}));g.querySelector('.hit').addEventListener('click',()=>selectTest(d.id));$('chart-points').append(g);pointEls.set(d.id,g);}
+for(let i=0;i<10;i++){const btn=document.createElement('button');btn.className='progress-step';btn.setAttribute('aria-label','Step '+(i+1)+': '+scenes[i].title);const fill=document.createElement('i');btn.append(fill);btn.addEventListener('click',()=>navigate(i));$('progress-steps').append(btn);progressEls.push({btn,fill});}
+for(let i=0;i<10;i++){const segment=document.createElement('span');segment.style.animationDelay=(i*65)+'ms';$('budget').append(segment);}
+for(const d of ordered){const tr=document.createElement('tr');tr.innerHTML='<th scope="row">'+d.rank+' / '+d.id+'</th><td>'+d.p.toFixed(3)+'</td><td>'+d.bon.toFixed(3)+'</td><td>'+d.bh.toFixed(3)+'</td><td'+(d.bon<=alpha?' class="chosen"':'')+'>'+(d.bon<=alpha?'✓':'Not rejected')+'</td><td'+(d.bh<=q?' class="chosen"':'')+'>'+(d.bh<=q?'✓':'Not rejected')+'</td>';$('data-rows').append(tr);}
+function makePicks(){const parent=$('point-picks');parent.replaceChildren();const order=state.scene>=4?ordered:tests;for(const d of order){const b=document.createElement('button');b.className='pick';b.textContent=d.id;b.setAttribute('aria-label',d.id+', p = '+d.p.toFixed(3));b.setAttribute('aria-pressed',String(state.selected===d.id));b.addEventListener('click',()=>selectTest(d.id));parent.append(b);}}
+function selectTest(id){pause();state.selected=state.selected===id?null:id;makePicks();paintPoints();updateNote();}
+function updateNote(){
+if(state.selected){const d=tests.find(x=>x.id===state.selected);let msg='<strong>'+d.id+'</strong> · p = '+d.p.toFixed(3);if(state.scene>=4)msg+=' · rank '+d.rank+' · BH threshold '+(q*d.rank/m).toFixed(3);if(state.scene===2||state.scene===3)msg+=' · Bonferroni: '+(d.p<=alpha/m?'reject H₀ ✓':'do not reject H₀');if(state.scene>=7)msg+=' · BH: '+(d.rank<=maxRank?'selected ✓':'not selected');$('chart-note').innerHTML=msg;return;}
+if(state.scene===6){const d=ordered[state.scan-1],cut=q*d.rank/m;const pass=d.p<=cut;$('chart-note').innerHTML='<strong>'+'Rank '+d.rank+':</strong> p = '+d.p.toFixed(3)+(pass?' ≤ ':' > ')+cut.toFixed(3)+' → '+(pass?'<strong>qualifies; largest rank k = '+d.rank+'</strong>':'does not qualify; inspect the preceding rank');return;}
+$('chart-note').innerHTML=scenes[state.scene].note;
+}
+function colorsFor(d){const s=state.scene;if(s===0)return d.p<=alpha?'var(--blue)':'var(--muted)';if(s===2||s===3)return d.p<=alpha/m?'var(--amber)':'var(--muted)';if(s===7||s===8)return d.rank<=maxRank?'var(--green)':'var(--muted)';return 'var(--ink)';}
+function paintPoints(){if(!coords)return;const s=state.scene;for(const d of tests){const g=pointEls.get(d.id),pos=s>=4?d.rank-1:d.original;g.style.transform='translate('+coords.x(pos)+'px,'+coords.y(d.p)+'px)';g.querySelector('.mark').setAttribute('fill',colorsFor(d));const focus=state.selected===d.id||(s===6&&d.rank===state.scan);g.querySelector('.halo').setAttribute('opacity',focus?1:0);g.querySelector('.mark').setAttribute('r',focus?7:6);g.querySelector('.p-label').setAttribute('opacity',width>=480||focus?1:0);}}
+function linePath(arr){return arr.map((y,i)=>(i?'L':'M')+coords.x(i)+','+coords.y(y)).join(' ');}
+function animateLines(bonTo,bhTo,animate){cancelAnimationFrame(lineFrame);const bonFrom=bonCurrent||Array(10).fill(.05),bhFrom=bhCurrent||Array(10).fill(.005);if(!animate||reduced.matches){bonCurrent=bonTo;bhCurrent=bhTo;$('bon-path').setAttribute('d',linePath(bonTo));$('bh-path').setAttribute('d',linePath(bhTo));return;}let start;function frame(now){if(!start)start=now;const t=Math.min((now-start)/850,1),ease=1-Math.pow(1-t,3);bonCurrent=bonTo.map((v,i)=>bonFrom[i]+(v-bonFrom[i])*ease);bhCurrent=bhTo.map((v,i)=>bhFrom[i]+(v-bhFrom[i])*ease);$('bon-path').setAttribute('d',linePath(bonCurrent));$('bh-path').setAttribute('d',linePath(bhCurrent));if(t<1)lineFrame=requestAnimationFrame(frame);}lineFrame=requestAnimationFrame(frame);}
+function drawChart(animate=true){
+ width=Math.max(260,$('chart-panel').getBoundingClientRect().width);height=305;const left=47,right=16,top=26,bottom=48;const x=i=>left+16+i*(width-left-right-32)/9,y=p=>top+(height-top-bottom)*(1-p/.1);coords={x,y};$('chart').setAttribute('viewBox','0 0 '+width+' '+height);
+ const axis=$('chart-axes');axis.replaceChildren();for(const v of [0,.025,.05,.075,.1]){axis.append(svgEl('line',{x1:left,y1:y(v),x2:width-right,y2:y(v),'class':'grid'}));axis.append(svgEl('text',{x:left-9,y:y(v)+4,'text-anchor':'end'},v===0?'0':v.toFixed(3)));}
+ axis.append(svgEl('text',{x:left,y:12,'class':'chart-axis-title'},'Raw p-value'));
+ for(let i=0;i<10;i++){if(width<420&&i%2===1&&i!==9)continue;axis.append(svgEl('text',{x:x(i),y:height-bottom+21,'text-anchor':'middle'},state.scene>=4?String(i+1):'T'+(i+1)));}
+ axis.append(svgEl('text',{x:(left+width-right)/2,y:height-5,'text-anchor':'middle','class':'chart-axis-title'},state.scene>=4?'p-value rank (i), smallest to largest':'Test identity · original order'));
+ $('raw-path').setAttribute('d',linePath(Array(10).fill(alpha)));$('bon-path').style.opacity=state.scene===2||state.scene===3||state.scene===8?1:0;$('bh-path').style.opacity=state.scene>=5?1:0;
+ const shade=$('chart-shading');shade.replaceChildren();if(state.scene===7||state.scene===8){const end=(x(maxRank-1)+x(maxRank))/2;shade.append(svgEl('rect',{x:x(0)-15,y:top,width:end-x(0)+15,height:height-top-bottom,rx:8,fill:'var(--green-soft)'}));}
+ const targets=Array(10).fill(state.scene<2?alpha:alpha/m),bhTargets=Array.from({length:10},(_,i)=>state.scene>=5?q*(i+1)/m:alpha/m);animateLines(targets,bhTargets,animate);paintPoints();drawScan();
+}
+function drawScan(){const scan=$('chart-scan');scan.replaceChildren();if(state.scene!==6||!coords)return;const rank=state.scan,d=ordered[rank-1],x=coords.x(rank-1),cy=coords.y(d.p),cutY=coords.y(q*rank/m);scan.append(svgEl('line',{x1:x,y1:20,x2:x,y2:257,'class':'scan-guide'}),svgEl('circle',{cx:x,cy:cutY,r:4,fill:'var(--green)'}));}
+function setGoal(goal){const fwer=goal==='fwer';for(const b of document.querySelectorAll('[data-goal]'))b.setAttribute('aria-pressed',String(b.dataset.goal===goal));$('answer-label').textContent=fwer?'FWER control':'FDR control';$('answer-title').textContent=fwer?'Consider Bonferroni or Holm.':'Consider Benjamini–Hochberg.';$('answer-body').textContent=fwer?'Control the chance of any false positive in the family. Bonferroni is simple; Holm is an alternative with at least as much power for the same FWER target.':'Control the expected proportion of false positives among discoveries. This often retains more candidates for follow-up. Plan validation and consider whether the dependence assumptions are appropriate.';}
+function updateRisk(){const n=Number($('risk-m').value),risk=1-Math.pow(.95,n);$('risk-value').textContent=(100*risk).toFixed(1)+'%';$('risk-m-value').value=n;$('risk-amount').style.strokeDashoffset=571.77*(1-risk);$('risk-title').textContent='With '+n+' independent tests, the probability of at least one false positive is '+(100*risk).toFixed(1)+' percent';}
+function renderScene(animate=true){const s=scenes[state.scene];state.selected=null;state.scan=10;
+ $('scene-number').textContent=String(state.scene+1).padStart(2,'0');$('scene-title').textContent=s.title;$('scene-description').textContent=s.description;$('scene-formula').textContent=s.formula;$('scene-takeaway').textContent=s.takeaway;$('board-title').textContent=s.board;$('step-count').textContent=String(state.scene+1).padStart(2,'0')+' / 10';$('section-name').textContent=groupLabels[s.group];$('board-tag').textContent=state.scene===1?'All null hypotheses true':state.scene===9?'Select a priority':'m = 10 · α = q = 0.05';
+ for(const b of document.querySelectorAll('.chapter')){const current=scenes[Number(b.dataset.chapter)].group===s.group;if(current)b.setAttribute('aria-current','step');else b.removeAttribute('aria-current');}
+ $('chart-panel').hidden=state.scene===1||state.scene===9;$('risk-panel').hidden=state.scene!==1;$('decision-panel').hidden=state.scene!==9;$('budget-panel').hidden=state.scene!==2;$('results').hidden=state.scene!==8;$('legend-bon').hidden=!(state.scene===2||state.scene===3||state.scene===8);$('legend-bh').hidden=state.scene<5;
+ $('prev').disabled=state.scene===0;$('next').disabled=state.scene===9;
+ if(animate&&!reduced.matches){for(const el of [$('scene-title'),$('scene-description'),$('scene-formula')])el.animate([{opacity:0,transform:'translateY(7px)'},{opacity:1,transform:'translateY(0)'}],{duration:450,easing:'ease-out'});}
+ if(!$('chart-panel').hidden){makePicks();drawChart(animate);updateNote();}if(state.scene===1)updateRisk();updateProgress();updatePlay();
+}
+function updateProgress(){const duration=scenes[state.scene].duration;progressEls.forEach(({btn,fill},i)=>{fill.style.width=i<state.scene?'100%':i>state.scene?'0%':(100*state.elapsed/duration)+'%';if(i===state.scene)btn.setAttribute('aria-current','step');else btn.removeAttribute('aria-current');});}
+function updatePlay(){const playing=state.playing;$('play-text').textContent=playing?'Pause':state.scene===9&&state.elapsed>=scenes[9].duration?'Replay':'Play';$('play').setAttribute('aria-label',playing?'Pause the animation':'Play the animation');$('play-icon').setAttribute('d',playing?'M4 3 H8 V17 H4 Z M12 3 H16 V17 H12 Z':'M5 3 L17 10 L5 17 Z');}
+function pause(){state.playing=false;cancelAnimationFrame(state.frame);updatePlay();}
+function navigate(index){pause();state.scene=Math.max(0,Math.min(scenes.length-1,index));state.elapsed=0;renderScene();}
+function frame(now){if(!state.playing)return;const dt=Math.min(now-state.last,150)*state.speed;state.last=now;state.elapsed+=dt;
+ if(state.scene===6){const rank=Math.max(maxRank,10-Math.floor(state.elapsed/1200));if(rank!==state.scan){state.scan=rank;paintPoints();drawScan();updateNote();}}
+ if(state.elapsed>=scenes[state.scene].duration){if(state.scene===scenes.length-1){state.elapsed=scenes[state.scene].duration;updateProgress();pause();return;}state.scene++;state.elapsed=0;renderScene();}
+ updateProgress();state.frame=requestAnimationFrame(frame);
+}
+function toggle(){if(state.playing){pause();return;}if(state.scene===scenes.length-1&&state.elapsed>=scenes[state.scene].duration){state.scene=0;state.elapsed=0;renderScene();}state.playing=true;state.last=performance.now();updatePlay();state.frame=requestAnimationFrame(frame);}
+document.querySelectorAll('.chapter').forEach(b=>b.addEventListener('click',()=>navigate(Number(b.dataset.chapter))));document.querySelectorAll('[data-goal]').forEach(b=>b.addEventListener('click',()=>{pause();setGoal(b.dataset.goal);}));$('play').addEventListener('click',toggle);$('prev').addEventListener('click',()=>navigate(state.scene-1));$('next').addEventListener('click',()=>navigate(state.scene+1));$('restart').addEventListener('click',()=>navigate(0));$('speed').addEventListener('change',()=>state.speed=Number($('speed').value));$('risk-m').addEventListener('input',()=>{pause();updateRisk();});
+document.addEventListener('keydown',e=>{if(e.target.closest('input,select,textarea,button,summary,a'))return;if(e.code==='Space'){e.preventDefault();toggle();}if(e.code==='ArrowRight'){e.preventDefault();navigate(state.scene+1);}if(e.code==='ArrowLeft'){e.preventDefault();navigate(state.scene-1);}});
+document.addEventListener('visibilitychange',()=>{if(document.hidden)pause();});
+const observer=new ResizeObserver(()=>{if(!$('chart-panel').hidden&&Math.abs($('chart-panel').getBoundingClientRect().width-width)>.5)drawChart(false);});observer.observe($('chart-panel'));
+
+document.querySelectorAll('[data-check]').forEach(button=>button.addEventListener('click',()=>{
+  pause();
+  const correct=button.dataset.check==='no';
+  document.querySelectorAll('[data-check]').forEach(b=>b.setAttribute('aria-pressed',String(b===button)));
+  $('check-feedback').textContent=correct
+    ? 'Correct. BH rejects every hypothesis through the largest qualifying rank k. A point may exceed its own rank-specific threshold and still be selected.'
+    : 'Not quite. The rank-specific comparisons identify the largest qualifying rank, k. Once k = 5 is found, all hypotheses at ranks 1–5 are rejected, including rank 2.';
+}));
+setGoal('fwer');renderScene(false);requestAnimationFrame(()=>requestAnimationFrame(()=>document.documentElement.classList.add('ready')));
+})();
+
+</script>
+</body>
+</html>
