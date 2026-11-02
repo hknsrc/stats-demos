@@ -1,4 +1,4 @@
-# Statistical Visualization Demos
+# Interactive Research Methods Studio
 
 This repository contains a set of small interactive visualizations designed to help students develop intuition about key concepts in quantitative methods and factor analysis.
 
