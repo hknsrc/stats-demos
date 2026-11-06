@@ -1,184 +1,198 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>ESEM Mini Game: CFA vs ESEM</title>
-  <style>
-    :root { --pad: 12px; --radius: 14px; }
-    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; margin: 0; background:#f6f7fb; color:#111; }
-    header { padding: 18px 16px; background: white; border-bottom: 1px solid #e7e7ef; position: sticky; top:0; z-index: 5; }
-    header h1 { margin: 0 0 6px; font-size: 18px; }
-    header p { margin: 0; color:#444; font-size: 13px; line-height: 1.3; }
-    .wrap { max-width: 1100px; margin: 0 auto; padding: 16px; }
-    .grid { display: grid; grid-template-columns: 1.1fr 1.9fr; gap: 16px; align-items: start; }
-    @media (max-width: 920px){ .grid { grid-template-columns: 1fr; } }
-
-    .card { background: white; border: 1px solid #e7e7ef; border-radius: var(--radius); padding: var(--pad); box-shadow: 0 1px 0 rgba(0,0,0,.03); }
-    .row { display:flex; gap: 10px; flex-wrap: wrap; align-items:center; }
-    .pill { padding: 6px 10px; border-radius: 999px; background:#eef2ff; border: 1px solid #d9ddff; font-size: 12px; color:#1f2a6b; }
-    .btn { border: 1px solid #d7d7e6; background:#fff; border-radius: 10px; padding: 8px 10px; cursor: pointer; font-weight: 600; }
-    .btn:hover { background:#f4f5ff; }
-    .btn.primary { background:#1f6feb; border-color:#1f6feb; color:white; }
-
-    .sectionTitle { font-weight: 800; margin: 0 0 8px; font-size: 14px; }
-    .subtle { color:#555; font-size: 12px; line-height: 1.4; }
-
-    .columns { display:grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
-
-    .bucket { border: 2px dashed #d7d7e6; border-radius: var(--radius); min-height: 120px; padding: 10px; background:#fafbff; }
-    .bucket h3 { margin: 0 0 8px; font-size: 13px; }
-
-    .items { display:flex; flex-wrap: wrap; gap: 8px; }
-    .item {
-      user-select: none;
-      padding: 8px 10px;
-      border-radius: 12px;
-      background:#fff;
-      border: 1px solid #e1e1ef;
-      cursor: grab;
-      font-size: 12px;
-    }
-    .item .meta { display:block; color:#666; font-size: 11px; margin-top: 4px; }
-
-    .kpi { display:grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 10px; }
-    .kpi .box { background:#fbfbff; border: 1px solid #ececff; border-radius: 12px; padding: 10px; }
-    .kpi .val { font-size: 18px; font-weight: 900; }
-    .kpi .lab { font-size: 11px; color:#555; }
-#edu-note {
-  position: fixed;
-  bottom: 8px;
-  right: 12px;
-  background: transparent;
-  padding: 0;
-  border: none;
-  box-shadow: none;
-  font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
-}
-
-#edu-note .line1 {
-  font-size: 10.5px;
-  color: #9ca3af;
-  font-style: italic;
-}
-
-#edu-note .line2 {
-  font-size: 11.5px;
-  color: #374151;
-}
-
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#f6f5ef">
+<meta name="description" content="An interactive ESEM mini game. Assign twelve items to three factors, get immediate feedback, and explore a schematic CFA versus ESEM comparison.">
+<title>ESEM Mini Game: CFA vs ESEM</title>
+<style>
+:root{--paper:#f6f5ef;--surface:#fdfdf9;--ink:#243d32;--muted:#5e7065;--line:#d7ded3;--green:#176e60;--pale:#eaf2e9;--orange:#955427;--orange-bg:#fbefe2;--blue:#446c80;--serif:Georgia,"Times New Roman",serif;--sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
+*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:14px/1.6 var(--sans)}button,input{font:inherit}button,a,input{touch-action:manipulation}button{cursor:pointer}button:disabled{cursor:default;opacity:.45}button:focus-visible,a:focus-visible,input:focus-visible,summary:focus-visible{outline:3px solid var(--green);outline-offset:4px}a{color:var(--green);text-underline-offset:4px}button{color:inherit}h1,h2,h3,p{margin:0}svg{display:block;max-width:100%}[hidden]{display:none!important}.shell{max-width:1260px;width:calc(100% - 72px);margin:auto}.topbar{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:19px 0;border-bottom:1px solid var(--line);font-size:11px}.back{text-decoration:none;font-weight:650}.topnote{color:var(--muted);font-family:ui-monospace,Consolas,monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase}.hero{display:flex;align-items:flex-end;justify-content:space-between;gap:30px;padding:28px 0 25px}.eyebrow{color:var(--green);font-size:10px;letter-spacing:.16em;text-transform:uppercase;font-weight:650;margin-bottom:9px}h1{font-family:var(--serif);font-weight:400;font-size:46px;letter-spacing:-.04em;line-height:1.1}h1 em{color:var(--green);font-weight:400}.lead{color:var(--muted);max-width:660px;margin-top:10px;font-size:13px}.steps{display:flex;gap:20px;list-style:none;padding:0;margin:0 0 3px;color:var(--muted);font-size:11px;white-space:nowrap}.steps b{color:var(--green);margin-right:6px;font-family:ui-monospace,Consolas,monospace}.panel{background:var(--surface);border:1px solid var(--line);border-radius:6px}.controls{display:grid;grid-template-columns:1fr 1.1fr .95fr;margin-bottom:20px}.control{padding:19px 22px}.control+.control{border-left:1px solid var(--line)}.control-title{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.1em;font-weight:700;margin-bottom:10px}.segment{display:inline-flex;gap:3px;padding:3px;background:#edf0e8;border:1px solid var(--line);border-radius:5px}.segment button{min-height:38px;padding:7px 19px;border:1px solid transparent;background:transparent;border-radius:3px;font-size:12px;font-weight:650}.segment button[aria-pressed="true"]{color:#fff;background:var(--ink);border-color:var(--ink)}.help{font-size:11px;line-height:1.6;color:var(--muted);margin-top:8px;max-width:350px}.range-label{display:flex;align-items:center;justify-content:space-between;gap:15px;font-size:12px}.range-label output{font-family:ui-monospace,Consolas,monospace;font-size:16px;color:var(--green);font-weight:700}input[type="range"]{width:100%;accent-color:var(--green);height:24px;margin:4px 0 0}.check{display:flex;align-items:center;gap:8px;font-size:12px;min-height:30px;cursor:pointer}.check input{accent-color:var(--green);width:16px;height:16px}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:9px}.small-btn{background:transparent;border:1px solid var(--line);border-radius:4px;min-height:36px;padding:6px 12px;font-size:11px;font-weight:650}.small-btn:not(:disabled):hover{background:var(--pale);border-color:#9aae9c}.board-top{display:flex;justify-content:space-between;align-items:flex-start;gap:24px;margin-bottom:11px}.section-title{font-family:var(--serif);font-size:24px;letter-spacing:-.025em;font-weight:400;line-height:1.2}.instructions{font-size:12px;color:var(--muted);margin-top:5px}.progress-block{width:240px;max-width:42%;flex-shrink:0}.progress-text{display:flex;justify-content:space-between;font-size:11px;margin-bottom:7px;gap:10px}.progress-text strong{font-weight:650}.progress-track{height:4px;background:#e1e7dc;border-radius:3px;overflow:hidden}.progress-fill{height:100%;width:0;background:var(--green);transition:width .2s}.feedback{min-height:49px;display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-left:3px solid #91a48f;background:#f0f3ec;padding:11px 15px;font-size:12px;line-height:1.6;border-radius:4px;margin-bottom:14px}.feedback[data-tone="success"]{background:#eaf3e8;border-left-color:var(--green)}.feedback[data-tone="warning"]{background:var(--orange-bg);border-left-color:var(--orange);color:#78451f}.feedback strong{font-weight:650}.selected-bar{display:flex;justify-content:space-between;align-items:center;gap:12px;font-size:11px;margin-bottom:12px;color:var(--muted);min-height:24px}.selected-bar b{color:var(--ink)}.clear-selection{border:0;background:none;text-decoration:underline;text-underline-offset:3px;font-size:11px;color:var(--green);min-height:28px}.board{display:grid;grid-template-columns:1.05fr repeat(3,1fr);gap:12px;align-items:stretch}.zone{background:var(--surface);border:1px solid var(--line);border-radius:6px;min-width:0;transition:border-color .15s,background .15s}.zone.over{border:2px solid var(--green);background:#e9f4e7}.zone.ready{border-color:#8aa88e}.zone-head{padding:15px 15px 12px;border-bottom:1px solid var(--line)}.zone-heading{display:flex;justify-content:space-between;align-items:center;gap:8px}.zone h3{font-family:var(--serif);font-size:19px;font-weight:400;letter-spacing:-.025em}.badge{font-family:ui-monospace,Consolas,monospace;font-size:10px;color:var(--muted);border:1px solid var(--line);padding:1px 6px;border-radius:3px}.zone-subtitle{font-size:10px;color:var(--muted);margin-top:3px}.destination{width:100%;margin-top:11px;min-height:36px;border:1px solid #cbd7c7;background:#eef3ea;border-radius:4px;font-size:11px;font-weight:650}.destination:hover{background:#dfeada}.destination[aria-disabled="true"]{color:#6c7d71;background:#f3f4ef}.items{padding:12px;display:grid;grid-template-columns:1fr;gap:8px;align-content:start;min-height:264px}.pool .items{grid-template-columns:repeat(2,minmax(0,1fr))}.item{display:flex;flex-direction:column;align-items:flex-start;justify-content:center;text-align:left;gap:3px;background:#fff;border:1px solid var(--line);border-radius:4px;min-height:57px;padding:9px 10px;cursor:grab;user-select:none;min-width:0;font-size:12px;position:relative}.item:hover{border-color:#6f9678;background:#f9fcf5}.item[aria-pressed="true"]{outline:2px solid var(--green);outline-offset:1px;background:#edf5e9}.item:active{cursor:grabbing}.item.correct{border-left:3px solid var(--green);background:#f3f8ef}.item.incorrect{border-left:3px solid var(--orange);background:#fff8ed}.item-label{font-weight:650}.item-meta{font-size:10px;color:var(--muted)}.item-status{font-size:10px;line-height:1.4}.correct .item-status{color:var(--green)}.incorrect .item-status{color:var(--orange)}.empty{font-size:11px;line-height:1.7;color:#6b7e6c;border:1px dashed #c9d6c7;border-radius:4px;padding:17px 11px;text-align:center;grid-column:1/-1}.complete{color:var(--green);font-weight:650}.board-summary{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;padding:12px 0 22px;font-size:11px;color:var(--muted)}.status-key{display:flex;gap:16px}.status-key span:before{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--green);margin-right:6px}.status-key span:last-child:before{background:var(--orange)}kbd{font:10px ui-monospace,Consolas,monospace;border:1px solid var(--line);border-bottom-width:2px;padding:1px 4px;border-radius:3px;background:#fcfcf8}.results{display:grid;grid-template-columns:1.4fr 1fr;gap:20px;margin-top:2px}.comparison,.explanation{padding:23px}.section-kicker{color:var(--green);font-size:10px;text-transform:uppercase;letter-spacing:.13em;margin-bottom:7px}.result-note{font-size:12px;color:var(--muted);margin:8px 0 15px}.models{display:grid;grid-template-columns:1fr 1fr;gap:12px}.model-result{padding:17px;border:1px solid var(--line);border-radius:5px;background:#f6f7f0}.model-result.active{border-color:var(--green);background:#edf4e9;box-shadow:inset 0 3px 0 var(--green)}.model-result h3{font-size:12px;display:flex;align-items:center;justify-content:space-between}.current{font:9px ui-monospace,Consolas,monospace;color:var(--green);text-transform:uppercase}.metric-label{font-size:10px;color:var(--muted);margin-top:15px}.metric-value{font-family:var(--serif);font-size:34px;line-height:1.2;letter-spacing:-.035em;margin:3px 0}.metric-value span{font-family:var(--sans);font-size:11px;color:var(--muted);letter-spacing:0}.inflation-value{font:600 17px ui-monospace,Consolas,monospace;margin-top:4px}.interpretation{border-top:1px solid var(--line);padding-top:14px;margin-top:17px;font-size:12px;line-height:1.8;color:var(--muted)}.schematic{width:100%;margin-top:8px}.schematic text{font-family:var(--sans)}.legend{display:flex;gap:12px;flex-wrap:wrap;font-size:10px;color:var(--muted)}.legend span:before{content:"";display:inline-block;vertical-align:middle;margin-right:6px;width:17px;border-top:2px solid var(--green)}.legend span:last-child:before{border-color:var(--orange);border-top-style:dashed}.model-explanation{font-size:12px;line-height:1.8;color:var(--muted);margin-top:12px}.explanation .help{max-width:none}.method-note{margin:20px 0 28px;font-size:11px;color:var(--muted);line-height:1.8;padding:16px 20px;border:1px solid var(--line);border-radius:5px}.method-note strong{color:var(--ink)}details{margin-top:8px}summary{cursor:pointer;color:var(--green);width:fit-content}details p{margin-top:9px;max-width:950px}.formula{font-family:ui-monospace,Consolas,monospace;background:#eef1e8;padding:10px 13px;border-radius:4px;font-size:10px;line-height:2;margin-top:10px;overflow-wrap:anywhere}.footer{display:flex;justify-content:space-between;gap:20px;border-top:1px solid var(--line);padding:19px 0 28px;font-size:10px;color:var(--muted)}.footer strong{color:var(--ink)}.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}.skip{position:absolute;left:12px;top:-100px;background:var(--ink);color:#fff;padding:10px;z-index:9}.skip:focus{top:8px}
+@media(max-width:1050px){.shell{width:calc(100% - 44px)}.hero{align-items:flex-start}.steps{flex-direction:column;gap:4px}.control{padding:17px}.board{gap:9px}.zone-head{padding:12px}.items{padding:9px}.pool .items{grid-template-columns:1fr}.results{grid-template-columns:1.2fr 1fr}.item{font-size:11px}.controls{grid-template-columns:1fr 1fr}.control:last-child{grid-column:1/-1;border-top:1px solid var(--line);border-left:0;display:flex;align-items:center;justify-content:space-between;gap:10px}.control:last-child .control-title{margin:0}.control:last-child .actions{margin:0}}
+@media(max-width:720px){.shell{width:calc(100% - 32px)}.topbar{padding:15px 0}.topnote{font-size:9px}.hero{flex-direction:column;gap:17px;padding:25px 0 23px}h1{font-size:38px}.lead{font-size:12px}.steps{flex-direction:row;gap:20px}.controls{grid-template-columns:1fr}.control+.control{border-left:0;border-top:1px solid var(--line)}.control:last-child{display:block;grid-column:auto}.control:last-child .control-title{margin-bottom:8px}.control:last-child .actions{margin-top:9px}.board-top{flex-direction:column;gap:14px}.progress-block{max-width:none;width:100%}.board{grid-template-columns:1fr 1fr;gap:12px}.pool{grid-column:1/-1}.pool .items{grid-template-columns:repeat(3,minmax(0,1fr));min-height:0}.zone:last-child{grid-column:1/-1}.zone:last-child .items{grid-template-columns:repeat(2,minmax(0,1fr));min-height:100px}.items{min-height:150px}.item{font-size:12px;min-height:59px}.feedback{font-size:12px;min-height:65px}.selected-bar{align-items:flex-start}.results{grid-template-columns:1fr}.comparison,.explanation{padding:18px}.models{gap:8px}.model-result{padding:13px}.section-title{font-size:23px}.board-summary{align-items:flex-start}.keyboard-tip{display:none}.metric-value{font-size:32px}.footer{flex-direction:column;gap:4px}.method-note{padding:14px;font-size:11px}.actions .small-btn{min-height:40px}.destination{min-height:42px}.clear-selection{min-height:40px}.segment button{min-height:42px}}
+@media(max-width:370px){.pool .items{grid-template-columns:repeat(2,minmax(0,1fr))}h1{font-size:34px}.topnote{display:none}.models{grid-template-columns:1fr}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{transition:none!important;animation:none!important}}
+</style>
 </head>
-
 <body>
-<header>
-  <h1>ESEM Mini Game: CFA (ICM) vs ESEM</h1>
-  <p>Drag items into factors and see how allowing cross-loadings changes model fit and factor correlations.</p>
-</header>
-
-<div class="wrap">
-  <div class="grid">
-
-    <!-- LEFT PANEL -->
-    <div class="card">
-      <div class="sectionTitle">1) Choose model</div>
-      <div class="row">
-        <button class="btn primary" onclick="setMode('CFA')">CFA (ICM)</button>
-        <button class="btn" onclick="setMode('ESEM')">ESEM</button>
-        <span class="pill" id="modeLabel">Current: CFA</span>
-      </div>
-
-      <div class="sectionTitle" style="margin-top:14px">2) Real-world complexity</div>
-      <div class="subtle">
-        In reality, items often slightly reflect more than one factor.
-        This slider represents <b>true cross-loadings</b>.
-      </div>
-
-      <input type="range" min="0" max="30" value="10" oninput="updateCL(this.value)">
-      <div class="subtle">Cross-loading level: <b id="clVal">0.10</b></div>
-
-      <div class="sectionTitle" style="margin-top:14px">Goal</div>
-      <div class="subtle">
-        • Assign items to their intended factor<br>
-        • Compare CFA vs ESEM when cross-loadings exist
-      </div>
-    </div>
-
-    <!-- RIGHT PANEL -->
-    <div class="card">
-      <div class="sectionTitle">Item Pool</div>
-      <div class="items" id="pool"></div>
-
-      <div class="columns" style="margin-top:12px">
-        <div class="bucket" ondrop="drop(event,'F1')" ondragover="allowDrop(event)">
-          <h3>F1 (Emotional)</h3><div class="items" id="F1"></div>
-        </div>
-        <div class="bucket" ondrop="drop(event,'F2')" ondragover="allowDrop(event)">
-          <h3>F2 (Social)</h3><div class="items" id="F2"></div>
-        </div>
-        <div class="bucket" ondrop="drop(event,'F3')" ondragover="allowDrop(event)">
-          <h3>F3 (Physical)</h3><div class="items" id="F3"></div>
-        </div>
-      </div>
-
-      <div class="kpi">
-        <div class="box"><div class="val" id="fit">—</div><div class="lab">Model Fit</div></div>
-        <div class="box"><div class="val" id="infl">—</div><div class="lab">Correlation Inflation</div></div>
-        <div class="box"><div class="val" id="acc">—</div><div class="lab">Correct Assignments</div></div>
-      </div>
-    </div>
-
-  </div>
+<a class="skip" href="#assignment">Skip to the assignment board</a>
+<div class="shell">
+<nav class="topbar" aria-label="Breadcrumb"><a class="back" href="./index.html">← Interactive Research Methods Studio</a><span class="topnote">Learning through interaction</span></nav>
+<header class="hero"><div><p class="eyebrow">Factor structure / Interactive exercise</p><h1>ESEM <em>Mini Game</em></h1><p class="lead">Assign items to their primary factors. Then explore what changes when CFA fixes secondary loadings to zero and ESEM allows them.</p></div><ol class="steps"><li><b>01</b>Place &amp; review</li><li><b>02</b>Compare models</li></ol></header>
+<main>
+<section class="controls panel" aria-label="Game settings">
+<div class="control"><h2 class="control-title">1 / Choose a model</h2><div class="segment" role="group" aria-label="Model"><button id="mode-CFA" type="button" data-mode="CFA" aria-pressed="true">CFA (ICM)</button><button id="mode-ESEM" type="button" data-mode="ESEM" aria-pressed="false">ESEM</button></div><p class="help" id="mode-help">Secondary loadings are fixed at zero. Your item assignments stay the same when you switch models.</p></div>
+<div class="control"><label class="control-title" for="complexity">2 / Real-world complexity</label><div class="range-label"><span>Hypothetical cross-loading level</span><output id="clVal" for="complexity">0.10</output></div><input id="complexity" type="range" min="0" max="30" step="1" value="10" aria-describedby="complexity-help"><p class="help" id="complexity-help">Change the scenario from 0.00 to 0.30. This represents secondary influences in the illustrative data-generating scenario.</p></div>
+<div class="control"><h2 class="control-title">Practice controls</h2><label class="check"><input id="hints" type="checkbox" checked>Show target hints</label><div class="actions"><button class="small-btn" id="undo" type="button" disabled>Undo last change</button><button class="small-btn" id="reset" type="button" disabled>Reset assignments</button></div></div>
+</section>
+<section id="assignment" aria-labelledby="assignment-title" tabindex="-1">
+<div class="board-top"><div><h2 class="section-title" id="assignment-title">Give each item a primary home.</h2><p class="instructions" id="board-instructions">Drag an item, or select it and use a destination button. <span id="target-guide">Items 1–4 → F1; 5–8 → F2; 9–12 → F3.</span></p></div><div class="progress-block"><div class="progress-text"><strong id="placed-count">0 / 12 placed</strong><span id="correct-count">0 correct · 0 to review</span></div><div class="progress-track" role="progressbar" aria-label="Items placed" aria-valuemin="0" aria-valuemax="12" aria-valuenow="0" id="progress"><div class="progress-fill" id="progress-fill"></div></div></div></div>
+<div id="feedback" class="feedback" role="status" aria-live="polite" aria-atomic="true" data-tone="neutral">Start with any item. Select it, then choose its primary factor below.</div>
+<div class="selected-bar"><span id="selection-label">No item selected. <b>Click or tap an item to begin.</b></span><button type="button" class="clear-selection" id="clear" hidden>Cancel selection</button></div>
+<div class="board" aria-describedby="board-instructions">
+<section class="zone pool" data-zone="pool" aria-labelledby="pool-title"><div class="zone-head"><div class="zone-heading"><h3 id="pool-title">Item Pool</h3><span id="count-pool" class="badge">12</span></div><p class="zone-subtitle">Unassigned items</p><button type="button" class="destination" data-destination="pool" aria-disabled="true">Return selected item</button></div><div class="items" id="pool"></div></section>
+<section class="zone" data-zone="F1" aria-labelledby="F1-title"><div class="zone-head"><div class="zone-heading"><h3 id="F1-title">F1</h3><span id="count-F1" class="badge">0</span></div><p class="zone-subtitle">Emotional</p><button type="button" class="destination" data-destination="F1" aria-disabled="true">Assign to F1</button></div><div class="items" id="F1"></div></section>
+<section class="zone" data-zone="F2" aria-labelledby="F2-title"><div class="zone-head"><div class="zone-heading"><h3 id="F2-title">F2</h3><span id="count-F2" class="badge">0</span></div><p class="zone-subtitle">Social</p><button type="button" class="destination" data-destination="F2" aria-disabled="true">Assign to F2</button></div><div class="items" id="F2"></div></section>
+<section class="zone" data-zone="F3" aria-labelledby="F3-title"><div class="zone-head"><div class="zone-heading"><h3 id="F3-title">F3</h3><span id="count-F3" class="badge">0</span></div><p class="zone-subtitle">Physical</p><button type="button" class="destination" data-destination="F3" aria-disabled="true">Assign to F3</button></div><div class="items" id="F3"></div></section>
 </div>
-
+<div class="board-summary"><div class="status-key"><span>✓ Correct primary factor</span><span>! Review assignment</span></div><span class="keyboard-tip">Select with <kbd>Enter</kbd> or <kbd>Space</kbd>; move with <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd>; return with <kbd>P</kbd>; cancel with <kbd>Esc</kbd>.</span></div>
+</section>
+<section class="results" aria-label="Model comparison and explanation">
+<div class="comparison panel"><p class="section-kicker">02 / Hold assignments constant</p><h2 class="section-title">CFA vs ESEM</h2><p class="result-note" id="results-gate">Place all 12 items to unlock the illustrative comparison. Correctness updates after every move.</p><div class="models">
+<section class="model-result active" id="result-CFA" aria-labelledby="CFA-result-title"><h3 id="CFA-result-title">CFA (ICM) <span class="current" id="current-CFA">Selected</span></h3><p class="metric-label">Illustrative fit score</p><p class="metric-value"><strong id="fit-CFA">—</strong> <span>/ 100</span></p><p class="metric-label">Illustrative inflation index</p><p class="inflation-value" id="infl-CFA">—</p></section>
+<section class="model-result" id="result-ESEM" aria-labelledby="ESEM-result-title"><h3 id="ESEM-result-title">ESEM <span class="current" id="current-ESEM" hidden>Selected</span></h3><p class="metric-label">Illustrative fit score</p><p class="metric-value"><strong id="fit-ESEM">—</strong> <span>/ 100</span></p><p class="metric-label">Illustrative inflation index</p><p class="inflation-value" id="infl-ESEM">—</p></section>
+</div><p class="interpretation" id="interpretation">First distinguish an item's primary factor from its smaller secondary influences. Allowing secondary influences does not make a wrong primary assignment correct.</p></div>
+<div class="explanation panel"><p class="section-kicker">What changes?</p><h2 class="section-title" id="schematic-title">Secondary paths: fixed at zero</h2><svg class="schematic" viewBox="0 0 480 190" role="img" aria-labelledby="diagram-title diagram-description"><title id="diagram-title">Schematic CFA measurement model</title><desc id="diagram-description">An illustrative item has a primary loading on F1. Its secondary paths from F2 and F3 are fixed at zero in CFA.</desc><g stroke="#176e60" stroke-width="2"><path d="M80 55L217 135"/></g><g id="secondary-paths" stroke="#955427" stroke-width="1.8" stroke-dasharray="5 5" hidden><path d="M240 58V133M400 55L263 135"/></g><g fill="#eaf2e9" stroke="#7e9b82"><ellipse cx="80" cy="36" rx="33" ry="23"/><ellipse cx="240" cy="36" rx="33" ry="23"/><ellipse cx="400" cy="36" rx="33" ry="23"/></g><rect x="195" y="133" width="90" height="36" rx="4" fill="#f6f5ef" stroke="#8fa18e"/><g text-anchor="middle" fill="#243d32" font-size="14"><text x="80" y="41">F1</text><text x="240" y="41">F2</text><text x="400" y="41">F3</text><text x="240" y="156">Item</text></g><text x="114" y="108" font-size="11" fill="#176e60">Primary</text><text id="secondary-label" x="306" y="107" font-size="11" fill="#955427">Fixed at 0</text></svg><div class="legend"><span>Primary loading</span><span>Allowed secondary paths (ESEM)</span></div><p class="model-explanation" id="model-explanation">This CFA (ICM) schematic fixes secondary loadings at zero. If the true cross-loadings are nonzero, that restriction can worsen fit and inflate factor correlations.</p><p class="help">Schematic example: an item with primary factor F1. Line width is illustrative; no parameters are estimated.</p></div>
+</section>
+<aside class="method-note"><strong>Teaching model, not statistical estimation.</strong> These are illustrative game scores, not CFI, TLI, RMSEA, or estimated correlations. ESEM is not automatically the preferred model; theory, fit, interpretability, identification, and parsimony matter.<details><summary>How the game scores work</summary><p>The original game's scoring rules are retained, but scores are shown only after all 12 items are placed. Each wrong primary assignment subtracts 10 points in both models. Changing the model never changes whether an assignment is correct. Returning any item to the pool hides both model scores until the assignment is complete again.</p><div class="formula">Fit score = max(0, round(100 − 10 × wrong assignments − c × cross-loading level))<br>c = 80 for CFA; c = 25 for ESEM<br>Inflation index = cross-loading level × k; k = 1.2 for CFA and 0.3 for ESEM</div><p>The coefficients are teaching choices, not fitted or empirically calibrated parameters. With zero cross-loadings, the two scores coincide by construction. The inflation index illustrates the effect of omitted secondary loadings only; it does not summarize every source of bias, including incorrect primary assignments.</p><p>Conceptual background: <a href="https://www.statmodel.com/download/SEM-Asparouhov2009.pdf">Asparouhov &amp; Muthén (2009), Exploratory Structural Equation Modeling</a>.</p></details></aside>
+</main>
+<footer class="footer"><span>For educational purposes only</span><span>Developed by <strong>Hakan Sarac</strong> for course presentation</span></footer>
+</div>
 <script>
-let mode="CFA", cl=0.10;
-const factors=["F1","F2","F3"];
-const items=[];
-for(let i=1;i<=12;i++){
-  items.push({id:"I"+i,label:"Item "+i,true:factors[Math.floor((i-1)/4)],loc:"pool"});
+'use strict';
+// Pure game rules. The UI below uses the same functions for every input method.
+const FACTORS = ['F1','F2','F3'];
+const DESTINATIONS = ['pool',...FACTORS];
+function createItems(){return Array.from({length:12},(_,i)=>({id:'I'+(i+1),label:'Item '+(i+1),target:FACTORS[Math.floor(i/4)],loc:'pool'}));}
+function moveItem(list,id,destination){
+  const item=list.find(it=>it.id===id);
+  if(!item || !DESTINATIONS.includes(destination) || item.loc===destination)return null;
+  return list.map(it=>it.id===id?{...it,loc:destination}:{...it});
 }
-
-function render(){
-  ["pool","F1","F2","F3"].forEach(id=>document.getElementById(id).innerHTML="");
-  items.forEach(it=>{
-    const d=document.createElement("div");
-    d.className="item"; d.draggable=true;
-    d.ondragstart=e=>e.dataTransfer.setData("id",it.id);
-    d.innerHTML=`<b>${it.label}</b><span class="meta">Target: ${it.true}</span>`;
-    document.getElementById(it.loc).appendChild(d);
+function summarize(list){
+  const placed=list.filter(it=>it.loc!=='pool').length;
+  const correct=list.filter(it=>it.loc===it.target).length;
+  return {placed,correct,wrong:placed-correct,remaining:list.length-placed,complete:placed===12&&list.length===12};
+}
+function modelScores(list,level){
+  const stats=summarize(list);
+  if(!stats.complete)return null;
+  const crossLoading=Math.min(.30,Math.max(0,Number.isFinite(Number(level))?Number(level):0));
+  return Object.fromEntries(['CFA','ESEM'].map(model=>[model,{
+    fit:Math.max(0,Math.round(100-stats.wrong*10-crossLoading*(model==='CFA'?80:25))),
+    inflation:crossLoading*(model==='CFA'?1.2:.3)
+  }]));
+}
+// UI
+let items=createItems(),mode='CFA',cl=.10,selectedId=null,draggingId=null,showHints=true;
+const history=[];
+const itemNodes=new Map();
+const $=id=>document.getElementById(id);
+function feedback(message,tone='neutral'){$('feedback').textContent=message;$('feedback').dataset.tone=tone;}
+function updateSelection(){
+  const selected=items.find(it=>it.id===selectedId);
+  $('selection-label').textContent=selected?`${selected.label} selected · ${selected.loc==='pool'?'in the pool':'currently in '+selected.loc}. Choose a destination.`:'No item selected. Click or tap an item to begin.';
+  $('clear').hidden=!selected;
+  document.querySelectorAll('[data-destination]').forEach(button=>button.setAttribute('aria-disabled',String(!selected||selected.loc===button.dataset.destination)));
+  document.querySelectorAll('.zone').forEach(zone=>zone.classList.toggle('ready',!!selected&&zone.dataset.zone!==selected.loc));
+  itemNodes.forEach((node,id)=>node.setAttribute('aria-pressed',String(id===selectedId)));
+}
+function selectItem(id){
+  if(!items.some(it=>it.id===id))return;
+  selectedId=selectedId===id?null:id;
+  updateSelection();
+  const it=items.find(item=>item.id===selectedId);
+  feedback(it?`${it.label} selected. Choose F1, F2, F3, or return it to the Item Pool.`:'Selection cancelled. Choose another item.');
+}
+function clearSelection(){selectedId=null;updateSelection();feedback('Selection cancelled. Your assignments are unchanged.');}
+function remember(){history.push(items.map(it=>({...it})));if(history.length>100)history.shift();}
+function assign(id,destination){
+  const item=items.find(it=>it.id===id);
+  if(!item||!DESTINATIONS.includes(destination)){feedback('That item could not be moved. Select one of the twelve game items and try again.','warning');return false;}
+  if(item.loc===destination){feedback(`${item.label} is already ${destination==='pool'?'in the Item Pool':'assigned to '+destination}. Choose another destination.`);return false;}
+  const next=moveItem(items,id,destination);
+  remember();items=next;selectedId=null;render();
+  const stats=summarize(items);
+  if(destination==='pool')feedback(`${item.label} returned to the Item Pool. Select it again when you are ready to assign it.`);
+  else if(destination===item.target)feedback(`✓ ${item.label} → ${destination}: correct primary factor.${stats.correct===12?' All 12 primary assignments are correct. Now compare CFA and ESEM below.':stats.complete?' All items are placed. Review the marked assignments, then compare the models.':''}`,'success');
+  else feedback(`Review ${item.label} → ${destination}. Its intended primary factor is ${item.target}. Allowing cross-loadings in ESEM does not change that primary target.${stats.complete?' All items are placed; the comparison is now available.':''}`,'warning');
+  return true;
+}
+function renderItems(){
+  $('target-guide').hidden=!showHints;
+  const focused=document.activeElement?.dataset.item;
+  DESTINATIONS.forEach(destination=>{
+    const container=$(destination);
+    container.querySelectorAll('.empty').forEach(node=>node.remove());
+    const members=items.filter(it=>it.loc===destination);
+    for(const item of members){
+      let node=itemNodes.get(item.id);
+      if(!node){
+        node=document.createElement('button');node.type='button';node.id='item-'+item.id;node.dataset.item=item.id;node.draggable=true;node.className='item';
+        node.addEventListener('click',()=>selectItem(item.id));
+        node.addEventListener('dragstart',event=>{
+          draggingId=item.id;selectedId=item.id;
+          if(event.dataTransfer){event.dataTransfer.setData('text/plain',item.id);event.dataTransfer.effectAllowed='move';}
+          updateSelection();feedback(`Moving ${item.label}. Drop it on a factor or the Item Pool.`);
+        });
+        node.addEventListener('dragend',()=>{draggingId=null;document.querySelectorAll('.zone.over').forEach(zone=>zone.classList.remove('over'));});
+        itemNodes.set(item.id,node);
+      }
+      const isPlaced=item.loc!=='pool',isCorrect=item.loc===item.target;
+      node.className='item'+(isPlaced?(isCorrect?' correct':' incorrect'):'');
+      const status=isPlaced?(isCorrect?'✓ Correct':'! Review'):'Unassigned';
+      node.setAttribute('aria-label',`${item.label}, ${item.loc==='pool'?'Item Pool':item.loc}, ${status}${showHints?', target '+item.target:''}`);
+      node.innerHTML=`<span class="item-label">${item.label}</span>${showHints?`<span class="item-meta">Target: ${item.target}</span>`:''}<span class="item-status">${status}</span>`;
+      container.appendChild(node);
+    }
+    $('count-'+destination).textContent=members.length;
+    if(!members.length){const empty=document.createElement('p');empty.className='empty';empty.textContent=destination==='pool'?'All items placed. You can still move any item back here.':'Drop items here, or select an item and use Assign.';container.appendChild(empty);}
   });
-  document.getElementById("modeLabel").textContent="Current: "+mode;
-  document.getElementById("clVal").textContent=cl.toFixed(2);
-  updateStats();
+  if(focused)itemNodes.get(focused)?.focus({preventScroll:true});
 }
-
-function allowDrop(e){e.preventDefault();}
-function drop(e,f){
-  const id=e.dataTransfer.getData("id");
-  items.find(x=>x.id===id).loc=f;
-  render();
+function renderResults(){
+  const stats=summarize(items),scores=modelScores(items,cl);
+  $('placed-count').textContent=`${stats.placed} / 12 placed`;
+  $('correct-count').textContent=`${stats.correct} correct · ${stats.wrong} to review`;
+  $('progress').setAttribute('aria-valuenow',stats.placed);
+  $('progress-fill').style.width=(stats.placed/12*100)+'%';
+  $('undo').disabled=!history.length;$('reset').disabled=stats.placed===0;
+  ['CFA','ESEM'].forEach(model=>{
+    $('mode-'+model).setAttribute('aria-pressed',String(mode===model));
+    $('result-'+model).classList.toggle('active',mode===model);
+    $('current-'+model).hidden=mode!==model;
+    $('fit-'+model).textContent=scores?scores[model].fit:'—';
+    $('infl-'+model).textContent=scores?scores[model].inflation.toFixed(2):'—';
+  });
+  $('clVal').textContent=cl.toFixed(2);
+  $('complexity').setAttribute('aria-valuetext',cl.toFixed(2)+' hypothetical cross-loading level');
+  $('results-gate').textContent=stats.complete?`${stats.correct} / 12 correct primary assignments. Both models use the same assignments and cross-loading level (${cl.toFixed(2)}).`:`Place ${stats.remaining} more item${stats.remaining===1?'':'s'} to unlock the illustrative comparison. Correctness updates after every move.`;
+  const assignmentNote=stats.wrong?` ${stats.wrong} primary assignment${stats.wrong===1?' needs':'s need'} review; both fit scores receive the same assignment penalty.`:'';
+  $('interpretation').textContent=!stats.complete?'First distinguish an item\'s primary factor from its smaller secondary influences. Allowing secondary influences does not make a wrong primary assignment correct.':cl===0?'At zero cross-loadings, the scores coincide by construction. This scenario does not demonstrate an advantage for ESEM.'+assignmentNote:'With nonzero cross-loadings, this teaching rule penalizes CFA more strongly for fixing secondary loadings at zero. The ESEM fit score is at least as high by construction; this is not evidence that ESEM always performs better in real data.'+assignmentNote;
+  const esem=mode==='ESEM';
+  $('mode-help').textContent=esem?'Secondary loadings are allowed. Primary assignments and their correctness are unchanged.':'Secondary loadings are fixed at zero. Your item assignments stay the same when you switch models.';
+  $('schematic-title').textContent=esem?'Secondary paths: allowed':'Secondary paths: fixed at zero';
+  $('secondary-paths').style.display=esem?'':'none';
+  // SVG hidden support varies across browsers; explicit display handles the same state.
+  $('secondary-paths').removeAttribute('hidden');
+  $('secondary-label').textContent=esem?(cl===0?'True level: 0.00':'Scenario: '+cl.toFixed(2)):'Fixed at 0';
+  $('diagram-title').textContent=`Schematic ${mode} measurement model`;
+  $('diagram-description').textContent=esem?'An illustrative item has a primary loading on F1. Dashed paths from F2 and F3 are allowed in ESEM. These are model permissions, even when the true scenario level is zero.':'An illustrative item has a primary loading on F1. Its secondary paths from F2 and F3 are fixed at zero in CFA.';
+  $('model-explanation').textContent=esem?'ESEM allows secondary loadings and uses rotation to aid interpretation. Dashed lines show allowed paths, not estimated nonzero effects. The primary factor still matters.':'This CFA (ICM) schematic fixes secondary loadings at zero. If the true cross-loadings are nonzero, that restriction can worsen fit and inflate factor correlations.';
 }
-function setMode(m){mode=m;render();}
-function updateCL(v){cl=v/100;render();}
-
-function updateStats(){
-  const placed=items.filter(i=>i.loc!=="pool");
-  const correct=placed.filter(i=>i.loc===i.true).length;
-  let fit=100-correct*0-(placed.length-correct)*10-cl*(mode==="CFA"?80:25);
-  fit=Math.max(0,Math.round(fit));
-  document.getElementById("fit").textContent=fit;
-  document.getElementById("infl").textContent=(mode==="CFA"?(cl*1.2):(cl*0.3)).toFixed(2);
-  document.getElementById("acc").textContent=`${correct}/${placed.length}`;
-}
-
+function render(){renderItems();updateSelection();renderResults();}
+document.querySelectorAll('[data-mode]').forEach(button=>button.addEventListener('click',()=>{mode=button.dataset.mode;renderResults();feedback(`${mode==='CFA'?'CFA (ICM)':'ESEM'} selected. Your item assignments are unchanged. ${mode==='ESEM'?'Secondary loadings are allowed.':'Secondary loadings are fixed at zero.'}`);}));
+$('complexity').addEventListener('input',event=>{cl=Number(event.target.value)/100;renderResults();});
+$('complexity').addEventListener('change',()=>feedback(`Hypothetical cross-loading level is now ${cl.toFixed(2)}. Your item assignments are unchanged.`));
+$('hints').addEventListener('change',event=>{showHints=event.target.checked;renderItems();updateSelection();feedback(`Target hints ${showHints?'shown':'hidden'}. Your assignments are unchanged.`);} );
+$('clear').addEventListener('click',clearSelection);
+$('undo').addEventListener('click',()=>{if(!history.length)return;items=history.pop();selectedId=null;render();feedback('Last assignment change undone. Model and complexity settings are unchanged.');});
+$('reset').addEventListener('click',()=>{if(!summarize(items).placed)return;remember();items=createItems();selectedId=null;render();feedback('All 12 items returned to the Item Pool. Use Undo last change to restore the previous layout.');});
+document.querySelectorAll('[data-destination]').forEach(button=>button.addEventListener('click',()=>{if(!selectedId){feedback('Select an item first, then choose its destination.');return;}assign(selectedId,button.dataset.destination);}));
+document.querySelectorAll('[data-zone]').forEach(zone=>{
+  zone.addEventListener('dragover',event=>{event.preventDefault();if(event.dataTransfer)event.dataTransfer.dropEffect='move';zone.classList.add('over');});
+  zone.addEventListener('dragleave',event=>{if(!zone.contains(event.relatedTarget))zone.classList.remove('over');});
+  zone.addEventListener('drop',event=>{event.preventDefault();event.stopPropagation();zone.classList.remove('over');const id=event.dataTransfer?.getData('text/plain')||draggingId;draggingId=null;assign(id,zone.dataset.zone);});
+});
+document.addEventListener('keydown',event=>{
+  if(event.ctrlKey||event.metaKey||event.altKey||event.repeat||/^(INPUT|TEXTAREA|SELECT)$/.test(event.target.tagName)||event.target.isContentEditable)return;
+  if(event.key==='Escape'&&selectedId){event.preventDefault();clearSelection();return;}
+  if(!selectedId)return;
+  const destinations={'1':'F1','2':'F2','3':'F3','p':'pool','P':'pool'};
+  if(destinations[event.key]){event.preventDefault();assign(selectedId,destinations[event.key]);}
+});
 render();
 </script>
 </body>
 </html>
-
-<div id="edu-note">
-  <div class="line1">For educational purposes only</div>
-  <div class="line2">Developed by Hakan Sarac for course presentation</div>
-</div>
-
