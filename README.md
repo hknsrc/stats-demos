@@ -8,10 +8,11 @@ The demos aim to make abstract statistical ideas more visually intuitive and eas
 
 The current visualizations include:
 
-- **Rotation Intuition** – A visual explanation of factor rotation (unrotated, orthogonal, and oblique solutions).
-- **EFA Motion Demo** – An animated illustration showing how factors can emerge from patterns of shared movement.
-- **ESEM Visualization / Mini Game** – An interactive example illustrating differences between CFA (ICM) and ESEM when cross-loadings are present.
-- **Bonferroni & False Discovery Rate** 
+- **Rotation Intuition** 
+- **EFA Motion Demo** 
+- **ESEM Visualization / Mini Game** 
+- **Bonferroni & False Discovery Rate**
+- **Group × Time Interaction**
 
 ## Live demo
 
