@@ -1,0 +1,392 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="An interactive lesson on group × time interactions using two groups and two measurement occasions.">
+<meta name="theme-color" content="#f6f5ef">
+<title>Group × Time Interaction | Interactive Research Methods Studio</title>
+<style>
+:root {
+  --paper:#f6f5ef; --panel:#fdfdf9; --ink:#243d32; --muted:#52665b;
+  --line:#d9dfd4; --green:#176e60; --sage:#e9f0e7; --copper:#90522f;
+  --warm:#f5ece2; --serif:Georgia,"Times New Roman",serif;
+  --sans:system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+* { box-sizing:border-box; }
+body { margin:0; background:var(--paper); color:var(--ink); font:15px/1.55 var(--sans); }
+button,input { font:inherit; }
+a { color:inherit; text-underline-offset:4px; }
+button { color:inherit; cursor:pointer; background:var(--panel); }
+button:disabled { cursor:default; opacity:.48; }
+:focus-visible { outline:3px solid var(--green); outline-offset:4px; }
+.shell { width:min(1120px,calc(100% - 80px)); margin-inline:auto; }
+.topbar { display:flex; justify-content:space-between; align-items:center; gap:20px; padding:20px 0; border-bottom:1px solid var(--line); font-size:.82rem; }
+.topbar a { text-decoration:none; font-weight:650; }
+.topbar a:hover { text-decoration:underline; }
+.topbar span { color:var(--muted); text-align:right; }
+.hero { padding:38px 0 26px; }
+.eyebrow { margin:0 0 8px; color:var(--green); font-size:.72rem; font-weight:750; letter-spacing:.13em; text-transform:uppercase; }
+h1,h2 { font-family:var(--serif); font-weight:400; line-height:1.08; margin:0; }
+h1 { font-size:clamp(34px,5.5vw,63px); letter-spacing:-.04em; }
+h2 { font-size:clamp(23px,3vw,32px); letter-spacing:-.025em; }
+.intro { margin:12px 0 0; color:var(--muted); }
+.module { border:1px solid var(--line); border-radius:12px; background:var(--panel); overflow:hidden; }
+.steps { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); background:#f1f3ec; border-bottom:1px solid var(--line); }
+.steps button { position:relative; border:0; border-right:1px solid var(--line); min-height:52px; text-align:left; padding:10px 16px; background:transparent; font-weight:650; font-size:.83rem; }
+.steps button:last-child { border-right:0; }
+.steps button[aria-current="step"] { background:var(--sage); color:var(--green); box-shadow:inset 0 -3px var(--green); }
+.steps button:focus-visible { outline-offset:-5px; }
+.step-num { margin-right:.55em; font-variant-numeric:tabular-nums; }
+.workspace { display:grid; grid-template-columns:minmax(0,1fr) minmax(240px,315px); }
+.figure-pane { min-width:0; padding:22px 24px 18px; }
+.side { display:flex; flex-direction:column; padding:24px; border-left:1px solid var(--line); background:#f8f9f3; }
+.presets { display:flex; flex-wrap:wrap; gap:7px; }
+.presets button,.nav-button { min-height:40px; padding:7px 13px; border:1px solid var(--line); border-radius:6px; font-size:.82rem; font-weight:600; }
+.presets button[aria-pressed="true"] { background:var(--sage); color:#154e43; border-color:#98b7a4; }
+.presets button:hover,.nav-button:hover:not(:disabled) { border-color:var(--green); }
+figure { margin:17px 0 0; }
+figcaption { margin-bottom:7px; font-size:.82rem; font-weight:650; }
+canvas { display:block; width:100%; height:285px; touch-action:none; }
+.legend { display:flex; flex-wrap:wrap; gap:8px 22px; color:var(--muted); font-size:.81rem; margin-top:6px; }
+.legend span { display:inline-flex; align-items:center; gap:7px; }
+.marker { display:inline-block; width:20px; border-top:3px solid var(--green); }
+.marker.control { border-top:3px dashed var(--copper); }
+.side p { color:var(--muted); margin:9px 0 16px; line-height:1.5; font-size:.9rem; }
+.metric-area { display:grid; gap:1px; border-block:1px solid var(--line); padding:6px 0; }
+.metric { display:flex; gap:10px; justify-content:space-between; align-items:baseline; padding:7px 0; font-size:.83rem; }
+.metric output { font-size:1.15rem; font-weight:700; color:var(--green); white-space:nowrap; font-variant-numeric:tabular-nums; }
+.metric.control output { color:var(--copper); }
+.metric.total { border-top:1px solid var(--line); margin-top:2px; }
+#formula { margin:9px 0 5px; font-size:.78rem; font-variant-numeric:tabular-nums; }
+#interpretation { margin-bottom:8px; color:var(--ink); }
+.inference { color:var(--muted); margin-top:0; font-size:.75rem; }
+.nav-buttons { display:flex; flex-wrap:wrap; gap:8px; margin-top:auto; padding-top:18px; }
+.nav-button.next { background:var(--ink); color:white; border-color:var(--ink); }
+.controls { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px 22px; border-top:1px solid var(--line); padding:15px 24px; }
+.controls fieldset { min-width:0; border:0; margin:0; padding:0; }
+.controls legend { font-size:.81rem; font-weight:700; color:var(--green); padding:0; }
+.controls fieldset + fieldset legend { color:var(--copper); }
+.slider-row { display:grid; grid-template-columns:69px minmax(40px,1fr) 36px; align-items:center; gap:7px; min-height:32px; font-size:.76rem; }
+.slider-row output { text-align:right; font-variant-numeric:tabular-nums; }
+input[type="range"] { width:100%; margin:0; accent-color:var(--green); }
+fieldset + fieldset input { accent-color:var(--copper); }
+footer { display:flex; gap:8px 20px; flex-wrap:wrap; justify-content:space-between; padding:17px 0 26px; color:var(--muted); font-size:.76rem; }
+.sr-only { position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap; }
+[hidden] { display:none!important; }
+@media (max-width:760px) {
+  .shell { width:calc(100% - 28px); }
+  .workspace { grid-template-columns:1fr; }
+  .side { border-left:0; border-top:1px solid var(--line); }
+  .figure-pane,.side,.controls { padding:17px; }
+  .hero { padding:28px 0 20px; }
+}
+@media (max-width:510px) {
+  .steps button { font-size:.72rem; padding:8px; }
+  .step-num { display:block; }
+  .controls { grid-template-columns:1fr; }
+  canvas { height:255px; }
+}
+</style>
+</head>
+<body>
+<div class="shell">
+  <header class="topbar">
+    <a href="./">← Interactive Research Methods Studio</a>
+    <span>Repeated measures</span>
+  </header>
+  <main>
+    <section class="hero" aria-labelledby="page-title">
+      <p class="eyebrow">An interactive teaching demo</p>
+      <h1 id="page-title">What does a Group × Time interaction mean?</h1>
+      <p class="intro">Two groups in a physical activity study. Did their average daily steps change by the same amount?</p>
+    </section>
+
+    <section class="module" aria-label="Group × Time walkthrough">
+      <nav class="steps" aria-label="Lesson steps">
+        <button type="button" data-step="0" aria-current="step"><span class="step-num">1.</span>Read the lines</button>
+        <button type="button" data-step="1"><span class="step-num">2.</span>Compare changes</button>
+        <button type="button" data-step="2"><span class="step-num">3.</span>Interpret the pattern</button>
+      </nav>
+      <div class="workspace">
+        <div class="figure-pane">
+          <div class="presets" role="group" aria-label="Example patterns">
+            <button type="button" data-preset="parallel" aria-pressed="true">Parallel lines</button>
+            <button type="button" data-preset="diverge" aria-pressed="false">Different gains</button>
+            <button type="button" data-preset="cross" aria-pressed="false">Crossing lines</button>
+          </div>
+          <figure aria-labelledby="chart-title">
+            <figcaption id="chart-title">Mean daily steps (thousands)</figcaption>
+            <canvas id="chart" role="img" aria-labelledby="chart-title" aria-describedby="chart-description"></canvas>
+            <p id="chart-description" class="sr-only"></p>
+            <div class="legend">
+              <span><i class="marker" aria-hidden="true"></i>Intervention (●)</span>
+              <span><i class="marker control" aria-hidden="true"></i>Control (■)</span>
+            </div>
+          </figure>
+        </div>
+        <section class="side" aria-labelledby="step-title">
+          <div id="lesson" aria-live="polite">
+            <h2 id="step-title">Read the lines</h2>
+            <p id="step-copy">Each point is a group mean. Drag a point or use the sliders to change it.</p>
+            <div id="metrics" class="metric-area" hidden>
+              <div class="metric"><span>Intervention change</span><output id="intervention-change"></output></div>
+              <div class="metric control"><span>Control change</span><output id="control-change"></output></div>
+              <div class="metric total" id="total" hidden><span>Difference in changes</span><output id="difference"></output></div>
+            </div>
+            <p id="formula" hidden></p>
+            <p id="interpretation" hidden></p>
+            <div class="inference" id="inference" hidden>A significance test also needs information about variability and sample size.</div>
+          </div>
+          <div class="nav-buttons">
+            <button type="button" class="nav-button" id="back" disabled>← Back</button>
+            <button type="button" class="nav-button next" id="next">Next →</button>
+          </div>
+        </section>
+      </div>
+
+      <div class="controls" aria-label="Adjust group means in thousands of steps">
+        <fieldset>
+          <legend>Intervention</legend>
+          <div class="slider-row"><label for="i-base">Baseline</label><input id="i-base" type="range" min="3" max="10" step=".5" value="6" aria-label="Intervention baseline, thousand steps"><output id="i-base-value" for="i-base">6.0</output></div>
+          <div class="slider-row"><label for="i-follow">Week 12</label><input id="i-follow" type="range" min="3" max="10" step=".5" value="7.5" aria-label="Intervention week 12, thousand steps"><output id="i-follow-value" for="i-follow">7.5</output></div>
+        </fieldset>
+        <fieldset>
+          <legend>Control</legend>
+          <div class="slider-row"><label for="c-base">Baseline</label><input id="c-base" type="range" min="3" max="10" step=".5" value="5" aria-label="Control baseline, thousand steps"><output id="c-base-value" for="c-base">5.0</output></div>
+          <div class="slider-row"><label for="c-follow">Week 12</label><input id="c-follow" type="range" min="3" max="10" step=".5" value="6.5" aria-label="Control week 12, thousand steps"><output id="c-follow-value" for="c-follow">6.5</output></div>
+        </fieldset>
+      </div>
+    </section>
+    <noscript><p>Enable JavaScript to adjust the group means and compare their changes.</p></noscript>
+  </main>
+  <footer><span>Hakan Sarac</span><span>Illustrative data for teaching</span></footer>
+</div>
+<script>
+'use strict';
+(() => {
+  const byId = id => document.getElementById(id);
+  const keys = ['i-base', 'i-follow', 'c-base', 'c-follow'];
+  const sliders = keys.map(byId);
+  const groups = [
+    { color:'#176e60', offset:0, square:false },
+    { color:'#90522f', offset:2, square:true }
+  ];
+  const presets = {
+    parallel:[6, 7.5, 5, 6.5],
+    diverge:[6, 9, 5, 6],
+    cross:[5, 8, 7, 6]
+  };
+  const steps = [
+    { title:'Read the lines', copy:'Each point is a group mean. Drag a point or use the sliders to change it.' },
+    { title:'Compare changes', copy:'For each group, subtract its baseline mean from its Week 12 mean.' },
+    { title:'Interpret the pattern', copy:'Subtract the control group’s change from the intervention group’s change.' }
+  ];
+  const canvas = byId('chart');
+  const ctx = canvas.getContext('2d');
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)');
+  let values = [...presets.parallel];
+  let drawn = [...values];
+  let step = 0;
+  let activePoint = null;
+  let frame = 0;
+  let chartWidth = 0;
+  let chartHeight = 0;
+  const fixed = value => value.toFixed(1);
+  const signed = value => value > 0 ? '+' + fixed(value) : value < 0 ? '−' + fixed(-value) : '0.0';
+  const x = time => time === 0 ? 63 : chartWidth - (step >= 1 ? 65 : 34);
+  const y = value => 12 + (11 - value) * (chartHeight - 52) / 9;
+
+  function line(x1, y1, x2, y2, color, width = 1, dash = []) {
+    ctx.beginPath();
+    ctx.strokeStyle = color;
+    ctx.lineWidth = width;
+    ctx.setLineDash(dash);
+    ctx.moveTo(x1, y1);
+    ctx.lineTo(x2, y2);
+    ctx.stroke();
+    ctx.setLineDash([]);
+  }
+
+  function label(value, left, top, color, align = 'center') {
+    ctx.fillStyle = color;
+    ctx.textAlign = align;
+    ctx.fillText(value, left, top);
+  }
+
+  function paint() {
+    if (!chartWidth) return;
+    ctx.clearRect(0, 0, chartWidth, chartHeight);
+    ctx.font = '12px system-ui';
+    for (const tick of [2, 4, 6, 8, 10]) {
+      line(36, y(tick), chartWidth - 14, y(tick), tick === 2 ? '#9eaba0' : '#e1e6dd');
+      label(tick, 27, y(tick) + 4, '#52665b', 'right');
+    }
+    label('Baseline', x(0), chartHeight - 14, '#52665b');
+    label('Week 12', x(1), chartHeight - 14, '#52665b');
+
+    groups.forEach(({color, offset, square}, index) => {
+      const start = y(drawn[offset]);
+      const end = y(drawn[offset + 1]);
+      line(x(0), start, x(1), end, color, 3, square ? [7, 6] : []);
+      for (let time = 0; time < 2; time++) {
+        const pointY = y(drawn[offset + time]);
+        const pointX = x(time);
+        ctx.beginPath();
+        if (square) ctx.rect(pointX - 5.5, pointY - 5.5, 11, 11);
+        else ctx.arc(pointX, pointY, 7, 0, Math.PI * 2);
+        ctx.fillStyle = color;
+        ctx.fill();
+        ctx.strokeStyle = '#fdfdf9';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+      }
+      if (step >= 1) {
+        const bracketX = x(1) + 22 + index * 13;
+        line(x(1) + 9, end, bracketX + 4, end, color, 1, [3, 3]);
+        line(x(1) + 9, start, bracketX + 4, start, color, 1, [3, 3]);
+        line(bracketX, start, bracketX, end, color, 1.5, square ? [3, 3] : []);
+      }
+    });
+  }
+
+  function resize() {
+    const bounds = canvas.getBoundingClientRect();
+    const scale = devicePixelRatio || 1;
+    chartWidth = bounds.width;
+    chartHeight = bounds.height;
+    canvas.width = Math.round(chartWidth * scale);
+    canvas.height = Math.round(chartHeight * scale);
+    ctx.setTransform(scale, 0, 0, scale, 0, 0);
+    paint();
+  }
+
+  function updateText() {
+    const [iBase, iFollow, cBase, cFollow] = values;
+    const iChange = iFollow - iBase;
+    const cChange = cFollow - cBase;
+    const difference = iChange - cChange;
+    keys.forEach((key, index) => {
+      sliders[index].value = values[index];
+      byId(key + '-value').textContent = fixed(values[index]);
+    });
+    document.querySelectorAll('[data-preset]').forEach(button => {
+      const selected = presets[button.dataset.preset].every((value, index) => value === values[index]);
+      button.setAttribute('aria-pressed', String(selected));
+    });
+    byId('chart-description').textContent =
+      'Intervention: ' + fixed(iBase) + ' at baseline, ' + fixed(iFollow) + ' at Week 12. ' +
+      'Control: ' + fixed(cBase) + ' at baseline, ' + fixed(cFollow) + ' at Week 12. Values are in thousands of daily steps.';
+    byId('intervention-change').textContent = signed(iChange) + 'k';
+    byId('control-change').textContent = signed(cChange) + 'k';
+    byId('difference').textContent = signed(difference) + 'k';
+    byId('formula').textContent = '(' + signed(iChange) + 'k) − (' + signed(cChange) + 'k) = ' + signed(difference) + 'k';
+    const interpretation = difference === 0
+      ? 'Both groups changed by the same amount. The interaction contrast is zero.'
+      : 'The ' + (difference > 0 ? 'intervention' : 'control') + ' group’s change was ' +
+        (Math.abs(difference) * 1000).toLocaleString('en-US') + ' steps/day more positive. The group means show an interaction pattern.';
+    byId('interpretation').textContent = interpretation;
+  }
+
+  function setMeans(next, animate) {
+    cancelAnimationFrame(frame);
+    values = [...next];
+    updateText();
+    if (!animate || reduced.matches) {
+      drawn = [...values];
+      paint();
+      return;
+    }
+    const start = performance.now();
+    const previous = [...drawn];
+    function move(now) {
+      const progress = Math.min(1, (now - start) / 450);
+      const ease = 1 - Math.pow(1 - progress, 3);
+      drawn = values.map((value, index) => previous[index] + (value - previous[index]) * ease);
+      paint();
+      if (progress < 1) frame = requestAnimationFrame(move);
+    }
+    frame = requestAnimationFrame(move);
+  }
+
+  function goTo(nextStep) {
+    step = Math.max(0, Math.min(2, nextStep));
+    document.querySelectorAll('[data-step]').forEach(button => {
+      if (Number(button.dataset.step) === step) button.setAttribute('aria-current', 'step');
+      else button.removeAttribute('aria-current');
+    });
+    byId('step-title').textContent = steps[step].title;
+    byId('step-copy').textContent = steps[step].copy;
+    byId('metrics').hidden = step === 0;
+    ['total','formula','interpretation','inference'].forEach(id => { byId(id).hidden = step !== 2; });
+    byId('back').disabled = step === 0;
+    byId('next').hidden = step === 2;
+    paint();
+  }
+
+  function localPoint(event) {
+    const bounds = canvas.getBoundingClientRect();
+    return { left:event.clientX - bounds.left, top:event.clientY - bounds.top };
+  }
+  function closest(point) {
+    let near = null;
+    let distance = 20;
+    drawn.forEach((value, index) => {
+      const separation = Math.hypot(point.left - x(index % 2), point.top - y(value));
+      if (separation <= distance) {
+        near = index;
+        distance = separation;
+      }
+    });
+    return near;
+  }
+  canvas.addEventListener('pointerdown', event => {
+    if (!event.isPrimary || event.button !== 0) return;
+    activePoint = closest(localPoint(event));
+    if (activePoint === null) return;
+    canvas.setPointerCapture(event.pointerId);
+    canvas.style.cursor = 'grabbing';
+  });
+  canvas.addEventListener('pointermove', event => {
+    if (!event.isPrimary) return;
+    const point = localPoint(event);
+    if (activePoint === null) {
+      canvas.style.cursor = closest(point) === null ? '' : 'grab';
+      return;
+    }
+    const target = 11 - (point.top - 12) * 9 / (chartHeight - 52);
+    const next = [...values];
+    next[activePoint] = Math.min(10, Math.max(3, Math.round(target * 2) / 2));
+    if (next[activePoint] !== values[activePoint]) setMeans(next, false);
+  });
+  canvas.addEventListener('lostpointercapture', () => {
+    activePoint = null;
+    canvas.style.cursor = '';
+  });
+
+  sliders.forEach((slider, index) => slider.addEventListener('input', () => {
+    const next = [...values];
+    next[index] = Number(slider.value);
+    setMeans(next, false);
+  }));
+  document.querySelectorAll('[data-preset]').forEach(button => button.addEventListener('click', () => {
+    setMeans(presets[button.dataset.preset], true);
+  }));
+  document.querySelectorAll('[data-step]').forEach(button => button.addEventListener('click', () => {
+    goTo(Number(button.dataset.step));
+  }));
+  byId('next').addEventListener('click', () => {
+    goTo(step + 1);
+    if (step === 2) document.querySelector('[data-step="2"]').focus();
+  });
+  byId('back').addEventListener('click', () => {
+    goTo(step - 1);
+    if (step === 0) document.querySelector('[data-step="0"]').focus();
+  });
+  updateText();
+  new ResizeObserver(resize).observe(canvas);
+  resize();
+})();
+</script>
+</body>
+</html>
