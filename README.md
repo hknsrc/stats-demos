@@ -33,10 +33,6 @@ The demos are grouped into four topics:
 - ESEM Visualization / Mini Game
 - Measurement Invariance
 
-## Related collection
-
-The [Interactive Exercise & Health Behavior Studio](https://hknsrc.github.io/health-behavior/) covers theories of behavior change for undergraduate courses in exercise psychology and health behavior. Source: [hknsrc/health-behavior](https://github.com/hknsrc/health-behavior).
-
 ## Live demo
 
 You can access the interactive demos here:
