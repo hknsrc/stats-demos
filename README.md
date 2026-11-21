@@ -33,6 +33,19 @@ The demos are grouped into four topics:
 - ESEM Visualization / Mini Game
 - Measurement Invariance
 
+## Interactive Exercise & Health Behavior Studio
+
+A second collection, in `health-behavior/`, covers theories of behavior change for undergraduate courses in exercise psychology and health behavior. Every demo follows the same fictional student, Jordan, who is trying to walk 150 minutes a week.
+
+**Motivation & Intention**
+- Why Intention Isn’t Action (Theory of Planned Behavior)
+- Why Does Jordan Walk? (Self-Determination Theory)
+
+**Habits & Self-Regulation**
+- How Long Does a Habit Take? (Habit Formation)
+
+Live: https://hknsrc.github.io/stats-demos/health-behavior/
+
 ## Live demo
 
 You can access the interactive demos here:

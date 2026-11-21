@@ -1,0 +1,423 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="An interactive lesson on Self-Determination Theory: sorting reasons for exercise along the motivation continuum.">
+<meta name="theme-color" content="#f6f5ef">
+<title>Motivation Continuum | Interactive Exercise &amp; Health Behavior Studio</title>
+<style>
+:root {
+  --paper:#f6f5ef; --panel:#fdfdf9; --ink:#243d32; --muted:#52665b;
+  --line:#d9dfd4; --green:#176e60; --sage:#e9f0e7; --copper:#90522f;
+  --warm:#f5ece2; --red:#ac4050; --serif:Georgia,"Times New Roman",serif;
+  --sans:system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+* { box-sizing:border-box; }
+body { margin:0; background:var(--paper); color:var(--ink); font:15px/1.55 var(--sans); }
+button,input { font:inherit; }
+a { color:inherit; text-underline-offset:4px; }
+button { color:inherit; cursor:pointer; background:var(--panel); }
+button:disabled { cursor:default; opacity:.48; }
+:focus-visible { outline:3px solid var(--green); outline-offset:4px; }
+.shell { width:min(1120px,calc(100% - 80px)); margin-inline:auto; }
+.topbar { display:flex; justify-content:space-between; align-items:center; gap:20px; padding:20px 0; border-bottom:1px solid var(--line); font-size:.82rem; }
+.topbar a { text-decoration:none; font-weight:650; }
+.topbar a:hover { text-decoration:underline; }
+.topbar span { color:var(--muted); text-align:right; }
+.hero { padding:38px 0 26px; }
+.eyebrow { margin:0 0 8px; color:var(--green); font-size:.72rem; font-weight:750; letter-spacing:.13em; text-transform:uppercase; }
+h1,h2 { font-family:var(--serif); font-weight:400; line-height:1.08; margin:0; }
+h1 { font-size:clamp(34px,5.5vw,63px); letter-spacing:-.04em; }
+h2 { font-size:clamp(23px,3vw,32px); letter-spacing:-.025em; }
+.intro { margin:12px 0 0; color:var(--muted); max-width:720px; }
+.module { border:1px solid var(--line); border-radius:12px; background:var(--panel); overflow:hidden; }
+.steps { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); background:#f1f3ec; border-bottom:1px solid var(--line); }
+.steps button { position:relative; border:0; border-right:1px solid var(--line); min-height:52px; text-align:left; padding:10px 16px; background:transparent; font-weight:650; font-size:.83rem; }
+.steps button:last-child { border-right:0; }
+.steps button[aria-current="step"] { background:var(--sage); color:var(--green); box-shadow:inset 0 -3px var(--green); }
+.steps button:focus-visible { outline-offset:-5px; }
+.step-num { margin-right:.55em; font-variant-numeric:tabular-nums; }
+.workspace { display:grid; grid-template-columns:minmax(0,1fr) minmax(240px,315px); }
+.figure-pane { min-width:0; padding:22px 24px 18px; }
+.side { display:flex; flex-direction:column; padding:24px; border-left:1px solid var(--line); background:#f8f9f3; }
+.toolbar { display:flex; flex-wrap:wrap; gap:10px; justify-content:space-between; align-items:center; }
+.presets { display:flex; flex-wrap:wrap; gap:7px; }
+.presets button,.nav-button,.small-button { min-height:40px; padding:7px 13px; border:1px solid var(--line); border-radius:6px; font-size:.82rem; font-weight:600; }
+.presets button[aria-pressed="true"] { background:var(--sage); color:#154e43; border-color:#98b7a4; }
+.presets button:hover,.nav-button:hover:not(:disabled),.small-button:hover { border-color:var(--green); }
+figure { margin:17px 0 0; }
+figcaption { margin-bottom:7px; font-size:.82rem; font-weight:650; }
+canvas { display:block; width:100%; height:430px; touch-action:none; }
+.legend { display:flex; flex-wrap:wrap; gap:8px 22px; color:var(--muted); font-size:.81rem; margin-top:6px; }
+.legend span { display:inline-flex; align-items:center; gap:7px; }
+.dot { display:inline-block; width:10px; height:10px; border-radius:50%; background:var(--green); }
+.dot.observed { background:var(--copper); }
+.dot.ghost { background:#cfe0d6; }
+.side p { color:var(--muted); margin:9px 0 16px; line-height:1.5; font-size:.9rem; }
+.metric-area { display:grid; gap:1px; border-block:1px solid var(--line); padding:6px 0; }
+.metric { display:flex; gap:10px; justify-content:space-between; align-items:baseline; padding:7px 0; font-size:.83rem; }
+.metric output { font-size:1.15rem; font-weight:700; color:var(--green); white-space:nowrap; font-variant-numeric:tabular-nums; }
+.metric.observed output { color:var(--copper); }
+.metric.total { border-top:1px solid var(--line); margin-top:2px; }
+#formula { margin:9px 0 5px; font-size:.78rem; font-variant-numeric:tabular-nums; }
+#interpretation { margin-bottom:8px; color:var(--ink); }
+.inference { color:var(--muted); margin-top:0; font-size:.75rem; }
+.nav-buttons { display:flex; flex-wrap:wrap; gap:8px; margin-top:auto; padding-top:18px; }
+.nav-button.next { background:var(--ink); color:white; border-color:var(--ink); }
+.controls { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px 22px; border-top:1px solid var(--line); padding:15px 24px; }
+.controls fieldset { min-width:0; border:0; margin:0; padding:0; }
+.controls legend { font-size:.81rem; font-weight:700; color:var(--green); padding:0; }
+.controls fieldset + fieldset legend { color:var(--copper); }
+.slider-row { display:grid; grid-template-columns:110px minmax(40px,1fr) 40px; align-items:center; gap:7px; min-height:32px; font-size:.76rem; }
+.slider-row output { text-align:right; font-variant-numeric:tabular-nums; }
+input[type="range"] { width:100%; margin:0; accent-color:var(--green); }
+fieldset + fieldset input { accent-color:var(--copper); }
+.check-section { margin-top:28px; padding:22px 0 18px; border-top:1px solid var(--line); }
+.check-section h2 { font-size:clamp(22px,2.6vw,27px); margin-bottom:8px; }
+.check-section p { color:var(--muted); margin:0 0 14px; max-width:780px; font-size:.92rem; }
+.check-options { display:flex; flex-wrap:wrap; gap:8px; }
+.check-options button { min-height:40px; padding:7px 15px; border:1px solid var(--line); border-radius:6px; font-weight:600; font-size:.85rem; }
+.check-options button:hover { border-color:var(--green); }
+.check-options button[aria-pressed="true"] { background:var(--sage); border-color:var(--green); color:#154e43; }
+.check-feedback { min-height:24px; margin-top:12px; max-width:800px; font-size:.9rem; }
+details { border-top:1px solid var(--line); padding:15px 0; font-size:.86rem; }
+summary { cursor:pointer; font-weight:650; }
+details p { color:var(--muted); max-width:880px; }
+.sources { padding-left:20px; color:var(--muted); font-size:.8rem; max-width:880px; }
+.sources li { margin:7px 0; }
+.sources a { color:var(--green); }
+footer { display:flex; gap:8px 20px; flex-wrap:wrap; justify-content:space-between; padding:17px 0 26px; color:var(--muted); font-size:.76rem; border-top:1px solid var(--line); }
+.sr-only { position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap; }
+[hidden] { display:none!important; }
+@media (max-width:760px) {
+  .shell { width:calc(100% - 28px); }
+  .workspace { grid-template-columns:1fr; }
+  .side { border-left:0; border-top:1px solid var(--line); }
+  .figure-pane,.side,.controls { padding:17px; }
+  .hero { padding:28px 0 20px; }
+}
+@media (max-width:510px) {
+  .steps button { font-size:.72rem; padding:8px; }
+  .step-num { display:block; }
+  .controls { grid-template-columns:1fr; }
+  canvas { height:300px; }
+}
+:root { --green:#a14f2c; --sage:#f6e8df; --copper:#2e6b73; --teal:#2e6b73; }
+.presets button[aria-pressed="true"],.check-options button[aria-pressed="true"],.toggle[aria-pressed="true"] { color:#7a3a1f; border-color:#d9b19c; }
+.controls fieldset + fieldset legend { color:var(--teal); }
+fieldset + fieldset input { accent-color:var(--teal); }
+.jordan { display:flex; gap:14px; align-items:flex-start; max-width:760px; margin:20px 0 0; padding:14px 16px; background:#f7ede6; border:1px solid #e6cfc0; border-radius:8px; }
+.jordan-mark { flex:0 0 38px; height:38px; border-radius:50%; background:var(--green); color:#fff; display:grid; place-items:center; font:600 15px/1 var(--serif); }
+.jordan p { margin:0; font-size:.9rem; color:var(--ink); }
+.jordan .jordan-label { display:block; margin-bottom:2px; font-size:.68rem; font-weight:750; letter-spacing:.12em; text-transform:uppercase; color:var(--green); }
+.panel-title { margin:16px 0 8px; font-size:.82rem; font-weight:650; }
+.bands { display:grid; grid-template-columns:repeat(6,minmax(0,1fr)); gap:4px; font-size:.68rem; font-weight:650; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); text-align:center; }
+.bands span { padding:4px 2px; border-bottom:2px solid var(--line); }
+.bands .b-none { grid-column:1; border-color:#a9b3ac; }
+.bands .b-ctrl { grid-column:2 / span 2; border-color:var(--green); color:var(--green); }
+.bands .b-auto { grid-column:4 / span 3; border-color:var(--teal); color:var(--teal); }
+.zones { display:grid; grid-template-columns:repeat(6,minmax(0,1fr)); gap:4px; margin-top:6px; }
+.zone { display:flex; flex-direction:column; gap:6px; min-height:190px; padding:8px 6px; border:1px dashed #c9d0c6; border-radius:8px; background:#fbfbf7; text-align:left; font:inherit; color:inherit; cursor:pointer; }
+.zone:hover,.zone.over { border-color:var(--green); background:#fbf3ee; }
+.zone-name { width:100%; padding:2px 0 4px; border:0; background:none; font-size:.76rem; font-weight:700; text-align:center; cursor:pointer; }
+.zone[data-zone="0"] .zone-name { color:#5b6b61; }
+.zone[data-zone="1"] .zone-name,.zone[data-zone="2"] .zone-name { color:var(--green); }
+.zone[data-zone="3"] .zone-name,.zone[data-zone="4"] .zone-name,.zone[data-zone="5"] .zone-name { color:var(--teal); }
+.pool { display:flex; flex-wrap:wrap; gap:8px; min-height:52px; margin-top:12px; padding:10px; border:1px solid var(--line); border-radius:8px; background:#f8f9f3; }
+.pool:empty::before { content:"All reasons placed."; color:var(--muted); font-size:.8rem; }
+.card { max-width:100%; padding:7px 9px; border:1px solid var(--line); border-radius:6px; background:var(--panel); font-size:.78rem; line-height:1.35; text-align:left; cursor:grab; }
+.zone .card { font-size:.7rem; padding:6px 7px; cursor:pointer; }
+.card[aria-pressed="true"] { border-color:var(--green); box-shadow:0 0 0 2px var(--green); }
+.card.right { border-color:var(--teal); background:#eef5f4; }
+.card.wrong { border-color:var(--green); background:#fbefe8; }
+.hint { color:var(--muted); font-size:.76rem; margin:8px 0 0; }
+.profile { display:grid; grid-template-columns:repeat(6,minmax(0,1fr)); gap:8px; align-items:end; height:220px; margin-top:12px; padding:0 4px; border-bottom:1px solid #9eaba0; }
+.bar-col { display:flex; flex-direction:column; justify-content:flex-end; align-items:center; height:100%; }
+.bar { width:70%; max-width:56px; border-radius:4px 4px 0 0; transition:height .25s ease; }
+.bar-val { font-size:.76rem; font-weight:650; margin-bottom:4px; font-variant-numeric:tabular-nums; }
+.bar-labels { display:grid; grid-template-columns:repeat(6,minmax(0,1fr)); gap:8px; margin-top:6px; font-size:.7rem; text-align:center; color:var(--muted); }
+.rai { margin-top:18px; }
+.rai-track { position:relative; height:10px; border-radius:5px; background:linear-gradient(90deg,#a14f2c,#e7ebe3 50%,#2e6b73); }
+.rai-dot { position:absolute; top:50%; width:18px; height:18px; border-radius:50%; background:var(--panel); border:3px solid var(--ink); transform:translate(-50%,-50%); transition:left .25s ease; }
+.rai-ends { display:flex; justify-content:space-between; margin-top:6px; font-size:.7rem; color:var(--muted); }
+.evidence { width:100%; border-collapse:collapse; margin-top:10px; font-size:.8rem; }
+.evidence th,.evidence td { padding:8px 6px; border-bottom:1px solid var(--line); text-align:left; vertical-align:top; }
+.evidence th { font-size:.72rem; color:var(--muted); font-weight:650; }
+.tag { display:inline-block; padding:2px 8px; border-radius:10px; font-size:.7rem; font-weight:650; white-space:nowrap; }
+.tag.pos { background:#e3efee; color:var(--teal); }
+.tag.mix { background:#f1ede4; color:#7a5b2e; }
+.tag.neg { background:#f6e3da; color:#8a3d1f; }
+.needs { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; margin-top:16px; }
+.need { padding:12px; border:1px solid var(--line); border-radius:8px; background:var(--panel); font-size:.8rem; }
+.need h3 { margin:0 0 6px; font-family:var(--serif); font-weight:400; font-size:1.05rem; }
+.need p { margin:0; color:var(--muted); }
+.controls { grid-template-columns:repeat(3,minmax(0,1fr)); }
+.slider-row { grid-template-columns:86px minmax(40px,1fr) 30px; }
+@media (max-width:760px) {
+  .zones,.bands { grid-template-columns:repeat(3,minmax(0,1fr)); }
+  .bands { display:none; }
+  .zone { min-height:120px; }
+  .needs { grid-template-columns:1fr; }
+  .controls { grid-template-columns:1fr; }
+}
+@media (prefers-reduced-motion:reduce) { .bar,.rai-dot { transition:none; } }
+</style>
+</head>
+<body>
+<div class="shell">
+  <header class="topbar">
+    <a href="./">← Interactive Exercise &amp; Health Behavior Studio</a>
+    <span>Motivation &amp; intention</span>
+  </header>
+  <main>
+    <section class="hero" aria-labelledby="page-title">
+      <p class="eyebrow">An interactive teaching demo</p>
+      <h1 id="page-title">Why does Jordan walk?</h1>
+      <p class="intro">Self-Determination Theory sorts reasons for being active along a continuum, from pressure to personal value and enjoyment. The type of motivation matters as much as the amount.</p>
+      <div class="jordan">
+        <span class="jordan-mark" aria-hidden="true">J</span>
+        <p><span class="jordan-label">Jordan’s situation</span>Jordan has started walking after the doctor’s advice. Ask Jordan why, and you get several different answers.</p>
+      </div>
+    </section>
+
+    <section class="module" aria-label="Motivation continuum walkthrough">
+      <nav class="steps" aria-label="Lesson steps">
+        <button type="button" data-step="0" aria-current="step"><span class="step-num">1.</span>Sort Jordan’s reasons</button>
+        <button type="button" data-step="1"><span class="step-num">2.</span>Jordan’s motivation profile</button>
+        <button type="button" data-step="2"><span class="step-num">3.</span>What tends to last</button>
+      </nav>
+      <div class="workspace">
+        <div class="figure-pane">
+          <div id="panel-sort">
+            <p class="panel-title">Place each reason on the continuum</p>
+            <div class="bands" aria-hidden="true"><span class="b-none">None</span><span class="b-ctrl">Controlled</span><span class="b-auto">Autonomous</span></div>
+            <div class="zones" id="zones">
+              <div class="zone" data-zone="0"><button type="button" class="zone-name" aria-label="Place selected reason in Amotivation">Amotivation</button></div>
+              <div class="zone" data-zone="1"><button type="button" class="zone-name" aria-label="Place selected reason in External">External</button></div>
+              <div class="zone" data-zone="2"><button type="button" class="zone-name" aria-label="Place selected reason in Introjected">Introjected</button></div>
+              <div class="zone" data-zone="3"><button type="button" class="zone-name" aria-label="Place selected reason in Identified">Identified</button></div>
+              <div class="zone" data-zone="4"><button type="button" class="zone-name" aria-label="Place selected reason in Integrated">Integrated</button></div>
+              <div class="zone" data-zone="5"><button type="button" class="zone-name" aria-label="Place selected reason in Intrinsic">Intrinsic</button></div>
+            </div>
+            <div class="pool" id="pool" aria-label="Jordan’s reasons to place"></div>
+            <p class="hint">Drag a reason onto a column, or select it and then select a column. Select a placed reason to move it back.</p>
+          </div>
+          <div id="panel-profile" hidden>
+            <p class="panel-title">How true is each type of reason for Jordan? (0 = not at all, 4 = very true)</p>
+            <div class="profile" id="profile" aria-hidden="true"></div>
+            <div class="bar-labels" aria-hidden="true"><span>Amotivation</span><span>External</span><span>Introjected</span><span>Identified</span><span>Integrated</span><span>Intrinsic</span></div>
+            <div class="rai" aria-hidden="true">
+              <div class="rai-track"><span class="rai-dot" id="rai-dot"></span></div>
+              <div class="rai-ends"><span>More controlled</span><span>More autonomous</span></div>
+            </div>
+          </div>
+          <div id="panel-evidence" hidden>
+            <p class="panel-title">Motivation types and long-term exercise, in research reviews</p>
+            <table class="evidence">
+              <thead><tr><th scope="col">Type</th><th scope="col">Typical association with exercise over time</th></tr></thead>
+              <tbody>
+                <tr><td>Intrinsic</td><td><span class="tag pos">Positive</span> Most consistent link with long-term adherence.</td></tr>
+                <tr><td>Identified</td><td><span class="tag pos">Positive</span> Strong link, especially when people are starting out.</td></tr>
+                <tr><td>Integrated</td><td><span class="tag pos">Positive</span> Fewer studies, generally positive.</td></tr>
+                <tr><td>Introjected</td><td><span class="tag mix">Mixed</span> Can start behavior; less reliable for keeping it going.</td></tr>
+                <tr><td>External</td><td><span class="tag neg">Weak or negative</span> Rarely predicts lasting activity.</td></tr>
+                <tr><td>Amotivation</td><td><span class="tag neg">Negative</span> Linked to less activity.</td></tr>
+              </tbody>
+            </table>
+            <p class="panel-title">Basic psychological needs that support a shift to the right</p>
+            <div class="needs">
+              <div class="need"><h3>Autonomy</h3><p>Jordan chooses the route and the days, instead of following a prescribed schedule.</p></div>
+              <div class="need"><h3>Competence</h3><p>Start with 10-minute walks and track progress, so each week feels achievable.</p></div>
+              <div class="need"><h3>Relatedness</h3><p>Walk with a classmate, or join a campus walking group.</p></div>
+            </div>
+          </div>
+        </div>
+        <section class="side" aria-labelledby="step-title">
+          <div id="lesson" aria-live="polite">
+            <h2 id="step-title">Sort Jordan’s reasons</h2>
+            <p id="step-copy"></p>
+            <div class="metric-area">
+              <div class="metric" data-to="0"><span>Placed correctly</span><output id="m-correct"></output></div>
+              <div class="metric" data-from="1"><span>Controlled (external + introjected)</span><output id="m-ctrl"></output></div>
+              <div class="metric observed" data-from="1"><span>Autonomous (identified + integrated + intrinsic)</span><output id="m-auto"></output></div>
+              <div class="metric total" data-from="1"><span>Relative autonomy index</span><output id="m-rai"></output></div>
+            </div>
+            <p id="interpretation"></p>
+            <div class="inference" id="inference" hidden>The index uses one common scoring (−3, −2, −1, +1, +2, +3 from amotivation to intrinsic), as used with exercise regulation questionnaires. Profiles here are illustrative.</div>
+          </div>
+          <div class="nav-buttons">
+            <button type="button" class="nav-button" id="back" disabled>← Back</button>
+            <button type="button" class="nav-button next" id="next">Next →</button>
+          </div>
+        </section>
+      </div>
+
+      <div class="controls" id="profile-controls" aria-label="Adjust Jordan’s motivation profile" hidden>
+        <fieldset>
+          <legend>Low autonomy</legend>
+          <div class="slider-row"><label for="r0">Amotivation</label><input id="r0" type="range" min="0" max="4" step=".5" value="1"><output id="r0-value" for="r0"></output></div>
+          <div class="slider-row"><label for="r1">External</label><input id="r1" type="range" min="0" max="4" step=".5" value="3"><output id="r1-value" for="r1"></output></div>
+        </fieldset>
+        <fieldset>
+          <legend>Middle</legend>
+          <div class="slider-row"><label for="r2">Introjected</label><input id="r2" type="range" min="0" max="4" step=".5" value="3"><output id="r2-value" for="r2"></output></div>
+          <div class="slider-row"><label for="r3">Identified</label><input id="r3" type="range" min="0" max="4" step=".5" value="2"><output id="r3-value" for="r3"></output></div>
+        </fieldset>
+        <fieldset>
+          <legend>High autonomy</legend>
+          <div class="slider-row"><label for="r4">Integrated</label><input id="r4" type="range" min="0" max="4" step=".5" value=".5"><output id="r4-value" for="r4"></output></div>
+          <div class="slider-row"><label for="r5">Intrinsic</label><input id="r5" type="range" min="0" max="4" step=".5" value="1"><output id="r5-value" for="r5"></output></div>
+        </fieldset>
+      </div>
+      <div class="controls" id="profile-presets" hidden style="grid-template-columns:1fr;">
+        <div class="presets" role="group" aria-label="Example profiles">
+          <button type="button" data-preset="week1" aria-pressed="true">Jordan in week 1</button>
+          <button type="button" data-preset="month3" aria-pressed="false">Jordan after 3 months</button>
+          <button type="button" data-preset="pressure" aria-pressed="false">Only pressure</button>
+        </div>
+      </div>
+    </section>
+    <noscript><p>Enable JavaScript to sort the reasons.</p></noscript>
+
+    <section class="check-section" aria-labelledby="check-title">
+      <h2 id="check-title">Check your understanding</h2>
+      <p>A month later, Jordan says: “I keep walking because I’d feel like a failure if I stopped.” Where does this reason belong?</p>
+      <div class="check-options" role="group" aria-labelledby="check-title">
+        <button type="button" data-check="intrinsic" aria-pressed="false">Intrinsic</button>
+        <button type="button" data-check="identified" aria-pressed="false">Identified</button>
+        <button type="button" data-check="introjected" aria-pressed="false">Introjected</button>
+      </div>
+      <div class="check-feedback" id="check-feedback" role="status" aria-live="polite"></div>
+    </section>
+
+    <details>
+      <summary>Assumptions, interpretation, and references</summary>
+      <p><strong>The continuum.</strong> Self-Determination Theory distinguishes amotivation, four types of extrinsic motivation (external, introjected, identified, integrated), and intrinsic motivation. External and introjected regulation are called controlled; identified, integrated, and intrinsic are called autonomous. People usually hold several types at once.</p>
+      <p><strong>Internalization.</strong> Support for autonomy, competence, and relatedness helps people take in the value of a behavior, moving their reasons toward the autonomous end. This is a tendency, not a fixed sequence of stages.</p>
+      <p><strong>Weight-related reasons.</strong> Reasons tied to appearance or self-worth usually count as introjected. They are common and understandable, and they tend to be less durable than reasons based on personal value or enjoyment.</p>
+      <p>Profiles and examples are illustrative. The references below credit the theory and evidence; no figures or text from them are reproduced.</p>
+      <ol class="sources">
+        <li>Ryan, R. M., &amp; Deci, E. L. (2000). Self-determination theory and the facilitation of intrinsic motivation, social development, and well-being. <em>American Psychologist, 55</em>(1), 68–78. <a href="https://doi.org/10.1037/0003-066X.55.1.68" target="_blank" rel="noopener noreferrer">doi:10.1037/0003-066X.55.1.68 ↗</a></li>
+        <li>Deci, E. L., &amp; Ryan, R. M. (2000). The “what” and “why” of goal pursuits: Human needs and the self-determination of behavior. <em>Psychological Inquiry, 11</em>(4), 227–268. <a href="https://doi.org/10.1207/S15327965PLI1104_01" target="_blank" rel="noopener noreferrer">doi:10.1207/S15327965PLI1104_01 ↗</a></li>
+        <li>Teixeira, P. J., Carraça, E. V., Markland, D., Silva, M. N., &amp; Ryan, R. M. (2012). Exercise, physical activity, and self-determination theory: A systematic review. <em>International Journal of Behavioral Nutrition and Physical Activity, 9</em>, 78. <a href="https://doi.org/10.1186/1479-5868-9-78" target="_blank" rel="noopener noreferrer">doi:10.1186/1479-5868-9-78 ↗</a></li>
+        <li>Markland, D., &amp; Tobin, V. (2004). A modification to the Behavioural Regulation in Exercise Questionnaire to include an assessment of amotivation. <em>Journal of Sport and Exercise Psychology, 26</em>(2), 191–196. <a href="https://doi.org/10.1123/jsep.26.2.191" target="_blank" rel="noopener noreferrer">doi:10.1123/jsep.26.2.191 ↗</a></li>
+      </ol>
+    </details>
+  </main>
+  <footer><span>Hakan Sarac</span><span>Illustrative examples for teaching</span></footer>
+</div>
+<script>
+'use strict';
+(() => {
+  const byId = id => document.getElementById(id);
+  const ZONES = ['Amotivation', 'External', 'Introjected', 'Identified', 'Integrated', 'Intrinsic'];
+  const WEIGHTS = [-3, -2, -1, 1, 2, 3];
+  const COLORS = ['#a9b3ac', '#a14f2c', '#c27a57', '#5f9196', '#3f7d83', '#2e6b73'];
+  const reasons = [
+    { text:'I don’t really see the point. I’ll probably skip it.', zone:0, why:'No sense of value or intention: amotivation.' },
+    { text:'My doctor told me to, and I don’t want a lecture at my next check-up.', zone:1, why:'Acting to avoid a consequence set by someone else is external regulation.' },
+    { text:'I’d feel guilty if I skipped a walk.', zone:2, why:'Guilt is internal pressure, so this is introjected.' },
+    { text:'I need to lose weight. I don’t like how I look in photos.', zone:2, why:'Pressure tied to appearance and self-worth is introjected.' },
+    { text:'I value what walking does for my blood pressure.', zone:3, why:'A personally valued outcome: identified regulation.' },
+    { text:'Walking clears my head before I study.', zone:3, why:'A valued result of walking, not enjoyment of the walk itself: identified.' },
+    { text:'Being active has become part of who I am.', zone:4, why:'The behavior fits Jordan’s identity: integrated regulation.' },
+    { text:'I enjoy the walk itself, especially the fresh air.', zone:5, why:'Done for its own enjoyment: intrinsic motivation.' }
+  ];
+  const presets = { week1:[1, 3, 3, 2, .5, 1], month3:[0, 1, 2, 3.5, 2.5, 3], pressure:[1.5, 4, 4, .5, 0, 0] };
+  const steps = [
+    { title:'Sort Jordan’s reasons', copy:'Each card is something Jordan might say. Place it where it fits on the continuum, from amotivation on the left to intrinsic motivation on the right.' },
+    { title:'Jordan’s motivation profile', copy:'Jordan holds several reasons at once. Set how true each type is for Jordan; the relative autonomy index summarizes whether the profile leans controlled or autonomous.' },
+    { title:'What tends to last', copy:'Research reviews find that autonomous reasons go with lasting physical activity more consistently than controlled reasons. Support for three basic needs helps reasons move to the right.' }
+  ];
+  let placed = reasons.map(() => null), selected = null, last = null, step = 0, prof = [...presets.week1];
+
+  function renderSort() {
+    const pool = byId('pool');
+    pool.innerHTML = '';
+    document.querySelectorAll('.zone').forEach(z => z.querySelectorAll('.card').forEach(c => c.remove()));
+    reasons.forEach((r, i) => {
+      const b = document.createElement('button');
+      b.type = 'button'; b.className = 'card'; b.textContent = r.text; b.dataset.i = i; b.draggable = true;
+      if (placed[i] !== null) b.classList.add(placed[i] === r.zone ? 'right' : 'wrong');
+      b.setAttribute('aria-pressed', String(selected === i));
+      if (placed[i] !== null) b.setAttribute('aria-label', r.text + ' — placed in ' + ZONES[placed[i]] + (placed[i] === r.zone ? ', correct' : ', not correct') + '. Select to move back.');
+      b.addEventListener('click', ev => {
+        ev.stopPropagation();
+        if (placed[i] !== null) { placed[i] = null; selected = i; last = null; }
+        else selected = selected === i ? null : i;
+        renderSort(); updateText();
+      });
+      b.addEventListener('dragstart', ev => { ev.dataTransfer.setData('text/plain', String(i)); selected = i; });
+      (placed[i] === null ? pool : document.querySelector('.zone[data-zone="' + placed[i] + '"]')).appendChild(b);
+    });
+  }
+  function place(i, z) { placed[i] = z; last = i; selected = null; renderSort(); updateText(); }
+  document.querySelectorAll('.zone').forEach(z => {
+    z.addEventListener('click', ev => { if (ev.target.closest('.card')) return; if (selected !== null) place(selected, Number(z.dataset.zone)); });
+    z.addEventListener('dragover', ev => { ev.preventDefault(); z.classList.add('over'); });
+    z.addEventListener('dragleave', () => z.classList.remove('over'));
+    z.addEventListener('drop', ev => { ev.preventDefault(); z.classList.remove('over'); const i = Number(ev.dataTransfer.getData('text/plain')); if (!Number.isNaN(i)) place(i, Number(z.dataset.zone)); });
+  });
+
+  function renderProfile() {
+    const el = byId('profile');
+    el.innerHTML = prof.map((v, i) => '<div class="bar-col"><span class="bar-val">' + v.toFixed(1) + '</span><div class="bar" style="height:' + (v / 4 * 85) + '%;background:' + COLORS[i] + '"></div></div>').join('');
+    prof.forEach((v, i) => { byId('r' + i).value = v; byId('r' + i + '-value').textContent = v.toFixed(1); });
+    const rai = prof.reduce((a, v, i) => a + WEIGHTS[i] * v, 0);
+    byId('rai-dot').style.left = ((rai + 24) / 48 * 100) + '%';
+    document.querySelectorAll('[data-preset]').forEach(b => b.setAttribute('aria-pressed', String(presets[b.dataset.preset].every((v, i) => v === prof[i]))));
+  }
+
+  function updateText() {
+    const correct = placed.filter((z, i) => z === reasons[i].zone).length, done = placed.filter(z => z !== null).length;
+    byId('m-correct').textContent = correct + ' of ' + reasons.length;
+    const ctrl = prof[1] + prof[2], auto = prof[3] + prof[4] + prof[5], rai = prof.reduce((a, v, i) => a + WEIGHTS[i] * v, 0);
+    byId('m-ctrl').textContent = ctrl.toFixed(1);
+    byId('m-auto').textContent = auto.toFixed(1);
+    byId('m-rai').textContent = (rai > 0 ? '+' : rai < 0 ? '−' : '') + Math.abs(rai).toFixed(1);
+    let msg;
+    if (step === 0) {
+      if (last !== null) { const r = reasons[last]; msg = (placed[last] === r.zone ? 'Correct. ' : 'Not quite: this belongs under ' + ZONES[r.zone] + '. ') + r.why; }
+      else msg = done === reasons.length && correct === reasons.length ? 'All reasons are in place.' : 'Select or drag a reason to begin.';
+      if (done === reasons.length && last !== null) msg += correct === reasons.length ? ' All eight are correct.' : ' ' + correct + ' of 8 are correct; select a card marked in orange to try again.';
+    } else if (step === 1) msg = rai < -4 ? 'Jordan’s reasons lean controlled: pressure from the doctor and guilt dominate.' : rai > 4 ? 'Jordan’s reasons lean autonomous: value and enjoyment now outweigh pressure.' : 'Jordan’s reasons are mixed: some pressure, some personal value.';
+    else msg = 'For Jordan, the practical question is not only “how motivated?” but “motivated how?”. Choices, achievable steps, and company all support more autonomous reasons.';
+    byId('interpretation').textContent = msg;
+  }
+
+  function goTo(next) {
+    step = Math.max(0, Math.min(2, next));
+    document.querySelectorAll('[data-step]').forEach(b => { if (Number(b.dataset.step) === step) b.setAttribute('aria-current', 'step'); else b.removeAttribute('aria-current'); });
+    byId('step-title').textContent = steps[step].title;
+    byId('step-copy').textContent = steps[step].copy;
+    byId('panel-sort').hidden = step !== 0;
+    byId('panel-profile').hidden = step !== 1;
+    byId('panel-evidence').hidden = step !== 2;
+    byId('profile-controls').hidden = byId('profile-presets').hidden = step !== 1;
+    document.querySelectorAll('[data-from]').forEach(el => { el.hidden = step < Number(el.dataset.from); });
+    document.querySelectorAll('[data-to]').forEach(el => { el.hidden = step > Number(el.dataset.to); });
+    byId('inference').hidden = step !== 1;
+    byId('back').disabled = step === 0;
+    byId('next').hidden = step === 2;
+    renderProfile(); updateText();
+  }
+
+  for (let i = 0; i < 6; i++) byId('r' + i).addEventListener('input', e => { prof[i] = Number(e.target.value); renderProfile(); updateText(); });
+  document.querySelectorAll('[data-preset]').forEach(b => b.addEventListener('click', () => { prof = [...presets[b.dataset.preset]]; renderProfile(); updateText(); }));
+  document.querySelectorAll('[data-step]').forEach(b => b.addEventListener('click', () => goTo(Number(b.dataset.step))));
+  byId('next').addEventListener('click', () => { goTo(step + 1); if (step === 2) document.querySelector('[data-step="2"]').focus(); });
+  byId('back').addEventListener('click', () => { goTo(step - 1); if (step === 0) document.querySelector('[data-step="0"]').focus(); });
+
+  document.querySelectorAll('[data-check]').forEach(b => b.addEventListener('click', () => {
+    document.querySelectorAll('[data-check]').forEach(o => o.setAttribute('aria-pressed', String(o === b)));
+    byId('check-feedback').textContent = (b.dataset.check === 'introjected' ? 'Correct. ' : 'Not quite. ') +
+      'The reason is about avoiding a feeling of failure, so Jordan’s self-worth depends on walking. That internal pressure is introjected regulation: still controlled, even though no one else is involved.';
+  }));
+
+  renderSort();
+  goTo(0);
+})();
+</script>
+</body>
+</html>

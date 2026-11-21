@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Interactive Exercise &amp; Health Behavior Studio</title>
+<meta name="description" content="Browser-based teaching demos for exercise psychology and health behavior: theories of behavior change, followed through one student, Jordan.">
+<meta name="theme-color" content="#f6f5ef">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Interactive Exercise &amp; Health Behavior Studio">
+<meta property="og:description" content="Browser-based teaching demos for exercise psychology and health behavior.">
+<meta property="og:url" content="https://hknsrc.github.io/stats-demos/health-behavior/">
+<meta property="og:image" content="https://hknsrc.github.io/stats-demos/health-behavior/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Interactive Exercise &amp; Health Behavior Studio: a habit curve rising toward a plateau on a paper grid.">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23f6f5ef'/%3E%3Cpath d='M7 24H25M9 26V7' stroke='%23769582' stroke-width='1.6'/%3E%3Cpath d='M7 24L25 8' stroke='%23a14f2c' stroke-width='2'/%3E%3Ccircle cx='14' cy='18' r='2.4' fill='%23a14f2c'/%3E%3Ccircle cx='20' cy='13' r='2.4' fill='%23a14f2c'/%3E%3Ccircle cx='24' cy='7.5' r='2.4' fill='%232e6b73'/%3E%3C/svg%3E">
+<style>
+:root {
+  --paper:#f6f5ef; --panel:#fdfdf9; --ink:#243d32; --muted:#5b6b61; --line:#d9dfd4;
+  --green:#176e60; --copper:#9a6644;
+  --serif:Georgia,"Times New Roman",serif;
+  --sans:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+  --mono:ui-monospace,SFMono-Regular,Consolas,monospace;
+}
+* { box-sizing:border-box; }
+html { scroll-behavior:smooth; -webkit-text-size-adjust:100%; }
+body { margin:0; background:var(--paper); color:var(--ink); font:15px/1.6 var(--sans); }
+a { color:inherit; -webkit-tap-highlight-color:transparent; touch-action:manipulation; }
+a:focus-visible { outline:3px solid var(--green); outline-offset:4px; border-radius:3px; }
+::selection { background:#d6e7d5; color:#183a2d; }
+svg { display:block; width:100%; height:auto; }
+h1,h2,h3 { font-family:var(--serif); font-weight:400; margin:0; text-wrap:balance; }
+.shell { width:min(1200px, calc(100% - 96px)); margin:0 auto; }
+.skip { position:absolute; top:10px; left:16px; padding:10px 18px; background:var(--ink); color:#fff; z-index:10; transform:translateY(-160%); }
+.skip:focus { transform:none; }
+
+/* Top bar */
+.topbar { display:flex; justify-content:space-between; align-items:center; gap:24px; padding:22px 0; border-bottom:1px solid var(--line); }
+.brand { display:inline-flex; align-items:center; gap:11px; text-decoration:none; font-size:12px; font-weight:650; letter-spacing:.015em; line-height:1.35; }
+.brand-symbol { width:31px; height:31px; flex-shrink:0; }
+.nav { display:flex; align-items:center; gap:26px; }
+.nav a { font-size:12px; text-decoration:none; color:var(--muted); }
+.nav a:hover { color:var(--green); }
+.nav .github { display:flex; align-items:center; gap:8px; }
+.github svg { width:16px; height:16px; }
+
+/* Hero */
+.hero { display:grid; grid-template-columns:minmax(0,1.25fr) minmax(0,1fr); gap:40px; align-items:center; padding:52px 0 40px; }
+.eyebrow { display:flex; align-items:center; gap:9px; margin:0 0 18px; text-transform:uppercase; letter-spacing:.16em; font-size:10px; font-weight:650; color:var(--green); }
+.eyebrow::before { content:""; width:6px; height:6px; border-radius:50%; background:var(--green); }
+h1 { font-size:clamp(44px,5vw,68px); letter-spacing:-.05em; line-height:1.03; margin-bottom:22px; }
+h1 span { display:block; }
+h1 .italic { font-style:italic; color:var(--green); }
+.subtitle { max-width:500px; margin:0; color:var(--muted); font-size:15px; line-height:1.75; }
+.facts { display:flex; flex-wrap:wrap; gap:8px 22px; margin:24px 0 0; padding:0; list-style:none; font-size:12px; color:var(--muted); }
+.facts li { display:flex; align-items:baseline; gap:6px; }
+.facts strong { font-family:var(--serif); font-size:22px; font-weight:400; color:var(--ink); font-variant-numeric:tabular-nums; }
+.hero-art { max-width:420px; justify-self:end; width:100%; }
+.hero-axis { transform-box:view-box; transform-origin:245px 185px; transition:transform .7s ease; }
+.hero-art:hover .hero-axis { transform:rotate(7deg); }
+
+/* Topic tiles */
+.topics { padding:0 0 46px; }
+.topics-title { margin:0 0 14px; font-family:var(--sans); font-size:11px; font-weight:650; letter-spacing:.12em; text-transform:uppercase; }
+.topic-list { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:14px; margin:0; padding:0; list-style:none; }
+.topic { position:relative; display:flex; flex-direction:column; height:100%; padding:18px 18px 16px; background:var(--panel); border:1px solid var(--line); border-radius:6px; text-decoration:none; transition:border-color .2s ease, transform .2s ease; }
+.topic:hover { border-color:#8fae9c; transform:translateY(-2px); }
+.topic-num { font:11px var(--mono); color:var(--green); }
+.topic-name { margin:10px 0 6px; font-family:var(--serif); font-size:21px; line-height:1.18; letter-spacing:-.02em; }
+.topic-blurb { font-size:12.5px; line-height:1.6; color:var(--muted); }
+.topic-count { margin-top:auto; padding-top:14px; font-size:11px; font-weight:650; color:var(--ink); }
+.topic-count::after { content:" ↓"; color:var(--green); }
+
+/* Sections */
+.topic-section { padding:34px 0 46px; border-top:1px solid var(--line); scroll-margin-top:16px; }
+.section-head { display:grid; grid-template-columns:auto minmax(0,1fr) auto; gap:4px 22px; align-items:start; margin-bottom:24px; }
+.section-num { margin:9px 0 0; font:12px var(--mono); color:var(--green); }
+.section-head h2 { font-size:clamp(28px,3vw,36px); line-height:1.1; letter-spacing:-.03em; }
+.section-blurb { margin:8px 0 0; max-width:620px; color:var(--muted); font-size:14px; }
+.to-top { margin-top:10px; font-size:11px; color:var(--muted); text-decoration:none; white-space:nowrap; }
+.to-top:hover { color:var(--green); text-decoration:underline; }
+.grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:20px; }
+
+/* Cards */
+.card { position:relative; display:flex; flex-direction:column; min-width:0; background:var(--panel); border:1px solid var(--line); border-radius:6px; overflow:hidden; transition:border-color .2s ease, box-shadow .2s ease, transform .2s ease; }
+.card:hover { border-color:#8fae9c; box-shadow:0 10px 26px rgba(40,63,53,.06); transform:translateY(-2px); }
+.card:has(a:focus-visible) { outline:3px solid var(--green); outline-offset:3px; }
+.card h3 a:focus-visible { outline:none; }
+.thumb { padding:4px 14px 0; border-bottom:1px solid var(--line); background:#edf2eb; }
+#inference .thumb { background:#edf0f1; }
+#regression .thumb { background:#f1eee6; }
+#measurement .thumb { background:#eef1e7; }
+.thumb svg { max-height:150px; }
+.rotate-axis { transform-box:view-box; transform-origin:240px 130px; transition:transform .55s ease; }
+.card:hover .rotate-axis { transform:rotate(9deg); }
+.card-body { display:flex; flex-direction:column; flex:1; padding:18px 20px 16px; }
+.card-label { margin:0 0 6px; font-size:9.5px; font-weight:650; letter-spacing:.14em; text-transform:uppercase; color:var(--green); }
+.card h3 { font-size:22px; line-height:1.18; letter-spacing:-.025em; margin-bottom:9px; }
+.card h3 a { text-decoration:none; }
+.card h3 a::after { content:""; position:absolute; inset:0; }
+.card-desc { margin:0 0 16px; font-size:13.5px; line-height:1.7; color:var(--muted); }
+.card-open { display:flex; justify-content:space-between; margin-top:auto; padding-top:12px; border-top:1px solid var(--line); font-size:11px; font-weight:650; }
+.card-open span { color:var(--green); transition:transform .2s ease; }
+.card:hover .card-open span { transform:translateX(3px); }
+
+/* Footer */
+.footer { display:flex; justify-content:space-between; align-items:center; gap:24px; padding:24px 0 34px; border-top:1px solid var(--line); font-size:11px; color:var(--muted); }
+.footer p { margin:0; }
+.footer strong { color:var(--ink); font-weight:650; }
+.footer a { color:var(--green); }
+
+@media (max-width:1040px) {
+  .topic-list { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  .grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+}
+@media (max-width:760px) {
+  .shell { width:calc(100% - 40px); }
+  .topbar { padding:18px 0; }
+  .nav { gap:16px; }
+  .nav .collection-nav { display:none; }
+  .hero { grid-template-columns:1fr; gap:10px; padding:36px 0 26px; }
+  .hero-art { max-width:360px; justify-self:center; }
+  .section-head { grid-template-columns:auto minmax(0,1fr); }
+  .to-top { display:none; }
+}
+@media (max-width:560px) {
+  .grid { grid-template-columns:1fr; }
+  .topic-list { grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
+  .topic { padding:13px 14px 12px; }
+  .topic-name { font-size:17px; margin:6px 0 0; }
+  .topic-blurb { display:none; }
+  .topic-count { padding-top:10px; }
+  .hero-art { max-width:280px; }
+  .footer { flex-direction:column; align-items:flex-start; }
+}
+@media (prefers-reduced-motion:reduce) {
+  html { scroll-behavior:auto; }
+  *,*::before,*::after { transition:none !important; animation:none !important; }
+  .topic:hover,.card:hover,.card:hover .rotate-axis,.hero-art:hover .hero-axis,.card:hover .card-open span { transform:none; }
+}
+
+:root { --green:#a14f2c; --copper:#2e6b73; }
+::selection { background:#f0d9cb; color:#4b2414; }
+.topic:hover,.card:hover { border-color:#d6ad97; }
+.thumb { background:#f5ede6; }
+#habits .thumb { background:#edf1ef; }
+.topic-list { grid-template-columns:repeat(2,minmax(0,1fr)); }
+.meet { display:grid; grid-template-columns:auto minmax(0,1fr); gap:28px; align-items:start; margin:0 0 46px; padding:26px 28px; background:#fbf6f2; border:1px solid #ead6c8; border-radius:8px; }
+.meet-mark { width:72px; height:72px; border-radius:50%; background:#a14f2c; color:#fff; display:grid; place-items:center; font:400 34px/1 var(--serif); }
+.meet-eyebrow { margin:0 0 6px; font-size:10px; font-weight:650; letter-spacing:.14em; text-transform:uppercase; color:#a14f2c; }
+.meet h2 { font-size:clamp(26px,3vw,34px); letter-spacing:-.03em; }
+.meet-intro { margin:8px 0 16px; max-width:640px; color:var(--muted); font-size:14px; }
+.meet-facts { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px 28px; margin:0; }
+.meet-facts div { padding-top:10px; border-top:1px solid #ead6c8; }
+.meet-facts dt { font-size:11px; font-weight:650; letter-spacing:.06em; text-transform:uppercase; color:var(--ink); }
+.meet-facts dd { margin:4px 0 0; font-size:13.5px; color:var(--muted); line-height:1.6; }
+@media (max-width:760px) {
+  .meet { grid-template-columns:1fr; gap:14px; padding:20px; }
+  .meet-mark { width:52px; height:52px; font-size:24px; }
+  .meet-facts { grid-template-columns:1fr; }
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to demos</a>
+<div class="shell">
+  <nav class="topbar" aria-label="Main navigation">
+    <a class="brand" href="./" aria-label="Interactive Exercise &amp; Health Behavior Studio, home"><svg class="brand-symbol" viewBox="0 0 32 32" fill="none" aria-hidden="true"><rect x=".5" y=".5" width="31" height="31" rx="5" stroke="#bccbbd"/><path d="M7 24H25M9 26V7" stroke="#769582"/><path d="M7 24L25 8" stroke="#a14f2c"/><circle cx="14" cy="18" r="2" fill="#a14f2c"/><circle cx="20" cy="14" r="2" fill="#a14f2c"/><circle cx="24" cy="7" r="2" fill="#2e6b73"/></svg><span translate="no">Interactive Exercise &amp;<br>Health Behavior Studio</span></a>
+    <div class="nav">
+      <a class="collection-nav" href="#topics">Topics</a>
+      <a href="../">Research Methods Studio</a>
+      <a class="github" href="https://github.com/hknsrc/stats-demos"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-3.16 19.49c.5.09.68-.22.68-.48v-1.86c-2.78.61-3.37-1.18-3.37-1.18-.46-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.61.07-.61 1 .07 1.53 1.03 1.53 1.03.89 1.53 2.34 1.09 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.55-1.11-4.55-4.94 0-1.09.39-1.99 1.03-2.69-.1-.25-.45-1.27.1-2.65 0 0 .84-.27 2.75 1.03a9.55 9.55 0 0 1 5 0c1.91-1.3 2.75-1.03 2.75-1.03.55 1.38.2 2.4.1 2.65.64.7 1.03 1.6 1.03 2.69 0 3.84-2.34 4.69-4.57 4.94.36.31.68.92.68 1.85v2.75c0 .27.18.58.69.48A10 10 0 0 0 12 2Z"/></svg><span>GitHub</span></a>
+    </div>
+  </nav>
+
+  <header class="hero">
+    <div>
+      <p class="eyebrow">Teaching demos for exercise psychology and health behavior</p>
+      <h1><span>Interactive</span> <span class="italic">Exercise &amp; Health Behavior</span> <span>Studio</span></h1>
+      <p class="subtitle">Theories of behavior change, one idea at a time. Every demo follows the same student, Jordan, and lets you change what the theory says matters. They run in the browser, with nothing to install.</p>
+      <ul class="facts" aria-label="Collection summary">
+        <li><strong>3</strong> demos</li>
+        <li><strong>2</strong> topics</li>
+      </ul>
+    </div>
+    <div class="hero-art"><svg class="hero-plot" viewBox="0 0 480 380" fill="none" aria-hidden="true" focusable="false">
+<defs><pattern id="paper-grid-h" width="32" height="32" patternUnits="userSpaceOnUse"><path d="M32 0H0V32" stroke="#4b2e23" stroke-opacity=".07"/></pattern></defs>
+<rect x="44" y="25" width="400" height="300" fill="url(#paper-grid-h)"/>
+<path d="M70 290H420M70 290V50" stroke="#99aaa1" stroke-width="1.2"/>
+<path d="M70 290C130 180 180 130 240 108C300 88 360 82 420 80" stroke="#a14f2c" stroke-width="3"/>
+<g fill="#a14f2c"><circle cx="100" cy="236" r="4.5"/><circle cx="130" cy="196" r="4.5"/><circle cx="160" cy="166" r="4.5"/><circle cx="190" cy="140" r="4.5"/><circle cx="220" cy="122" r="4.5"/><circle cx="250" cy="106" r="4.5"/><circle cx="280" cy="97" r="4.5"/><circle cx="310" cy="91" r="4.5"/><circle cx="340" cy="86" r="4.5"/><circle cx="370" cy="83" r="4.5"/><circle cx="400" cy="81" r="4.5"/></g>
+<circle cx="205" cy="131" r="5" fill="#fff" stroke="#a14f2c" stroke-width="1.6"/>
+<path d="M252 50V290" stroke="#a14f2c" stroke-opacity=".5" stroke-dasharray="3 5"/>
+<text x="258" y="64" font-family="Georgia,serif" font-size="17" font-style="italic" fill="#8a4426">66 days</text>
+<g transform="translate(70 330)"><rect width="58" height="9" fill="#a9b3ac"/><rect x="58" width="58" height="9" fill="#a14f2c"/><rect x="116" width="58" height="9" fill="#c27a57"/><rect x="174" width="58" height="9" fill="#5f9196"/><rect x="232" width="58" height="9" fill="#3f7d83"/><rect x="290" width="60" height="9" fill="#2e6b73"/></g>
+<text x="70" y="362" font-family="monospace" font-size="9" fill="#7a6a60" letter-spacing="2">INTENTION · MOTIVATION · HABIT</text>
+</svg></div>
+  </header>
+
+  <section class="meet" aria-labelledby="meet-title">
+    <div class="meet-mark" aria-hidden="true">J</div>
+    <div class="meet-body">
+      <p class="meet-eyebrow">The student in every demo</p>
+      <h2 id="meet-title">Meet Jordan</h2>
+      <p class="meet-intro">Each demo looks at the same situation through one theory, so the theories can be compared rather than memorized one by one.</p>
+      <dl class="meet-facts">
+        <div><dt>Who</dt><dd>A second-year university student, mostly inactive since exam season.</dd></div>
+        <div><dt>Why now</dt><dd>At a routine check-up, Jordan’s blood pressure was borderline and the doctor recommended regular activity.</dd></div>
+        <div><dt>Goal</dt><dd>150 minutes of brisk walking a week.</dd></div>
+        <div><dt>Barriers</dt><dd>A busy timetable, the weather, friends who don’t exercise, and often feeling too tired.</dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <main id="main" tabindex="-1">
+    <section class="topics" id="topics" aria-labelledby="topics-title">
+      <h2 class="topics-title" id="topics-title">Browse by Topic</h2>
+      <ul class="topic-list">
+      <li><a class="topic" href="#motivation">
+        <span class="topic-num">01</span>
+        <span class="topic-name">Motivation &amp; Intention</span>
+        <span class="topic-blurb">Why people intend to be active, and what kind of motivation keeps them going.</span>
+        <span class="topic-count">2 demos</span>
+      </a></li>
+      <li><a class="topic" href="#habits">
+        <span class="topic-num">02</span>
+        <span class="topic-name">Habits &amp; Self-Regulation</span>
+        <span class="topic-blurb">How a behavior repeated in a stable context becomes automatic.</span>
+        <span class="topic-count">1 demo</span>
+      </a></li>
+      </ul>
+    </section>
+
+    <section class="topic-section" id="motivation" aria-labelledby="motivation-title">
+      <header class="section-head">
+        <p class="section-num">01</p>
+        <div>
+          <h2 id="motivation-title">Motivation &amp; Intention</h2>
+          <p class="section-blurb">Why people intend to be active, and what kind of motivation keeps them going.</p>
+        </div>
+        <a class="to-top" href="#topics">All Topics ↑</a>
+      </header>
+      <div class="grid">
+      <article class="card">
+        <div class="thumb" aria-hidden="true"><svg viewBox="0 0 480 230" fill="none" aria-hidden="true" focusable="false"><g fill="#fdfdf9" stroke="#8a968e" stroke-width="1.3"><rect x="40" y="36" width="96" height="30" rx="5"/><rect x="40" y="100" width="96" height="30" rx="5"/><rect x="40" y="164" width="96" height="30" rx="5"/><rect x="340" y="100" width="96" height="30" rx="5"/></g><rect x="200" y="94" width="100" height="42" rx="6" fill="#fbf2ec" stroke="#a14f2c" stroke-width="1.5"/><g stroke="#a14f2c"><path d="M136 51L200 105" stroke-width="5"/><path d="M136 115H200" stroke-width="1.5"/><path d="M136 179L200 125" stroke-width="3.5"/></g><path d="M300 115H340" stroke="#a9b3ac" stroke-width="2"/><g fill="#52665b" font-family="monospace" font-size="10" text-anchor="middle"><text x="88" y="55">attitude</text><text x="88" y="119">norm</text><text x="88" y="183">control</text><text x="250" y="119" fill="#a14f2c">intention</text><text x="388" y="119">behavior</text></g></svg></div>
+        <div class="card-body">
+          <p class="card-label">Theory of Planned Behavior</p>
+          <h3><a href="./planned-behavior.html">Why Intention Isn’t Action</a></h3>
+          <p class="card-desc">Adjust Jordan’s attitude, norms, and perceived control, then see how many intenders actually walk and what an if–then plan changes.</p>
+          <span class="card-open" aria-hidden="true">Open Demo <span>→</span></span>
+        </div>
+      </article>
+      <article class="card">
+        <div class="thumb" aria-hidden="true"><svg viewBox="0 0 480 230" fill="none" aria-hidden="true" focusable="false"><g><rect x="50" y="120" width="62" height="12" fill="#a9b3ac"/><rect x="114" y="120" width="62" height="12" fill="#a14f2c"/><rect x="178" y="120" width="62" height="12" fill="#c27a57"/><rect x="242" y="120" width="62" height="12" fill="#5f9196"/><rect x="306" y="120" width="62" height="12" fill="#3f7d83"/><rect x="370" y="120" width="62" height="12" fill="#2e6b73"/></g><g fill="#fdfdf9" stroke="#8a968e"><rect x="120" y="56" width="104" height="40" rx="5"/><rect x="262" y="40" width="104" height="40" rx="5"/><rect x="330" y="152" width="96" height="36" rx="5"/></g><g stroke="#8a968e" stroke-width="1.2"><path d="M132 70H210M132 80H190"/><path d="M274 54H352M274 64H330"/><path d="M342 165H412M342 175H392"/></g><path d="M172 96V118" stroke="#a14f2c" stroke-dasharray="3 3"/><path d="M314 80V118" stroke="#2e6b73" stroke-dasharray="3 3"/><g fill="#52665b" font-family="monospace" font-size="10"><text x="50" y="150">controlled</text><text x="364" y="150" fill="#2e6b73">autonomous</text></g></svg></div>
+        <div class="card-body">
+          <p class="card-label">Self-Determination Theory</p>
+          <h3><a href="./motivation-continuum.html">Why Does Jordan Walk?</a></h3>
+          <p class="card-desc">Sort Jordan’s reasons along the motivation continuum, from pressure to enjoyment, and see which kinds tend to last.</p>
+          <span class="card-open" aria-hidden="true">Open Demo <span>→</span></span>
+        </div>
+      </article>
+      </div>
+    </section>
+    <section class="topic-section" id="habits" aria-labelledby="habits-title">
+      <header class="section-head">
+        <p class="section-num">02</p>
+        <div>
+          <h2 id="habits-title">Habits &amp; Self-Regulation</h2>
+          <p class="section-blurb">How a behavior repeated in a stable context becomes automatic.</p>
+        </div>
+        <a class="to-top" href="#topics">All Topics ↑</a>
+      </header>
+      <div class="grid">
+      <article class="card">
+        <div class="thumb" aria-hidden="true"><svg viewBox="0 0 480 230" fill="none" aria-hidden="true" focusable="false"><path d="M60 40V195M120 40V195M180 40V195M240 40V195M300 40V195M360 40V195M420 40V195M60 55H420M60 95H420M60 135H420M60 175H420" stroke="currentColor" opacity=".075"/><path d="M60 175H420M60 40V175" stroke="#9bada8" stroke-width="1.2"/><path d="M60 175C110 110 150 80 200 66C250 54 330 50 420 48" stroke="#a14f2c" stroke-width="2.6"/><path d="M96 40V175" stroke="#7d8a80" stroke-dasharray="4 4"/><path d="M190 40V175" stroke="#a14f2c" stroke-dasharray="3 4"/><g fill="#2e6b73"><rect x="232" y="150" width="9" height="9"/><rect x="244" y="150" width="9" height="9"/><rect x="256" y="150" width="9" height="9"/><rect x="280" y="150" width="9" height="9"/><rect x="292" y="150" width="9" height="9"/><rect x="304" y="150" width="9" height="9"/><rect x="316" y="150" width="9" height="9"/></g><rect x="268.5" y="150.5" width="8" height="8" fill="#fff" stroke="#a14f2c"/><g font-family="monospace" font-size="10"><text x="80" y="194" fill="#52665b">21</text><text x="180" y="194" fill="#a14f2c">66</text></g></svg></div>
+        <div class="card-body">
+          <p class="card-label">Habit Formation</p>
+          <h3><a href="./habit-formation.html">How Long Does a Habit Take?</a></h3>
+          <p class="card-desc">Follow Jordan’s daily walk for 28 weeks: the automaticity curve, missed days, stable cues, and why “21 days” is too short.</p>
+          <span class="card-open" aria-hidden="true">Open Demo <span>→</span></span>
+        </div>
+      </article>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p>Created by <strong>Hakan Sarac</strong> for teaching. Jordan is a fictional student; values in the demos are illustrative.</p>
+    <p><a href="../">Research Methods Studio</a> · <a href="https://github.com/hknsrc/stats-demos">Source on GitHub</a></p>
+  </footer>
+</div>
+</body>
+</html>

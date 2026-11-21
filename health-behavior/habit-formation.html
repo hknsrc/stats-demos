@@ -1,0 +1,419 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="An interactive lesson on habit formation: how automaticity grows with repetition, missed days, stable cues, and behavior complexity.">
+<meta name="theme-color" content="#f6f5ef">
+<title>Habit Formation | Interactive Exercise &amp; Health Behavior Studio</title>
+<style>
+:root {
+  --paper:#f6f5ef; --panel:#fdfdf9; --ink:#243d32; --muted:#52665b;
+  --line:#d9dfd4; --green:#176e60; --sage:#e9f0e7; --copper:#90522f;
+  --warm:#f5ece2; --red:#ac4050; --serif:Georgia,"Times New Roman",serif;
+  --sans:system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+* { box-sizing:border-box; }
+body { margin:0; background:var(--paper); color:var(--ink); font:15px/1.55 var(--sans); }
+button,input { font:inherit; }
+a { color:inherit; text-underline-offset:4px; }
+button { color:inherit; cursor:pointer; background:var(--panel); }
+button:disabled { cursor:default; opacity:.48; }
+:focus-visible { outline:3px solid var(--green); outline-offset:4px; }
+.shell { width:min(1120px,calc(100% - 80px)); margin-inline:auto; }
+.topbar { display:flex; justify-content:space-between; align-items:center; gap:20px; padding:20px 0; border-bottom:1px solid var(--line); font-size:.82rem; }
+.topbar a { text-decoration:none; font-weight:650; }
+.topbar a:hover { text-decoration:underline; }
+.topbar span { color:var(--muted); text-align:right; }
+.hero { padding:38px 0 26px; }
+.eyebrow { margin:0 0 8px; color:var(--green); font-size:.72rem; font-weight:750; letter-spacing:.13em; text-transform:uppercase; }
+h1,h2 { font-family:var(--serif); font-weight:400; line-height:1.08; margin:0; }
+h1 { font-size:clamp(34px,5.5vw,63px); letter-spacing:-.04em; }
+h2 { font-size:clamp(23px,3vw,32px); letter-spacing:-.025em; }
+.intro { margin:12px 0 0; color:var(--muted); max-width:720px; }
+.module { border:1px solid var(--line); border-radius:12px; background:var(--panel); overflow:hidden; }
+.steps { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); background:#f1f3ec; border-bottom:1px solid var(--line); }
+.steps button { position:relative; border:0; border-right:1px solid var(--line); min-height:52px; text-align:left; padding:10px 16px; background:transparent; font-weight:650; font-size:.83rem; }
+.steps button:last-child { border-right:0; }
+.steps button[aria-current="step"] { background:var(--sage); color:var(--green); box-shadow:inset 0 -3px var(--green); }
+.steps button:focus-visible { outline-offset:-5px; }
+.step-num { margin-right:.55em; font-variant-numeric:tabular-nums; }
+.workspace { display:grid; grid-template-columns:minmax(0,1fr) minmax(240px,315px); }
+.figure-pane { min-width:0; padding:22px 24px 18px; }
+.side { display:flex; flex-direction:column; padding:24px; border-left:1px solid var(--line); background:#f8f9f3; }
+.toolbar { display:flex; flex-wrap:wrap; gap:10px; justify-content:space-between; align-items:center; }
+.presets { display:flex; flex-wrap:wrap; gap:7px; }
+.presets button,.nav-button,.small-button { min-height:40px; padding:7px 13px; border:1px solid var(--line); border-radius:6px; font-size:.82rem; font-weight:600; }
+.presets button[aria-pressed="true"] { background:var(--sage); color:#154e43; border-color:#98b7a4; }
+.presets button:hover,.nav-button:hover:not(:disabled),.small-button:hover { border-color:var(--green); }
+figure { margin:17px 0 0; }
+figcaption { margin-bottom:7px; font-size:.82rem; font-weight:650; }
+canvas { display:block; width:100%; height:430px; touch-action:none; }
+.legend { display:flex; flex-wrap:wrap; gap:8px 22px; color:var(--muted); font-size:.81rem; margin-top:6px; }
+.legend span { display:inline-flex; align-items:center; gap:7px; }
+.dot { display:inline-block; width:10px; height:10px; border-radius:50%; background:var(--green); }
+.dot.observed { background:var(--copper); }
+.dot.ghost { background:#cfe0d6; }
+.side p { color:var(--muted); margin:9px 0 16px; line-height:1.5; font-size:.9rem; }
+.metric-area { display:grid; gap:1px; border-block:1px solid var(--line); padding:6px 0; }
+.metric { display:flex; gap:10px; justify-content:space-between; align-items:baseline; padding:7px 0; font-size:.83rem; }
+.metric output { font-size:1.15rem; font-weight:700; color:var(--green); white-space:nowrap; font-variant-numeric:tabular-nums; }
+.metric.observed output { color:var(--copper); }
+.metric.total { border-top:1px solid var(--line); margin-top:2px; }
+#formula { margin:9px 0 5px; font-size:.78rem; font-variant-numeric:tabular-nums; }
+#interpretation { margin-bottom:8px; color:var(--ink); }
+.inference { color:var(--muted); margin-top:0; font-size:.75rem; }
+.nav-buttons { display:flex; flex-wrap:wrap; gap:8px; margin-top:auto; padding-top:18px; }
+.nav-button.next { background:var(--ink); color:white; border-color:var(--ink); }
+.controls { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px 22px; border-top:1px solid var(--line); padding:15px 24px; }
+.controls fieldset { min-width:0; border:0; margin:0; padding:0; }
+.controls legend { font-size:.81rem; font-weight:700; color:var(--green); padding:0; }
+.controls fieldset + fieldset legend { color:var(--copper); }
+.slider-row { display:grid; grid-template-columns:110px minmax(40px,1fr) 40px; align-items:center; gap:7px; min-height:32px; font-size:.76rem; }
+.slider-row output { text-align:right; font-variant-numeric:tabular-nums; }
+input[type="range"] { width:100%; margin:0; accent-color:var(--green); }
+fieldset + fieldset input { accent-color:var(--copper); }
+.check-section { margin-top:28px; padding:22px 0 18px; border-top:1px solid var(--line); }
+.check-section h2 { font-size:clamp(22px,2.6vw,27px); margin-bottom:8px; }
+.check-section p { color:var(--muted); margin:0 0 14px; max-width:780px; font-size:.92rem; }
+.check-options { display:flex; flex-wrap:wrap; gap:8px; }
+.check-options button { min-height:40px; padding:7px 15px; border:1px solid var(--line); border-radius:6px; font-weight:600; font-size:.85rem; }
+.check-options button:hover { border-color:var(--green); }
+.check-options button[aria-pressed="true"] { background:var(--sage); border-color:var(--green); color:#154e43; }
+.check-feedback { min-height:24px; margin-top:12px; max-width:800px; font-size:.9rem; }
+details { border-top:1px solid var(--line); padding:15px 0; font-size:.86rem; }
+summary { cursor:pointer; font-weight:650; }
+details p { color:var(--muted); max-width:880px; }
+.sources { padding-left:20px; color:var(--muted); font-size:.8rem; max-width:880px; }
+.sources li { margin:7px 0; }
+.sources a { color:var(--green); }
+footer { display:flex; gap:8px 20px; flex-wrap:wrap; justify-content:space-between; padding:17px 0 26px; color:var(--muted); font-size:.76rem; border-top:1px solid var(--line); }
+.sr-only { position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap; }
+[hidden] { display:none!important; }
+@media (max-width:760px) {
+  .shell { width:calc(100% - 28px); }
+  .workspace { grid-template-columns:1fr; }
+  .side { border-left:0; border-top:1px solid var(--line); }
+  .figure-pane,.side,.controls { padding:17px; }
+  .hero { padding:28px 0 20px; }
+}
+@media (max-width:510px) {
+  .steps button { font-size:.72rem; padding:8px; }
+  .step-num { display:block; }
+  .controls { grid-template-columns:1fr; }
+  canvas { height:300px; }
+}
+:root { --green:#a14f2c; --sage:#f6e8df; --copper:#2e6b73; --teal:#2e6b73; }
+.presets button[aria-pressed="true"],.check-options button[aria-pressed="true"],.toggle[aria-pressed="true"] { color:#7a3a1f; border-color:#d9b19c; }
+.controls fieldset + fieldset legend { color:var(--teal); }
+fieldset + fieldset input { accent-color:var(--teal); }
+.jordan { display:flex; gap:14px; align-items:flex-start; max-width:760px; margin:20px 0 0; padding:14px 16px; background:#f7ede6; border:1px solid #e6cfc0; border-radius:8px; }
+.jordan-mark { flex:0 0 38px; height:38px; border-radius:50%; background:var(--green); color:#fff; display:grid; place-items:center; font:600 15px/1 var(--serif); }
+.jordan p { margin:0; font-size:.9rem; color:var(--ink); }
+.jordan .jordan-label { display:block; margin-bottom:2px; font-size:.68rem; font-weight:750; letter-spacing:.12em; text-transform:uppercase; color:var(--green); }
+canvas { height:470px; }
+.marker { display:inline-block; width:20px; border-top:3px solid var(--green); }
+.marker.myth { border-top:2px dashed #7d8a80; }
+.sq { display:inline-block; width:11px; height:11px; border-radius:2px; background:var(--teal); }
+.sq.miss { background:#fff; border:1.5px solid var(--green); }
+.band { display:inline-block; width:18px; height:10px; background:#efe3da; border:1px solid #e0c8b8; }
+.seg { display:flex; flex-wrap:wrap; gap:6px; }
+.seg button { min-height:34px; padding:4px 10px; border:1px solid var(--line); border-radius:6px; font-size:.76rem; font-weight:600; }
+.seg button[aria-pressed="true"] { background:var(--sage); border-color:#d9b19c; color:#7a3a1f; }
+.seg button:disabled { opacity:.45; cursor:default; }
+.ctl-label { display:block; margin:6px 0 6px; font-size:.76rem; }
+.controls { grid-template-columns:repeat(3,minmax(0,1fr)); }
+.slider-row { grid-template-columns:110px minmax(40px,1fr) 40px; }
+.hint { color:var(--muted); font-size:.76rem; margin:8px 0 0; }
+@media (max-width:760px) { .controls { grid-template-columns:1fr; } }
+</style>
+</head>
+<body>
+<div class="shell">
+  <header class="topbar">
+    <a href="./">← Interactive Exercise &amp; Health Behavior Studio</a>
+    <span>Habits &amp; self-regulation</span>
+  </header>
+  <main>
+    <section class="hero" aria-labelledby="page-title">
+      <p class="eyebrow">An interactive teaching demo</p>
+      <h1 id="page-title">How long does it take to form a habit?</h1>
+      <p class="intro">A habit is a behavior that starts almost automatically when its cue appears. Automaticity grows with each repetition, quickly at first and then more slowly.</p>
+      <div class="jordan">
+        <span class="jordan-mark" aria-hidden="true">J</span>
+        <p><span class="jordan-label">Jordan’s situation</span>Jordan’s plan is a 10-minute walk straight after lunch, every day. Jordan has read online that a habit takes 21 days.</p>
+      </div>
+    </section>
+
+    <section class="module" aria-label="Habit formation walkthrough">
+      <nav class="steps" aria-label="Lesson steps">
+        <button type="button" data-step="0" aria-current="step"><span class="step-num">1.</span>The habit curve</button>
+        <button type="button" data-step="1"><span class="step-num">2.</span>Missing a day</button>
+        <button type="button" data-step="2"><span class="step-num">3.</span>Cues and complexity</button>
+      </nav>
+      <div class="workspace">
+        <div class="figure-pane">
+          <div class="presets" role="group" aria-label="Example patterns">
+            <button type="button" data-preset="every" aria-pressed="true">Every day</button>
+            <button type="button" data-preset="misses" aria-pressed="false">Misses 1 day in 5</button>
+            <button type="button" data-preset="nocue" aria-pressed="false">No fixed time</button>
+          </div>
+          <figure aria-labelledby="chart-title">
+            <figcaption id="chart-title">Jordan’s automaticity over 28 weeks (illustrative model)</figcaption>
+            <canvas id="chart" role="img" aria-labelledby="chart-title" aria-describedby="chart-description"></canvas>
+            <p id="chart-description" class="sr-only"></p>
+            <div class="legend">
+              <span><i class="marker" aria-hidden="true"></i>Automaticity</span>
+              <span><i class="marker myth" aria-hidden="true"></i>Day 21</span>
+              <span><i class="band" aria-hidden="true"></i>Range in Lally et al. (18–254 days, top bar)</span>
+              <span><i class="sq" aria-hidden="true"></i>Walked</span>
+              <span><i class="sq miss" aria-hidden="true"></i>Missed</span>
+            </div>
+            <p class="hint" id="cal-hint" hidden>Select a day in the calendar to mark it walked or missed. The consistency slider does the same for many days at once.</p>
+          </figure>
+        </div>
+        <section class="side" aria-labelledby="step-title">
+          <div id="lesson" aria-live="polite">
+            <h2 id="step-title">The habit curve</h2>
+            <p id="step-copy"></p>
+            <div class="metric-area">
+              <div class="metric"><span>Automaticity on day 21</span><output id="m-21"></output></div>
+              <div class="metric"><span>Automaticity on day 66</span><output id="m-66"></output></div>
+              <div class="metric total"><span>Day it reaches 95% of its own plateau</span><output id="m-days"></output></div>
+              <div class="metric" data-from="1"><span>Plateau level</span><output id="m-plateau"></output></div>
+              <div class="metric" data-from="1"><span>Walks in the first 66 days</span><output id="m-walks"></output></div>
+            </div>
+            <p id="interpretation"></p>
+            <div class="inference">The curve is a simple model tuned so that a daily, cue-linked walk takes about 66 days, the median in Lally et al. Real people vary widely around it.</div>
+          </div>
+          <div class="nav-buttons">
+            <button type="button" class="nav-button" id="back" disabled>← Back</button>
+            <button type="button" class="nav-button next" id="next">Next →</button>
+          </div>
+        </section>
+      </div>
+
+      <div class="controls" aria-label="Adjust Jordan’s routine">
+        <fieldset>
+          <legend>Consistency</legend>
+          <div class="slider-row"><label for="cons">Days walked</label><input id="cons" type="range" min="50" max="100" step="5" value="100"><output id="cons-value" for="cons"></output></div>
+        </fieldset>
+        <fieldset>
+          <legend>Cue</legend>
+          <span class="ctl-label" id="cue-label">When does Jordan walk?</span>
+          <div class="seg" role="group" aria-labelledby="cue-label">
+            <button type="button" data-cue="fixed" aria-pressed="true">Right after lunch</button>
+            <button type="button" data-cue="varied" aria-pressed="false">Whenever it fits</button>
+          </div>
+        </fieldset>
+        <fieldset>
+          <legend>Behavior</legend>
+          <span class="ctl-label" id="cx-label">What is the new routine?</span>
+          <div class="seg" role="group" aria-labelledby="cx-label">
+            <button type="button" data-cx="simple" aria-pressed="false">Glass of water</button>
+            <button type="button" data-cx="walk" aria-pressed="true">10-minute walk</button>
+            <button type="button" data-cx="gym" aria-pressed="false">45-minute gym session</button>
+          </div>
+        </fieldset>
+      </div>
+    </section>
+    <noscript><p>Enable JavaScript to run the model.</p></noscript>
+
+    <section class="check-section" aria-labelledby="check-title">
+      <h2 id="check-title">Check your understanding</h2>
+      <p>In week 3, Jordan misses one planned walk because of an exam. What does habit research suggest about the effect on habit formation?</p>
+      <div class="check-options" role="group" aria-labelledby="check-title">
+        <button type="button" data-check="reset" aria-pressed="false">Progress starts over</button>
+        <button type="button" data-check="small" aria-pressed="false">A small, temporary dip</button>
+        <button type="button" data-check="none" aria-pressed="false">It cannot have any effect</button>
+      </div>
+      <div class="check-feedback" id="check-feedback" role="status" aria-live="polite"></div>
+    </section>
+
+    <details>
+      <summary>Assumptions, interpretation, and references</summary>
+      <p><strong>The evidence.</strong> In a 12-week study, participants chose a daily eating, drinking, or activity behavior in a consistent context and rated its automaticity each day. Automaticity rose along an asymptotic curve. The median time to reach 95% of each person’s plateau was 66 days, with a range of 18 to 254 days; activity behaviors tended to take longer than drinking. Missing a single opportunity did not materially affect the process.</p>
+      <p><strong>The model.</strong> Each walk adds a fixed share of the remaining distance to the maximum; a missed day removes a small share. The share is larger for simple behaviors and smaller when the behavior is not tied to a stable cue. The parameters are illustrative.</p>
+      <p><strong>Habit and goals.</strong> Habits form through repetition of a behavior in a stable context. Once formed, they can continue with less conscious effort. Intentions still matter for starting and for choosing which behaviors to repeat.</p>
+      <p>The model is illustrative. The references below credit the evidence; no figures or text from them are reproduced.</p>
+      <ol class="sources">
+        <li>Lally, P., van Jaarsveld, C. H. M., Potts, H. W. W., &amp; Wardle, J. (2010). How are habits formed: Modelling habit formation in the real world. <em>European Journal of Social Psychology, 40</em>(6), 998–1009. <a href="https://doi.org/10.1002/ejsp.674" target="_blank" rel="noopener noreferrer">doi:10.1002/ejsp.674 ↗</a></li>
+        <li>Gardner, B., Lally, P., &amp; Wardle, J. (2012). Making health habitual: The psychology of ‘habit-formation’ and general practice. <em>British Journal of General Practice, 62</em>(605), 664–666. <a href="https://doi.org/10.3399/bjgp12X659466" target="_blank" rel="noopener noreferrer">doi:10.3399/bjgp12X659466 ↗</a></li>
+        <li>Wood, W., &amp; Neal, D. T. (2007). A new look at habits and the habit–goal interface. <em>Psychological Review, 114</em>(4), 843–863. <a href="https://doi.org/10.1037/0033-295X.114.4.843" target="_blank" rel="noopener noreferrer">doi:10.1037/0033-295X.114.4.843 ↗</a></li>
+        <li>Gardner, B. (2015). A review and analysis of the use of ‘habit’ in understanding, predicting and influencing health-related behaviour. <em>Health Psychology Review, 9</em>(3), 277–295. <a href="https://doi.org/10.1080/17437199.2013.876238" target="_blank" rel="noopener noreferrer">doi:10.1080/17437199.2013.876238 ↗</a></li>
+      </ol>
+    </details>
+  </main>
+  <footer><span>Hakan Sarac</span><span>Illustrative model for teaching</span></footer>
+</div>
+<script>
+'use strict';
+(() => {
+  const byId = id => document.getElementById(id);
+  const DAYS = 196, ACC = '#a14f2c', TEAL = '#2e6b73', MUTED = '#52665b';
+  const RATE = { simple:1 - Math.pow(.05, 1 / 20), walk:1 - Math.pow(.05, 1 / 66), gym:1 - Math.pow(.05, 1 / 150) };
+  const DECAY = .015, CUE_FACTOR = { fixed:1, varied:.5 };
+  const presets = { every:{ cons:100, cue:'fixed', cx:'walk' }, misses:{ cons:80, cue:'fixed', cx:'walk' }, nocue:{ cons:100, cue:'varied', cx:'walk' } };
+  const steps = [
+    { title:'The habit curve', copy:'With a daily walk at the same moment, automaticity climbs fast in the first weeks and then levels off. On day 21 Jordan is well on the way, but not there yet.' },
+    { title:'Missing a day', copy:'Lower the consistency or select days in the calendar to mark them missed. One missed walk makes a small dip; many missed walks slow the curve and lower its plateau.' },
+    { title:'Cues and complexity', copy:'A stable cue (“right after lunch”) links the walk to a situation. Without one, each repetition builds less automaticity. More complex routines also take longer.' }
+  ];
+  const canvas = byId('chart');
+  const ctx = canvas.getContext('2d');
+  let s = { ...presets.every }, step = 0, W = 0, H = 0, override = new Map(), series = [], cal = {};
+  const noise = (() => { let a = 99; return Array.from({ length:400 }, () => { a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }); })();
+  const walked = d => override.has(d) ? override.get(d) : noise[d] < s.cons / 100;
+
+  function simulate() {
+    const r = RATE[s.cx] * CUE_FACTOR[s.cue];
+    let A = 0; series = [0];
+    for (let d = 1; d <= 365; d++) {
+      if (walked(d)) A += r * (100 - A); else A -= DECAY * A;
+      series.push(A);
+    }
+    const plateau = series.slice(300).reduce((a, b) => a + b, 0) / 66;
+    let reach = null;
+    for (let d = 1; d <= 365; d++) if (series[d] >= .95 * plateau) { reach = d; break; }
+    let walks = 0; for (let d = 1; d <= 66; d++) if (walked(d)) walks++;
+    return { plateau, reach, walks };
+  }
+
+  function layout() {
+    const l = 46, r = 16, t = 14;
+    const calRows = 7, cell = Math.max(7, Math.min(14, (W - l - r) / 28 - 2));
+    const calH = calRows * (cell + 2);
+    const plotB = H - calH - 70;
+    return { l, r, t:t + 22, plotB, cell, calTop:plotB + 54 };
+  }
+
+  function paint() {
+    if (!W) return;
+    ctx.clearRect(0, 0, W, H);
+    ctx.font = '11px system-ui';
+    const L = layout(), right = W - L.r;
+    const x = d => L.l + d / DAYS * (right - L.l), y = v => L.t + (100 - v) / 100 * (L.plotB - L.t);
+    const ry = L.t - 16;
+    ctx.fillStyle = '#efe3da'; ctx.fillRect(x(18), ry, right - x(18), 7);
+    ctx.strokeStyle = '#e0c8b8'; ctx.lineWidth = 1; ctx.strokeRect(x(18) + .5, ry + .5, right - x(18) - 1, 6);
+    ctx.fillStyle = '#7a3a1f'; ctx.fillRect(x(66) - 1, ry - 3, 2, 13);
+    ctx.font = '11px system-ui'; ctx.textAlign = 'left'; ctx.fillStyle = '#7a3a1f';
+    ctx.fillText('Lally et al.: median 66 days', x(66) + 6, ry - 3);
+    ctx.textAlign = 'right'; ctx.fillStyle = MUTED; ctx.fillText('range to 254 →', right, ry - 3);
+    for (const v of [0, 25, 50, 75, 100]) {
+      ctx.strokeStyle = v === 0 ? '#9eaba0' : '#eae6de'; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(L.l, y(v)); ctx.lineTo(right, y(v)); ctx.stroke();
+      ctx.fillStyle = MUTED; ctx.textAlign = 'right'; ctx.fillText(v, L.l - 6, y(v) + 4);
+    }
+    ctx.textAlign = 'center';
+    for (let d = 0; d <= DAYS; d += 28) ctx.fillText(d, x(d), L.plotB + 15);
+    ctx.fillText('Day', (L.l + right) / 2, L.plotB + 28);
+    ctx.save(); ctx.translate(12, (L.t + L.plotB) / 2); ctx.rotate(-Math.PI / 2); ctx.fillText('Automaticity (0–100)', 0, 0); ctx.restore();
+    ctx.strokeStyle = '#7d8a80'; ctx.lineWidth = 1.4; ctx.setLineDash([5, 4]);
+    ctx.beginPath(); ctx.moveTo(x(21), L.t); ctx.lineTo(x(21), L.plotB); ctx.stroke(); ctx.setLineDash([]);
+    ctx.fillStyle = MUTED; ctx.textAlign = 'left'; ctx.fillText('day 21', x(21) + 4, L.plotB - 6);
+    if (cal.reach && cal.reach <= DAYS) {
+      ctx.strokeStyle = ACC; ctx.lineWidth = 1.2; ctx.setLineDash([3, 4]);
+      ctx.beginPath(); ctx.moveTo(L.l, y(.95 * cal.plateau)); ctx.lineTo(x(cal.reach), y(.95 * cal.plateau)); ctx.lineTo(x(cal.reach), L.plotB); ctx.stroke(); ctx.setLineDash([]);
+      ctx.fillStyle = ACC; ctx.font = '600 11px system-ui'; ctx.textAlign = 'left';
+      const label = 'day ' + cal.reach, tw = ctx.measureText(label).width;
+      ctx.fillStyle = 'rgba(253,253,249,.95)'; ctx.fillRect(x(cal.reach) + 3, L.plotB - 36, tw + 6, 16);
+      ctx.fillStyle = ACC; ctx.fillText(label, x(cal.reach) + 6, L.plotB - 24); ctx.font = '11px system-ui';
+    }
+    ctx.strokeStyle = ACC; ctx.lineWidth = 2.8; ctx.beginPath();
+    for (let d = 0; d <= DAYS; d++) { const px = x(d), py = y(series[d]); d ? ctx.lineTo(px, py) : ctx.moveTo(px, py); }
+    ctx.stroke();
+    if (step >= 1) for (let d = 1; d <= DAYS; d++) if (!walked(d)) { ctx.beginPath(); ctx.arc(x(d), y(series[d]), 2.4, 0, Math.PI * 2); ctx.fillStyle = '#fff'; ctx.fill(); ctx.strokeStyle = ACC; ctx.lineWidth = 1.2; ctx.stroke(); }
+    // calendar
+    ctx.fillStyle = MUTED; ctx.textAlign = 'left'; ctx.fillText('Calendar (one column per week)', L.l, L.calTop - 8);
+    for (let d = 1; d <= DAYS; d++) {
+      const col = Math.floor((d - 1) / 7), row = (d - 1) % 7;
+      const cx = L.l + col * (L.cell + 2), cy = L.calTop + row * (L.cell + 2);
+      if (walked(d)) { ctx.fillStyle = TEAL; ctx.fillRect(cx, cy, L.cell, L.cell); }
+      else { ctx.fillStyle = '#fff'; ctx.fillRect(cx, cy, L.cell, L.cell); ctx.strokeStyle = ACC; ctx.lineWidth = 1.2; ctx.strokeRect(cx + .5, cy + .5, L.cell - 1, L.cell - 1); }
+    }
+  }
+
+  function resize() {
+    const b = canvas.getBoundingClientRect(), sc = devicePixelRatio || 1;
+    W = b.width; H = b.height; canvas.width = Math.round(W * sc); canvas.height = Math.round(H * sc);
+    ctx.setTransform(sc, 0, 0, sc, 0, 0); paint();
+  }
+
+  function update() {
+    cal = simulate();
+    byId('cons').value = s.cons; byId('cons-value').textContent = s.cons + '%';
+    document.querySelectorAll('[data-cue]').forEach(b => { b.setAttribute('aria-pressed', String(b.dataset.cue === s.cue)); b.disabled = step < 2; });
+    document.querySelectorAll('[data-cx]').forEach(b => { b.setAttribute('aria-pressed', String(b.dataset.cx === s.cx)); b.disabled = step < 2; });
+    byId('cons').disabled = step < 1;
+    document.querySelectorAll('[data-preset]').forEach(btn => {
+      const p = presets[btn.dataset.preset];
+      btn.setAttribute('aria-pressed', String(!override.size && p.cons === s.cons && p.cue === s.cue && p.cx === s.cx));
+    });
+    byId('m-21').textContent = Math.round(series[21]);
+    byId('m-66').textContent = Math.round(series[66]);
+    byId('m-days').textContent = cal.reach ? (cal.reach > DAYS ? cal.reach + ' (beyond chart)' : String(cal.reach)) : '—';
+    byId('m-plateau').textContent = Math.round(cal.plateau);
+    byId('m-walks').textContent = cal.walks + ' of 66';
+    let msg;
+    if (step === 0) msg = 'On day 21 Jordan’s automaticity is ' + Math.round(series[21]) + ' out of 100. In this model it reaches 95% of its plateau around day ' + cal.reach + '.';
+    else if (step === 1) {
+      const r = RATE[s.cx] * CUE_FACTOR[s.cue], full66 = 100 * (1 - Math.pow(1 - r, 66));
+      msg = s.cons === 100 && override.size <= 2 ? 'Mark a single day as missed in the calendar: the curve dips slightly and recovers within days.' : 'Walking on ' + s.cons + '% of days, automaticity on day 66 is ' + Math.round(series[66]) + ' instead of ' + Math.round(full66) + ', and the curve levels off lower, at about ' + Math.round(cal.plateau) + '. Occasional misses matter little; frequent misses add up.';
+    }
+    else msg = s.cue === 'varied' ? 'Without a fixed moment, each walk builds less automaticity: about ' + cal.reach + ' days to the plateau.' : s.cx === 'gym' ? 'A longer, more demanding routine takes much longer to become automatic: about ' + cal.reach + ' days here.' : s.cx === 'simple' ? 'A very simple routine becomes automatic quickly, in about ' + cal.reach + ' days.' : 'A short walk tied to lunch is a good starting habit; longer sessions can build on it later.';
+    byId('interpretation').textContent = msg;
+    byId('chart-description').textContent = 'Automaticity curve: ' + Math.round(series[21]) + ' on day 21, ' + Math.round(series[66]) + ' on day 66; 95% of plateau on day ' + cal.reach + '. Walked on ' + s.cons + '% of days.';
+    paint();
+  }
+
+  function goTo(next) {
+    step = Math.max(0, Math.min(2, next));
+    document.querySelectorAll('[data-step]').forEach(b => { if (Number(b.dataset.step) === step) b.setAttribute('aria-current', 'step'); else b.removeAttribute('aria-current'); });
+    byId('step-title').textContent = steps[step].title;
+    byId('step-copy').textContent = steps[step].copy;
+    document.querySelectorAll('[data-from]').forEach(el => { el.hidden = step < Number(el.dataset.from); });
+    byId('cal-hint').hidden = step < 1;
+    byId('back').disabled = step === 0;
+    byId('next').hidden = step === 2;
+    update();
+  }
+
+  canvas.addEventListener('click', ev => {
+    if (step < 1) return;
+    const b = canvas.getBoundingClientRect(), px = ev.clientX - b.left, py = ev.clientY - b.top, L = layout();
+    const col = Math.floor((px - L.l) / (L.cell + 2)), row = Math.floor((py - L.calTop) / (L.cell + 2));
+    if (col < 0 || col >= 28 || row < 0 || row >= 7) return;
+    const d = col * 7 + row + 1;
+    override.set(d, !walked(d));
+    update();
+  });
+  canvas.addEventListener('pointermove', ev => {
+    const b = canvas.getBoundingClientRect(), py = ev.clientY - b.top, L = layout();
+    canvas.style.cursor = step >= 1 && py >= L.calTop ? 'pointer' : '';
+  });
+  byId('cons').addEventListener('input', e => { s.cons = Number(e.target.value); override.clear(); update(); });
+  document.querySelectorAll('[data-cue]').forEach(b => b.addEventListener('click', () => { s.cue = b.dataset.cue; update(); }));
+  document.querySelectorAll('[data-cx]').forEach(b => b.addEventListener('click', () => { s.cx = b.dataset.cx; update(); }));
+  document.querySelectorAll('[data-preset]').forEach(b => b.addEventListener('click', () => {
+    s = { ...presets[b.dataset.preset] }; override.clear();
+    const need = s.cons < 100 ? 1 : s.cue !== 'fixed' ? 2 : 0;
+    if (step < need) goTo(need); else update();
+  }));
+  document.querySelectorAll('[data-step]').forEach(b => b.addEventListener('click', () => goTo(Number(b.dataset.step))));
+  byId('next').addEventListener('click', () => { goTo(step + 1); if (step === 2) document.querySelector('[data-step="2"]').focus(); });
+  byId('back').addEventListener('click', () => { goTo(step - 1); if (step === 0) document.querySelector('[data-step="0"]').focus(); });
+
+  document.querySelectorAll('[data-check]').forEach(b => b.addEventListener('click', () => {
+    document.querySelectorAll('[data-check]').forEach(o => o.setAttribute('aria-pressed', String(o === b)));
+    byId('check-feedback').textContent = (b.dataset.check === 'small' ? 'Correct. ' : 'Not quite. ') +
+      'In Lally et al., missing one opportunity did not materially affect habit formation. In the model, a single missed walk dips the curve slightly and it recovers within days. Go to step 2 and mark one day as missed to see it.';
+  }));
+
+  goTo(0);
+  new ResizeObserver(resize).observe(canvas);
+  resize();
+})();
+</script>
+</body>
+</html>

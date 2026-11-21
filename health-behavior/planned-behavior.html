@@ -1,0 +1,391 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="An interactive lesson on the Theory of Planned Behavior and the intention–behavior gap in physical activity.">
+<meta name="theme-color" content="#f6f5ef">
+<title>Theory of Planned Behavior | Interactive Exercise &amp; Health Behavior Studio</title>
+<style>
+:root {
+  --paper:#f6f5ef; --panel:#fdfdf9; --ink:#243d32; --muted:#52665b;
+  --line:#d9dfd4; --green:#176e60; --sage:#e9f0e7; --copper:#90522f;
+  --warm:#f5ece2; --red:#ac4050; --serif:Georgia,"Times New Roman",serif;
+  --sans:system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+* { box-sizing:border-box; }
+body { margin:0; background:var(--paper); color:var(--ink); font:15px/1.55 var(--sans); }
+button,input { font:inherit; }
+a { color:inherit; text-underline-offset:4px; }
+button { color:inherit; cursor:pointer; background:var(--panel); }
+button:disabled { cursor:default; opacity:.48; }
+:focus-visible { outline:3px solid var(--green); outline-offset:4px; }
+.shell { width:min(1120px,calc(100% - 80px)); margin-inline:auto; }
+.topbar { display:flex; justify-content:space-between; align-items:center; gap:20px; padding:20px 0; border-bottom:1px solid var(--line); font-size:.82rem; }
+.topbar a { text-decoration:none; font-weight:650; }
+.topbar a:hover { text-decoration:underline; }
+.topbar span { color:var(--muted); text-align:right; }
+.hero { padding:38px 0 26px; }
+.eyebrow { margin:0 0 8px; color:var(--green); font-size:.72rem; font-weight:750; letter-spacing:.13em; text-transform:uppercase; }
+h1,h2 { font-family:var(--serif); font-weight:400; line-height:1.08; margin:0; }
+h1 { font-size:clamp(34px,5.5vw,63px); letter-spacing:-.04em; }
+h2 { font-size:clamp(23px,3vw,32px); letter-spacing:-.025em; }
+.intro { margin:12px 0 0; color:var(--muted); max-width:720px; }
+.module { border:1px solid var(--line); border-radius:12px; background:var(--panel); overflow:hidden; }
+.steps { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); background:#f1f3ec; border-bottom:1px solid var(--line); }
+.steps button { position:relative; border:0; border-right:1px solid var(--line); min-height:52px; text-align:left; padding:10px 16px; background:transparent; font-weight:650; font-size:.83rem; }
+.steps button:last-child { border-right:0; }
+.steps button[aria-current="step"] { background:var(--sage); color:var(--green); box-shadow:inset 0 -3px var(--green); }
+.steps button:focus-visible { outline-offset:-5px; }
+.step-num { margin-right:.55em; font-variant-numeric:tabular-nums; }
+.workspace { display:grid; grid-template-columns:minmax(0,1fr) minmax(240px,315px); }
+.figure-pane { min-width:0; padding:22px 24px 18px; }
+.side { display:flex; flex-direction:column; padding:24px; border-left:1px solid var(--line); background:#f8f9f3; }
+.toolbar { display:flex; flex-wrap:wrap; gap:10px; justify-content:space-between; align-items:center; }
+.presets { display:flex; flex-wrap:wrap; gap:7px; }
+.presets button,.nav-button,.small-button { min-height:40px; padding:7px 13px; border:1px solid var(--line); border-radius:6px; font-size:.82rem; font-weight:600; }
+.presets button[aria-pressed="true"] { background:var(--sage); color:#154e43; border-color:#98b7a4; }
+.presets button:hover,.nav-button:hover:not(:disabled),.small-button:hover { border-color:var(--green); }
+figure { margin:17px 0 0; }
+figcaption { margin-bottom:7px; font-size:.82rem; font-weight:650; }
+canvas { display:block; width:100%; height:430px; touch-action:none; }
+.legend { display:flex; flex-wrap:wrap; gap:8px 22px; color:var(--muted); font-size:.81rem; margin-top:6px; }
+.legend span { display:inline-flex; align-items:center; gap:7px; }
+.dot { display:inline-block; width:10px; height:10px; border-radius:50%; background:var(--green); }
+.dot.observed { background:var(--copper); }
+.dot.ghost { background:#cfe0d6; }
+.side p { color:var(--muted); margin:9px 0 16px; line-height:1.5; font-size:.9rem; }
+.metric-area { display:grid; gap:1px; border-block:1px solid var(--line); padding:6px 0; }
+.metric { display:flex; gap:10px; justify-content:space-between; align-items:baseline; padding:7px 0; font-size:.83rem; }
+.metric output { font-size:1.15rem; font-weight:700; color:var(--green); white-space:nowrap; font-variant-numeric:tabular-nums; }
+.metric.observed output { color:var(--copper); }
+.metric.total { border-top:1px solid var(--line); margin-top:2px; }
+#formula { margin:9px 0 5px; font-size:.78rem; font-variant-numeric:tabular-nums; }
+#interpretation { margin-bottom:8px; color:var(--ink); }
+.inference { color:var(--muted); margin-top:0; font-size:.75rem; }
+.nav-buttons { display:flex; flex-wrap:wrap; gap:8px; margin-top:auto; padding-top:18px; }
+.nav-button.next { background:var(--ink); color:white; border-color:var(--ink); }
+.controls { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px 22px; border-top:1px solid var(--line); padding:15px 24px; }
+.controls fieldset { min-width:0; border:0; margin:0; padding:0; }
+.controls legend { font-size:.81rem; font-weight:700; color:var(--green); padding:0; }
+.controls fieldset + fieldset legend { color:var(--copper); }
+.slider-row { display:grid; grid-template-columns:110px minmax(40px,1fr) 40px; align-items:center; gap:7px; min-height:32px; font-size:.76rem; }
+.slider-row output { text-align:right; font-variant-numeric:tabular-nums; }
+input[type="range"] { width:100%; margin:0; accent-color:var(--green); }
+fieldset + fieldset input { accent-color:var(--copper); }
+.check-section { margin-top:28px; padding:22px 0 18px; border-top:1px solid var(--line); }
+.check-section h2 { font-size:clamp(22px,2.6vw,27px); margin-bottom:8px; }
+.check-section p { color:var(--muted); margin:0 0 14px; max-width:780px; font-size:.92rem; }
+.check-options { display:flex; flex-wrap:wrap; gap:8px; }
+.check-options button { min-height:40px; padding:7px 15px; border:1px solid var(--line); border-radius:6px; font-weight:600; font-size:.85rem; }
+.check-options button:hover { border-color:var(--green); }
+.check-options button[aria-pressed="true"] { background:var(--sage); border-color:var(--green); color:#154e43; }
+.check-feedback { min-height:24px; margin-top:12px; max-width:800px; font-size:.9rem; }
+details { border-top:1px solid var(--line); padding:15px 0; font-size:.86rem; }
+summary { cursor:pointer; font-weight:650; }
+details p { color:var(--muted); max-width:880px; }
+.sources { padding-left:20px; color:var(--muted); font-size:.8rem; max-width:880px; }
+.sources li { margin:7px 0; }
+.sources a { color:var(--green); }
+footer { display:flex; gap:8px 20px; flex-wrap:wrap; justify-content:space-between; padding:17px 0 26px; color:var(--muted); font-size:.76rem; border-top:1px solid var(--line); }
+.sr-only { position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap; }
+[hidden] { display:none!important; }
+@media (max-width:760px) {
+  .shell { width:calc(100% - 28px); }
+  .workspace { grid-template-columns:1fr; }
+  .side { border-left:0; border-top:1px solid var(--line); }
+  .figure-pane,.side,.controls { padding:17px; }
+  .hero { padding:28px 0 20px; }
+}
+@media (max-width:510px) {
+  .steps button { font-size:.72rem; padding:8px; }
+  .step-num { display:block; }
+  .controls { grid-template-columns:1fr; }
+  canvas { height:300px; }
+}
+:root { --green:#a14f2c; --sage:#f6e8df; --copper:#2e6b73; --teal:#2e6b73; }
+.presets button[aria-pressed="true"],.check-options button[aria-pressed="true"],.toggle[aria-pressed="true"] { color:#7a3a1f; border-color:#d9b19c; }
+.controls fieldset + fieldset legend { color:var(--teal); }
+fieldset + fieldset input { accent-color:var(--teal); }
+.jordan { display:flex; gap:14px; align-items:flex-start; max-width:760px; margin:20px 0 0; padding:14px 16px; background:#f7ede6; border:1px solid #e6cfc0; border-radius:8px; }
+.jordan-mark { flex:0 0 38px; height:38px; border-radius:50%; background:var(--green); color:#fff; display:grid; place-items:center; font:600 15px/1 var(--serif); }
+.jordan p { margin:0; font-size:.9rem; color:var(--ink); }
+.jordan .jordan-label { display:block; margin-bottom:2px; font-size:.68rem; font-weight:750; letter-spacing:.12em; text-transform:uppercase; color:var(--green); }
+canvas { height:420px; }
+.sq { display:inline-block; width:12px; height:12px; border-radius:50%; }
+.sq.acted { background:var(--teal); }
+.sq.gap { background:#fff; border:2px solid var(--green); }
+.sq.no { background:#c9d0c6; }
+.sq.other { background:#8fb1b4; }
+.toggle-row { display:flex; align-items:center; gap:10px; min-height:40px; font-size:.78rem; }
+.toggle { min-height:36px; padding:5px 12px; border:1px solid var(--line); border-radius:6px; font-size:.8rem; font-weight:600; }
+.toggle[aria-pressed="true"] { background:var(--sage); }
+.plan { margin:8px 0 0; padding:10px 12px; border-left:3px solid var(--green); background:#fbf6f2; font-size:.8rem; color:var(--ink); }
+.slider-row { grid-template-columns:150px minmax(40px,1fr) 36px; }
+</style>
+</head>
+<body>
+<div class="shell">
+  <header class="topbar">
+    <a href="./">← Interactive Exercise &amp; Health Behavior Studio</a>
+    <span>Motivation &amp; intention</span>
+  </header>
+  <main>
+    <section class="hero" aria-labelledby="page-title">
+      <p class="eyebrow">An interactive teaching demo</p>
+      <h1 id="page-title">Why doesn’t intention always become action?</h1>
+      <p class="intro">The Theory of Planned Behavior explains what shapes the intention to be active. Then comes the harder part: acting on it.</p>
+      <div class="jordan">
+        <span class="jordan-mark" aria-hidden="true">J</span>
+        <p><span class="jordan-label">Jordan’s situation</span>Jordan thinks regular walking would help their blood pressure. Their friends don’t really exercise, and with a full timetable Jordan isn’t sure three walks a week will fit.</p>
+      </div>
+    </section>
+
+    <section class="module" aria-label="Theory of Planned Behavior walkthrough">
+      <nav class="steps" aria-label="Lesson steps">
+        <button type="button" data-step="0" aria-current="step"><span class="step-num">1.</span>What shapes intention</button>
+        <button type="button" data-step="1"><span class="step-num">2.</span>Intention is not action</button>
+        <button type="button" data-step="2"><span class="step-num">3.</span>Closing the gap</button>
+      </nav>
+      <div class="workspace">
+        <div class="figure-pane">
+          <div class="presets" role="group" aria-label="Example situations">
+            <button type="button" data-preset="now" aria-pressed="true">Jordan now</button>
+            <button type="button" data-preset="friends" aria-pressed="false">Friends start walking</button>
+            <button type="button" data-preset="control" aria-pressed="false">Timetable gets lighter</button>
+          </div>
+          <figure aria-labelledby="chart-title">
+            <figcaption id="chart-title">The Theory of Planned Behavior for Jordan</figcaption>
+            <canvas id="chart" role="img" aria-labelledby="chart-title" aria-describedby="chart-description"></canvas>
+            <p id="chart-description" class="sr-only"></p>
+            <div class="legend" id="legend-grid" hidden>
+              <span><i class="sq acted" aria-hidden="true"></i>Intended and walked</span>
+              <span><i class="sq gap" aria-hidden="true"></i>Intended but did not walk</span>
+              <span><i class="sq other" aria-hidden="true"></i>Walked without intending</span>
+              <span><i class="sq no" aria-hidden="true"></i>Did not intend, did not walk</span>
+            </div>
+          </figure>
+        </div>
+        <section class="side" aria-labelledby="step-title">
+          <div id="lesson" aria-live="polite">
+            <h2 id="step-title">What shapes intention</h2>
+            <p id="step-copy"></p>
+            <div class="metric-area">
+              <div class="metric"><span>Jordan’s intention (1–7)</span><output id="m-int"></output></div>
+              <div class="metric" data-to="0"><span>Largest contribution</span><output id="m-top"></output></div>
+              <div class="metric" data-from="1"><span>Intend to walk 150 min/week</span><output id="m-intenders"></output></div>
+              <div class="metric total" data-from="1"><span>Intenders who walked</span><output id="m-acted"></output></div>
+              <div class="metric" data-from="1"><span>Non-intenders who walked</span><output id="m-others"></output></div>
+            </div>
+            <p id="interpretation"></p>
+            <div class="plan" id="plan" hidden>“If it’s Monday, Wednesday, or Friday and my 2 pm class ends, then I’ll walk the campus loop before going home.”</div>
+            <div class="inference">Weights and probabilities are illustrative. They follow the pattern in physical activity meta-analyses, not one data set.</div>
+          </div>
+          <div class="nav-buttons">
+            <button type="button" class="nav-button" id="back" disabled>← Back</button>
+            <button type="button" class="nav-button next" id="next">Next →</button>
+          </div>
+        </section>
+      </div>
+
+      <div class="controls" aria-label="Adjust Jordan’s beliefs">
+        <fieldset>
+          <legend>Jordan’s beliefs (1–7)</legend>
+          <div class="slider-row"><label for="att">Attitude: walking is good</label><input id="att" type="range" min="1" max="7" step=".5" value="6.5"><output id="att-value" for="att"></output></div>
+          <div class="slider-row"><label for="norm">Subjective norm: others expect it</label><input id="norm" type="range" min="1" max="7" step=".5" value="3"><output id="norm-value" for="norm"></output></div>
+          <div class="slider-row"><label for="pbc">Perceived control: I can do it</label><input id="pbc" type="range" min="1" max="7" step=".5" value="4.5"><output id="pbc-value" for="pbc"></output></div>
+        </fieldset>
+        <fieldset>
+          <legend>Planning</legend>
+          <div class="toggle-row"><button type="button" class="toggle" id="planBtn" aria-pressed="false" disabled>Make an if–then plan</button><span id="plan-note">Available in step 3</span></div>
+        </fieldset>
+      </div>
+    </section>
+    <noscript><p>Enable JavaScript to adjust Jordan’s beliefs.</p></noscript>
+
+    <section class="check-section" aria-labelledby="check-title">
+      <h2 id="check-title">Check your understanding</h2>
+      <p>Jordan has a strong intention to walk regularly. Across physical activity studies, roughly how often are positive intentions like this followed by action?</p>
+      <div class="check-options" role="group" aria-labelledby="check-title">
+        <button type="button" data-check="almost" aria-pressed="false">Almost always</button>
+        <button type="button" data-check="half" aria-pressed="false">About half the time</button>
+        <button type="button" data-check="rarely" aria-pressed="false">Rarely</button>
+      </div>
+      <div class="check-feedback" id="check-feedback" role="status" aria-live="polite"></div>
+    </section>
+
+    <details>
+      <summary>Assumptions, interpretation, and references</summary>
+      <p><strong>The theory.</strong> In the Theory of Planned Behavior, attitude, subjective norm, and perceived behavioral control predict intention; intention and perceived control predict behavior. Across behaviors, the model explains a substantial share of variance in intention and a smaller share in behavior.</p>
+      <p><strong>In this demo.</strong> Intention is a weighted average of the three beliefs with weights .45 (attitude), .10 (norm), and .35 (perceived control), reflecting the common finding that norms are weaker predictors of physical activity intentions. The 100 students have intentions spread around Jordan’s. Their chance of walking rises with intention and perceived control; an if–then plan raises it for those who intend.</p>
+      <p><strong>Limits.</strong> The theory says little about why intentions fail, which led to models of action control and to planning interventions. Effects of if–then plans vary across studies and are smaller when people are less committed to the goal.</p>
+      <p>Values are illustrative. The references below credit the theory and evidence; no figures or text from them are reproduced.</p>
+      <ol class="sources">
+        <li>Ajzen, I. (1991). The theory of planned behavior. <em>Organizational Behavior and Human Decision Processes, 50</em>(2), 179–211. <a href="https://doi.org/10.1016/0749-5978(91)90020-T" target="_blank" rel="noopener noreferrer">doi:10.1016/0749-5978(91)90020-T ↗</a></li>
+        <li>Hagger, M. S., Chatzisarantis, N. L. D., &amp; Biddle, S. J. H. (2002). A meta-analytic review of the theories of reasoned action and planned behavior in physical activity. <em>Journal of Sport and Exercise Psychology, 24</em>(1), 3–32. <a href="https://doi.org/10.1123/jsep.24.1.3" target="_blank" rel="noopener noreferrer">doi:10.1123/jsep.24.1.3 ↗</a></li>
+        <li>Rhodes, R. E., &amp; de Bruijn, G.-J. (2013). How big is the physical activity intention–behaviour gap? A meta-analysis using the action control framework. <em>British Journal of Health Psychology, 18</em>(2), 296–309. <a href="https://doi.org/10.1111/bjhp.12032" target="_blank" rel="noopener noreferrer">doi:10.1111/bjhp.12032 ↗</a></li>
+        <li>Sheeran, P. (2002). Intention–behavior relations: A conceptual and empirical review. <em>European Review of Social Psychology, 12</em>(1), 1–36. <a href="https://doi.org/10.1080/14792772143000003" target="_blank" rel="noopener noreferrer">doi:10.1080/14792772143000003 ↗</a></li>
+        <li>Gollwitzer, P. M., &amp; Sheeran, P. (2006). Implementation intentions and goal achievement: A meta-analysis of effects and processes. <em>Advances in Experimental Social Psychology, 38</em>, 69–119. <a href="https://doi.org/10.1016/S0065-2601(06)38002-1" target="_blank" rel="noopener noreferrer">doi:10.1016/S0065-2601(06)38002-1 ↗</a></li>
+      </ol>
+    </details>
+  </main>
+  <footer><span>Hakan Sarac</span><span>Illustrative values for teaching</span></footer>
+</div>
+<script>
+'use strict';
+(() => {
+  const byId = id => document.getElementById(id);
+  const ACC = '#a14f2c', TEAL = '#2e6b73', INK = '#243d32', MUTED = '#52665b';
+  const WEIGHTS = { att:.45, norm:.10, pbc:.35 };
+  const NAMES = { att:'Attitude', norm:'Subjective norm', pbc:'Perceived control' };
+  const presets = { now:{ att:6.5, norm:3, pbc:4.5 }, friends:{ att:6.5, norm:6.5, pbc:4.5 }, control:{ att:6.5, norm:3, pbc:6.5 } };
+  const steps = [
+    { title:'What shapes intention', copy:'Intention depends on three beliefs: whether walking seems good (attitude), whether important others expect it (subjective norm), and whether it feels doable (perceived control). Move the sliders and watch the arrows.' },
+    { title:'Intention is not action', copy:'Picture 100 students who think much like Jordan. Many intend to walk 150 minutes a week, yet a large share of them do not. Perceived control also affects action directly.' },
+    { title:'Closing the gap', copy:'An if–then plan ties the walk to a specific moment, so the decision is made in advance. Turn it on and compare how many intenders now follow through.' }
+  ];
+  const canvas = byId('chart');
+  const ctx = canvas.getContext('2d');
+  let s = { ...presets.now }, plan = false, step = 0, W = 0, H = 0;
+  const people = (() => {
+    let a = 77;
+    const u = () => { a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
+    return Array.from({ length:100 }, () => { const z = Math.sqrt(-2 * Math.log(u() || 1e-9)) * Math.cos(2 * Math.PI * u()); return { z, u:u() }; });
+  })();
+  const intention = () => (WEIGHTS.att * s.att + WEIGHTS.norm * s.norm + WEIGHTS.pbc * s.pbc) / (WEIGHTS.att + WEIGHTS.norm + WEIGHTS.pbc);
+  const sigmoid = v => 1 / (1 + Math.exp(-v));
+  function crowd() {
+    const I0 = intention();
+    return people.map(p => {
+      const I = Math.min(7, Math.max(1, I0 + p.z));
+      const intends = I >= 5;
+      const logit = 1.6 * (I - 6.1) + .45 * (s.pbc - 4) + (plan && intends ? 1.0 : 0);
+      return { intends, acted:p.u < sigmoid(logit) };
+    });
+  }
+
+  function box(x, y, w, h, title, sub, fill, stroke, faded) {
+    ctx.fillStyle = faded ? '#f6f5ef' : fill; ctx.strokeStyle = faded ? '#d9dfd4' : stroke; ctx.lineWidth = 1.5;
+    ctx.beginPath(); ctx.roundRect(x - w / 2, y - h / 2, w, h, 7); ctx.fill(); ctx.stroke();
+    ctx.fillStyle = faded ? '#a9b3ac' : INK; ctx.textAlign = 'center'; ctx.font = '600 13px system-ui'; ctx.fillText(title, x, y + (sub ? -3 : 4));
+    if (sub) { ctx.font = '11px system-ui'; ctx.fillStyle = faded ? '#b9c1bb' : MUTED; ctx.fillText(sub, x, y + 13); }
+  }
+  function arrow(x1, y1, x2, y2, w, color, dash = []) {
+    const ang = Math.atan2(y2 - y1, x2 - x1);
+    ctx.strokeStyle = color; ctx.fillStyle = color; ctx.lineWidth = w; ctx.setLineDash(dash);
+    ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2 - Math.cos(ang) * 9, y2 - Math.sin(ang) * 9); ctx.stroke(); ctx.setLineDash([]);
+    ctx.beginPath(); ctx.moveTo(x2, y2); ctx.lineTo(x2 - Math.cos(ang - .45) * 13, y2 - Math.sin(ang - .45) * 13); ctx.lineTo(x2 - Math.cos(ang + .45) * 13, y2 - Math.sin(ang + .45) * 13); ctx.closePath(); ctx.fill();
+  }
+
+  function paintDiagram() {
+    const xL = Math.max(78, W * .16), xM = W * .55, xR = W - Math.max(70, W * .12);
+    const ys = [H * .2, H * .48, H * .76], bw = Math.min(150, W * .26), bh = 46;
+    const keys = ['att', 'norm', 'pbc'];
+    const I = intention();
+    keys.forEach((k, i) => {
+      const contrib = WEIGHTS[k] * (s[k] - 1) / 6;
+      arrow(xL + bw / 2, ys[i], xM - 70, H * .48 + (i - 1) * 14, 1.2 + contrib * 22, ACC);
+      box(xL, ys[i], bw, bh, NAMES[k], s[k].toFixed(1) + ' / 7', '#fdfdf9', '#7d8a80');
+      ctx.fillStyle = '#e7ebe3'; ctx.fillRect(xL - bw / 2 + 10, ys[i] + bh / 2 - 8, bw - 20, 4);
+      ctx.fillStyle = ACC; ctx.fillRect(xL - bw / 2 + 10, ys[i] + bh / 2 - 8, (bw - 20) * (s[k] - 1) / 6, 4);
+    });
+    box(xM, H * .48, 140, 64, 'Intention', I.toFixed(1) + ' / 7', '#fbf2ec', ACC);
+    ctx.fillStyle = '#ead8cc'; ctx.fillRect(xM - 55, H * .48 + 20, 110, 5);
+    ctx.fillStyle = ACC; ctx.fillRect(xM - 55, H * .48 + 20, 110 * (I - 1) / 6, 5);
+    arrow(xM + 70, H * .48, xR - 62, H * .48, 2.2, '#a9b3ac');
+    box(xR, H * .48, 120, 52, 'Behavior', 'see step 2', '#fdfdf9', '#7d8a80', true);
+    ctx.strokeStyle = '#a9b3ac'; ctx.lineWidth = 1.4; ctx.setLineDash([5, 5]);
+    ctx.beginPath(); ctx.moveTo(xL + bw / 2, ys[2] + 6); ctx.quadraticCurveTo(xR - 20, ys[2] + 40, xR, H * .48 + 30); ctx.stroke(); ctx.setLineDash([]);
+    ctx.fillStyle = MUTED; ctx.font = '11px system-ui'; ctx.textAlign = 'center';
+    ctx.fillText('direct path from perceived control', (xL + xR) / 2 + 30, ys[2] + 38);
+  }
+
+  function paintGrid() {
+    const rank = p => p.intends ? (p.acted ? 0 : 1) : (p.acted ? 2 : 3);
+    const c = crowd().sort((a, b) => rank(a) - rank(b));
+    const cols = 10, size = Math.min((W - 40) / cols, (H - 30) / 10), r = size * .32;
+    const x0 = (W - size * cols) / 2, y0 = (H - size * 10) / 2;
+    c.forEach((p, i) => {
+      const cx = x0 + (i % cols + .5) * size, cy = y0 + (Math.floor(i / cols) + .5) * size;
+      ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2);
+      if (!p.intends) { ctx.fillStyle = p.acted ? '#8fb1b4' : '#c9d0c6'; ctx.fill(); }
+      else if (p.acted) { ctx.fillStyle = TEAL; ctx.fill(); }
+      else { ctx.fillStyle = '#fff'; ctx.fill(); ctx.strokeStyle = ACC; ctx.lineWidth = 2.2; ctx.stroke(); }
+    });
+    return c;
+  }
+
+  function paint() {
+    if (!W) return;
+    ctx.clearRect(0, 0, W, H);
+    if (step === 0) paintDiagram(); else paintGrid();
+  }
+
+  function resize() {
+    const b = canvas.getBoundingClientRect(), sc = devicePixelRatio || 1;
+    W = b.width; H = b.height; canvas.width = Math.round(W * sc); canvas.height = Math.round(H * sc);
+    ctx.setTransform(sc, 0, 0, sc, 0, 0); paint();
+  }
+
+  function update() {
+    for (const k of ['att', 'norm', 'pbc']) { byId(k).value = s[k]; byId(k + '-value').textContent = s[k].toFixed(1); }
+    document.querySelectorAll('[data-preset]').forEach(btn => {
+      const p = presets[btn.dataset.preset];
+      btn.setAttribute('aria-pressed', String(['att', 'norm', 'pbc'].every(k => p[k] === s[k])));
+    });
+    const I = intention(), c = crowd();
+    const intenders = c.filter(p => p.intends), acted = intenders.filter(p => p.acted).length, others = c.filter(p => !p.intends);
+    const contribs = ['att', 'norm', 'pbc'].map(k => [k, WEIGHTS[k] * s[k]]).sort((a, b) => b[1] - a[1]);
+    byId('m-int').textContent = I.toFixed(1);
+    byId('m-top').textContent = NAMES[contribs[0][0]];
+    byId('m-intenders').textContent = intenders.length + ' of 100';
+    byId('m-acted').textContent = intenders.length ? acted + ' of ' + intenders.length + ' (' + Math.round(100 * acted / intenders.length) + '%)' : '—';
+    byId('m-others').textContent = others.filter(p => p.acted).length + ' of ' + others.length;
+    byId('planBtn').disabled = step !== 2;
+    byId('planBtn').setAttribute('aria-pressed', String(plan));
+    byId('plan-note').textContent = step !== 2 ? 'Available in step 3' : plan ? 'Plan on' : 'Plan off';
+    byId('plan').hidden = !(step === 2 && plan);
+    let msg;
+    if (step === 0) msg = s.norm !== presets.now.norm && s.att === presets.now.att && s.pbc === presets.now.pbc ? 'Changing what friends expect moves Jordan’s intention only a little: in physical activity research, norms tend to be weaker predictors than attitude and perceived control.' : 'Jordan’s intention is ' + I.toFixed(1) + ' out of 7. ' + NAMES[contribs[0][0]] + ' contributes most.';
+    else if (step === 1) msg = intenders.length ? Math.round(100 * (1 - acted / intenders.length)) + '% of the students who intend to walk do not follow through. Raising perceived control helps both intention and action.' : 'Few students intend to walk with these beliefs.';
+    else msg = plan ? 'With an if–then plan, ' + acted + ' of ' + intenders.length + ' intenders walk. The plan helps those who already intend; it does little for those who do not.' : 'Turn on the if–then plan to see its effect on intenders.';
+    byId('interpretation').textContent = msg;
+    byId('chart-description').textContent = step === 0 ? 'Diagram: attitude ' + s.att + ', subjective norm ' + s.norm + ', perceived control ' + s.pbc + '; intention ' + I.toFixed(1) + ' of 7.' : 'Grid of 100 students: ' + intenders.length + ' intend to walk, ' + acted + ' of them walked; ' + others.filter(p => p.acted).length + ' non-intenders walked.';
+    byId('chart-title').textContent = step === 0 ? 'The Theory of Planned Behavior for Jordan' : '100 students who think much like Jordan, after four weeks';
+    paint();
+  }
+
+  function goTo(next) {
+    step = Math.max(0, Math.min(2, next));
+    document.querySelectorAll('[data-step]').forEach(b => { if (Number(b.dataset.step) === step) b.setAttribute('aria-current', 'step'); else b.removeAttribute('aria-current'); });
+    byId('step-title').textContent = steps[step].title;
+    byId('step-copy').textContent = steps[step].copy;
+    document.querySelectorAll('[data-from]').forEach(el => { el.hidden = step < Number(el.dataset.from); });
+    document.querySelectorAll('[data-to]').forEach(el => { el.hidden = step > Number(el.dataset.to); });
+    byId('legend-grid').hidden = step === 0;
+    if (step !== 2) plan = false;
+    byId('back').disabled = step === 0;
+    byId('next').hidden = step === 2;
+    update();
+  }
+
+  for (const k of ['att', 'norm', 'pbc']) byId(k).addEventListener('input', e => { s[k] = Number(e.target.value); update(); });
+  byId('planBtn').addEventListener('click', () => { plan = !plan; update(); });
+  document.querySelectorAll('[data-preset]').forEach(b => b.addEventListener('click', () => { s = { ...presets[b.dataset.preset] }; update(); }));
+  document.querySelectorAll('[data-step]').forEach(b => b.addEventListener('click', () => goTo(Number(b.dataset.step))));
+  byId('next').addEventListener('click', () => { goTo(step + 1); if (step === 2) document.querySelector('[data-step="2"]').focus(); });
+  byId('back').addEventListener('click', () => { goTo(step - 1); if (step === 0) document.querySelector('[data-step="0"]').focus(); });
+
+  document.querySelectorAll('[data-check]').forEach(b => b.addEventListener('click', () => {
+    document.querySelectorAll('[data-check]').forEach(o => o.setAttribute('aria-pressed', String(o === b)));
+    byId('check-feedback').textContent = (b.dataset.check === 'half' ? 'Correct. ' : 'Not quite. ') +
+      'A meta-analysis of physical activity studies found that close to half of people with positive intentions did not act on them (Rhodes & de Bruijn, 2013). Intention matters, but it is far from the whole story.';
+  }));
+
+  goTo(0);
+  new ResizeObserver(resize).observe(canvas);
+  resize();
+})();
+</script>
+</body>
+</html>
