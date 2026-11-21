@@ -6,22 +6,29 @@ The demos aim to make abstract statistical ideas more visually intuitive and eas
 
 ## Interactive demos
 
-The current visualizations include:
+The demos are grouped into four topics:
 
-- **Rotation Intuition** 
-- **EFA Motion Demo** 
-- **ESEM Visualization / Mini Game** 
-- **Bonferroni & False Discovery Rate**
-- **Group × Time Interaction**
-- **Measurement Error & Attenuation**
-- **Measurement Invariance**
-- **Simple Slopes & Johnson–Neyman**
-- **How Many Factors? (Parallel Analysis)**
-- **Cronbach’s Alpha & Omega**
-- **Item Response Curves**
-- **What Determines Power?**
-- **What 95% Confidence Means**
-- **Optional Stopping**
+**Statistical Inference**
+- What 95% Confidence Means
+- What Determines Power?
+- Optional Stopping
+- Bonferroni & False Discovery Rate
+
+**Regression & Research Designs**
+- Group × Time Interaction
+- Simple Slopes & Johnson–Neyman
+
+**Measurement & Reliability**
+- Measurement Error & Attenuation
+- Cronbach’s Alpha & Omega
+- Item Response Curves
+
+**Factor Analysis & SEM**
+- EFA Motion Demo
+- How Many Factors? (Parallel Analysis)
+- Rotation Intuition
+- ESEM Visualization / Mini Game
+- Measurement Invariance
 
 ## Live demo
 
