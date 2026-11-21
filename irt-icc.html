@@ -1,0 +1,406 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="An interactive lesson on item characteristic curves, item parameters, and information in item response theory.">
+<meta name="theme-color" content="#f6f5ef">
+<title>Item Response Curves | Interactive Research Methods Studio</title>
+<style>
+:root {
+  --paper:#f6f5ef; --panel:#fdfdf9; --ink:#243d32; --muted:#52665b;
+  --line:#d9dfd4; --green:#176e60; --sage:#e9f0e7; --copper:#90522f;
+  --warm:#f5ece2; --red:#ac4050; --serif:Georgia,"Times New Roman",serif;
+  --sans:system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+* { box-sizing:border-box; }
+body { margin:0; background:var(--paper); color:var(--ink); font:15px/1.55 var(--sans); }
+button,input { font:inherit; }
+a { color:inherit; text-underline-offset:4px; }
+button { color:inherit; cursor:pointer; background:var(--panel); }
+button:disabled { cursor:default; opacity:.48; }
+:focus-visible { outline:3px solid var(--green); outline-offset:4px; }
+.shell { width:min(1120px,calc(100% - 80px)); margin-inline:auto; }
+.topbar { display:flex; justify-content:space-between; align-items:center; gap:20px; padding:20px 0; border-bottom:1px solid var(--line); font-size:.82rem; }
+.topbar a { text-decoration:none; font-weight:650; }
+.topbar a:hover { text-decoration:underline; }
+.topbar span { color:var(--muted); text-align:right; }
+.hero { padding:38px 0 26px; }
+.eyebrow { margin:0 0 8px; color:var(--green); font-size:.72rem; font-weight:750; letter-spacing:.13em; text-transform:uppercase; }
+h1,h2 { font-family:var(--serif); font-weight:400; line-height:1.08; margin:0; }
+h1 { font-size:clamp(34px,5.5vw,63px); letter-spacing:-.04em; }
+h2 { font-size:clamp(23px,3vw,32px); letter-spacing:-.025em; }
+.intro { margin:12px 0 0; color:var(--muted); max-width:720px; }
+.module { border:1px solid var(--line); border-radius:12px; background:var(--panel); overflow:hidden; }
+.steps { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); background:#f1f3ec; border-bottom:1px solid var(--line); }
+.steps button { position:relative; border:0; border-right:1px solid var(--line); min-height:52px; text-align:left; padding:10px 16px; background:transparent; font-weight:650; font-size:.83rem; }
+.steps button:last-child { border-right:0; }
+.steps button[aria-current="step"] { background:var(--sage); color:var(--green); box-shadow:inset 0 -3px var(--green); }
+.steps button:focus-visible { outline-offset:-5px; }
+.step-num { margin-right:.55em; font-variant-numeric:tabular-nums; }
+.workspace { display:grid; grid-template-columns:minmax(0,1fr) minmax(240px,315px); }
+.figure-pane { min-width:0; padding:22px 24px 18px; }
+.side { display:flex; flex-direction:column; padding:24px; border-left:1px solid var(--line); background:#f8f9f3; }
+.toolbar { display:flex; flex-wrap:wrap; gap:10px; justify-content:space-between; align-items:center; }
+.presets { display:flex; flex-wrap:wrap; gap:7px; }
+.presets button,.nav-button,.small-button { min-height:40px; padding:7px 13px; border:1px solid var(--line); border-radius:6px; font-size:.82rem; font-weight:600; }
+.presets button[aria-pressed="true"] { background:var(--sage); color:#154e43; border-color:#98b7a4; }
+.presets button:hover,.nav-button:hover:not(:disabled),.small-button:hover { border-color:var(--green); }
+figure { margin:17px 0 0; }
+figcaption { margin-bottom:7px; font-size:.82rem; font-weight:650; }
+canvas { display:block; width:100%; height:430px; touch-action:none; }
+.legend { display:flex; flex-wrap:wrap; gap:8px 22px; color:var(--muted); font-size:.81rem; margin-top:6px; }
+.legend span { display:inline-flex; align-items:center; gap:7px; }
+.dot { display:inline-block; width:10px; height:10px; border-radius:50%; background:var(--green); }
+.dot.observed { background:var(--copper); }
+.dot.ghost { background:#cfe0d6; }
+.side p { color:var(--muted); margin:9px 0 16px; line-height:1.5; font-size:.9rem; }
+.metric-area { display:grid; gap:1px; border-block:1px solid var(--line); padding:6px 0; }
+.metric { display:flex; gap:10px; justify-content:space-between; align-items:baseline; padding:7px 0; font-size:.83rem; }
+.metric output { font-size:1.15rem; font-weight:700; color:var(--green); white-space:nowrap; font-variant-numeric:tabular-nums; }
+.metric.observed output { color:var(--copper); }
+.metric.total { border-top:1px solid var(--line); margin-top:2px; }
+#formula { margin:9px 0 5px; font-size:.78rem; font-variant-numeric:tabular-nums; }
+#interpretation { margin-bottom:8px; color:var(--ink); }
+.inference { color:var(--muted); margin-top:0; font-size:.75rem; }
+.nav-buttons { display:flex; flex-wrap:wrap; gap:8px; margin-top:auto; padding-top:18px; }
+.nav-button.next { background:var(--ink); color:white; border-color:var(--ink); }
+.controls { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px 22px; border-top:1px solid var(--line); padding:15px 24px; }
+.controls fieldset { min-width:0; border:0; margin:0; padding:0; }
+.controls legend { font-size:.81rem; font-weight:700; color:var(--green); padding:0; }
+.controls fieldset + fieldset legend { color:var(--copper); }
+.slider-row { display:grid; grid-template-columns:110px minmax(40px,1fr) 40px; align-items:center; gap:7px; min-height:32px; font-size:.76rem; }
+.slider-row output { text-align:right; font-variant-numeric:tabular-nums; }
+input[type="range"] { width:100%; margin:0; accent-color:var(--green); }
+fieldset + fieldset input { accent-color:var(--copper); }
+.check-section { margin-top:28px; padding:22px 0 18px; border-top:1px solid var(--line); }
+.check-section h2 { font-size:clamp(22px,2.6vw,27px); margin-bottom:8px; }
+.check-section p { color:var(--muted); margin:0 0 14px; max-width:780px; font-size:.92rem; }
+.check-options { display:flex; flex-wrap:wrap; gap:8px; }
+.check-options button { min-height:40px; padding:7px 15px; border:1px solid var(--line); border-radius:6px; font-weight:600; font-size:.85rem; }
+.check-options button:hover { border-color:var(--green); }
+.check-options button[aria-pressed="true"] { background:var(--sage); border-color:var(--green); color:#154e43; }
+.check-feedback { min-height:24px; margin-top:12px; max-width:800px; font-size:.9rem; }
+details { border-top:1px solid var(--line); padding:15px 0; font-size:.86rem; }
+summary { cursor:pointer; font-weight:650; }
+details p { color:var(--muted); max-width:880px; }
+.sources { padding-left:20px; color:var(--muted); font-size:.8rem; max-width:880px; }
+.sources li { margin:7px 0; }
+.sources a { color:var(--green); }
+footer { display:flex; gap:8px 20px; flex-wrap:wrap; justify-content:space-between; padding:17px 0 26px; color:var(--muted); font-size:.76rem; border-top:1px solid var(--line); }
+.sr-only { position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap; }
+[hidden] { display:none!important; }
+@media (max-width:760px) {
+  .shell { width:calc(100% - 28px); }
+  .workspace { grid-template-columns:1fr; }
+  .side { border-left:0; border-top:1px solid var(--line); }
+  .figure-pane,.side,.controls { padding:17px; }
+  .hero { padding:28px 0 20px; }
+}
+@media (max-width:510px) {
+  .steps button { font-size:.72rem; padding:8px; }
+  .step-num { display:block; }
+  .controls { grid-template-columns:1fr; }
+  canvas { height:300px; }
+}
+:root { --blue:#386da3; }
+canvas { height:440px; }
+.marker { display:inline-block; width:20px; border-top:3px solid var(--green); }
+.marker.i2 { border-top-color:var(--copper); }
+.marker.i3 { border-top-color:var(--blue); }
+.marker.test { border-top:3px dashed var(--ink); }
+.item-picks { display:flex; flex-wrap:wrap; gap:6px; align-items:center; margin-top:14px; font-size:.8rem; color:var(--muted); }
+.item-picks span { margin-right:4px; }
+.item-picks button { min-height:34px; padding:4px 11px; border:1px solid var(--line); border-radius:6px; font-weight:600; font-size:.8rem; }
+.item-picks button[aria-pressed="true"] { background:var(--sage); border-color:#98b7a4; color:#154e43; }
+.metric.i2 output { color:var(--copper); }
+.metric.i3 output { color:var(--blue); }
+.hint { color:var(--muted); font-size:.76rem; margin:8px 0 0; }
+.controls legend { color:var(--green)!important; }
+.controls input { accent-color:var(--green)!important; }
+</style>
+</head>
+<body>
+<div class="shell">
+  <header class="topbar">
+    <a href="./">← Interactive Research Methods Studio</a>
+    <span>Item response theory</span>
+  </header>
+  <main>
+    <section class="hero" aria-labelledby="page-title">
+      <p class="eyebrow">An interactive teaching demo</p>
+      <h1 id="page-title">What does an item response curve show?</h1>
+      <p class="intro">Three test items. For each ability level θ, the curve gives the probability of a correct answer. Change the item parameters and see what each one does.</p>
+    </section>
+
+    <section class="module" aria-label="Item response theory walkthrough">
+      <nav class="steps" aria-label="Lesson steps">
+        <button type="button" data-step="0" aria-current="step"><span class="step-num">1.</span>Difficulty (b)</button>
+        <button type="button" data-step="1"><span class="step-num">2.</span>Discrimination (a)</button>
+        <button type="button" data-step="2"><span class="step-num">3.</span>Guessing and information</button>
+      </nav>
+      <div class="workspace">
+        <div class="figure-pane">
+          <div class="presets" role="group" aria-label="Example item sets">
+            <button type="button" data-preset="difficulty" aria-pressed="true">Easy to hard</button>
+            <button type="button" data-preset="discrimination" aria-pressed="false">Flat to steep</button>
+            <button type="button" data-preset="guessing" aria-pressed="false">With guessing</button>
+          </div>
+          <div class="item-picks" role="group" aria-label="Item to edit">
+            <span>Edit item:</span>
+            <button type="button" data-item="0" aria-pressed="true">Item 1</button>
+            <button type="button" data-item="1" aria-pressed="false">Item 2</button>
+            <button type="button" data-item="2" aria-pressed="false">Item 3</button>
+          </div>
+          <figure aria-labelledby="chart-title">
+            <figcaption id="chart-title">Probability of a correct answer by ability</figcaption>
+            <canvas id="chart" role="img" aria-labelledby="chart-title" aria-describedby="chart-description"></canvas>
+            <p id="chart-description" class="sr-only"></p>
+            <div class="legend">
+              <span><i class="marker" aria-hidden="true"></i>Item 1</span>
+              <span><i class="marker i2" aria-hidden="true"></i>Item 2</span>
+              <span><i class="marker i3" aria-hidden="true"></i>Item 3</span>
+              <span id="legend-test" hidden><i class="marker test" aria-hidden="true"></i>Test information</span>
+            </div>
+            <p class="hint">Drag the handle on the selected curve to move its difficulty. Click elsewhere in the chart to move the θ line.</p>
+          </figure>
+        </div>
+        <section class="side" aria-labelledby="step-title">
+          <div id="lesson" aria-live="polite">
+            <h2 id="step-title">Difficulty (b)</h2>
+            <p id="step-copy"></p>
+            <div class="metric-area">
+              <div class="metric"><span>θ line</span><output id="m-theta"></output></div>
+              <div class="metric"><span>P(correct), Item 1</span><output id="m-p0"></output></div>
+              <div class="metric i2"><span>P(correct), Item 2</span><output id="m-p1"></output></div>
+              <div class="metric i3"><span>P(correct), Item 3</span><output id="m-p2"></output></div>
+              <div class="metric total" data-from="1"><span>Slope at b, selected item</span><output id="m-slope"></output></div>
+              <div class="metric" data-from="2"><span>Test information at θ</span><output id="m-info"></output></div>
+              <div class="metric" data-from="2"><span>Standard error of θ</span><output id="m-se"></output></div>
+            </div>
+            <p id="interpretation"></p>
+            <div class="inference" id="inference" hidden>A real test has many items; three are used here so each curve stays visible. The SE shown is the SE of a θ estimate based on these three items only.</div>
+          </div>
+          <div class="nav-buttons">
+            <button type="button" class="nav-button" id="back" disabled>← Back</button>
+            <button type="button" class="nav-button next" id="next">Next →</button>
+          </div>
+        </section>
+      </div>
+
+      <div class="controls" aria-label="Adjust item parameters">
+        <fieldset>
+          <legend id="item-legend">Item 1 parameters</legend>
+          <div class="slider-row"><label for="a">Discrimination a</label><input id="a" type="range" min=".3" max="2.5" step=".1" value="1.2"><output id="a-value" for="a"></output></div>
+          <div class="slider-row"><label for="b">Difficulty b</label><input id="b" type="range" min="-2.5" max="2.5" step=".1" value="-1.5"><output id="b-value" for="b"></output></div>
+          <div class="slider-row"><label for="c">Lower asymptote c</label><input id="c" type="range" min="0" max=".35" step=".05" value="0"><output id="c-value" for="c"></output></div>
+        </fieldset>
+        <fieldset>
+          <legend>Ability</legend>
+          <div class="slider-row"><label for="theta">θ line</label><input id="theta" type="range" min="-3" max="3" step=".1" value="0"><output id="theta-value" for="theta"></output></div>
+        </fieldset>
+      </div>
+    </section>
+    <noscript><p>Enable JavaScript to adjust the item parameters.</p></noscript>
+
+    <section class="check-section" aria-labelledby="check-title">
+      <h2 id="check-title">Check your understanding</h2>
+      <p>Item 1 has b = 0 and a = 2. Item 2 has b = 0 and a = 0.5 (no guessing for either). For which test-takers does Item 1 give more information than Item 2?</p>
+      <div class="check-options" role="group" aria-labelledby="check-title">
+        <button type="button" data-check="all" aria-pressed="false">For everyone</button>
+        <button type="button" data-check="near" aria-pressed="false">For those near θ = 0</button>
+        <button type="button" data-check="far" aria-pressed="false">For those far from θ = 0</button>
+      </div>
+      <div class="check-feedback" id="check-feedback" role="status" aria-live="polite"></div>
+    </section>
+
+    <details>
+      <summary>Assumptions, interpretation, and references</summary>
+      <p><strong>The model.</strong> The three-parameter logistic model: P(θ) = c + (1 − c) / (1 + e<sup>−a(θ − b)</sup>). With c = 0 it reduces to the two-parameter model, and with a common a to the Rasch / one-parameter model. Some texts include a scaling constant D = 1.7 in the exponent; this demo does not.</p>
+      <p><strong>Information.</strong> Item information is I(θ) = a<sup>2</sup> · [(P − c)<sup>2</sup> / (1 − c)<sup>2</sup>] · [(1 − P) / P]. Without guessing it peaks at θ = b with value a<sup>2</sup>/4; guessing lowers the peak and moves it slightly above b. Test information is the sum over items, and SE(θ) ≈ 1/√I(θ).</p>
+      <p><strong>Assumptions.</strong> The curves assume one latent trait (unidimensionality), local independence of items given θ, and a correctly specified curve shape. Parameters are estimated from data and have their own uncertainty.</p>
+      <p>Item parameters are illustrative. The references below credit the methods; no figures or text from them are reproduced.</p>
+      <ol class="sources">
+        <li>Birnbaum, A. (1968). Some latent trait models and their use in inferring an examinee’s ability. In F. M. Lord &amp; M. R. Novick, <em>Statistical theories of mental test scores</em> (pp. 397–479). Addison-Wesley.</li>
+        <li>Lord, F. M. (1980). <em>Applications of item response theory to practical testing problems.</em> Lawrence Erlbaum.</li>
+        <li>Embretson, S. E., &amp; Reise, S. P. (2000). <em>Item response theory for psychologists.</em> Lawrence Erlbaum.</li>
+        <li>de Ayala, R. J. (2009). <em>The theory and practice of item response theory.</em> Guilford Press.</li>
+      </ol>
+    </details>
+  </main>
+  <footer><span>Hakan Sarac</span><span>Illustrative item parameters for teaching</span></footer>
+</div>
+<script>
+'use strict';
+(() => {
+  const byId = id => document.getElementById(id);
+  const COLORS = ['#176e60', '#90522f', '#386da3'];
+  const presets = {
+    difficulty:[{ a:1.2, b:-1.5, c:0 }, { a:1.2, b:0, c:0 }, { a:1.2, b:1.5, c:0 }],
+    discrimination:[{ a:.5, b:0, c:0 }, { a:1, b:0, c:0 }, { a:2.2, b:0, c:0 }],
+    guessing:[{ a:1.5, b:0, c:0 }, { a:1.5, b:0, c:.2 }, { a:1.5, b:0, c:.3 }]
+  };
+  const steps = [
+    { title:'Difficulty (b)', copy:'The difficulty b is the ability level where the curve is halfway between its floor and 1. Without guessing, that is where P = .50. A higher b moves the curve to the right: the item is harder.' },
+    { title:'Discrimination (a)', copy:'The discrimination a sets how steep the curve is around b. A steep item separates people just below b from people just above it; a flat item changes little across the ability range.' },
+    { title:'Guessing and information', copy:'The lower asymptote c is the chance of a correct answer at very low ability, for example from guessing. The lower panel shows how much information each item gives at each θ; the dashed line is their sum.' }
+  ];
+  const canvas = byId('chart');
+  const ctx = canvas.getContext('2d');
+  let items = presets.difficulty.map(o => ({ ...o }));
+  let sel = 0, theta = 0, step = 0, W = 0, H = 0, drag = null;
+  const P = (it, t) => it.c + (1 - it.c) / (1 + Math.exp(-it.a * (t - it.b)));
+  const info = (it, t) => { const p = P(it, t); return it.a * it.a * ((p - it.c) ** 2 / (1 - it.c) ** 2) * ((1 - p) / p); };
+  const testInfo = t => items.reduce((s, it) => s + info(it, t), 0);
+  const fmt = (v, d = 2) => (v < -5e-4 ? '−' : '') + Math.abs(v).toFixed(d);
+
+  function layout() {
+    const l = 46, r = 16;
+    if (step < 2) return { l, r, top:{ t:12, b:H - 34 }, bot:null };
+    return { l, r, top:{ t:12, b:H * .55 }, bot:{ t:H * .55 + 30, b:H - 34 } };
+  }
+  const xOf = (t, L) => L.l + (t + 3) / 6 * (W - L.l - L.r);
+  const tOf = (px, L) => (px - L.l) / (W - L.l - L.r) * 6 - 3;
+
+  function line(x1, y1, x2, y2, color, width = 1, dash = []) {
+    ctx.beginPath(); ctx.strokeStyle = color; ctx.lineWidth = width; ctx.setLineDash(dash);
+    ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke(); ctx.setLineDash([]);
+  }
+  function text(t, px, py, color = '#52665b', align = 'center') { ctx.fillStyle = color; ctx.textAlign = align; ctx.fillText(t, px, py); }
+  function curve(fn, x, y, color, width, dash = []) {
+    ctx.strokeStyle = color; ctx.lineWidth = width; ctx.setLineDash(dash); ctx.beginPath();
+    for (let t = -3; t <= 3.0001; t += .03) { const px = x(t), py = y(fn(t)); t === -3 ? ctx.moveTo(px, py) : ctx.lineTo(px, py); }
+    ctx.stroke(); ctx.setLineDash([]);
+  }
+
+  function paint() {
+    if (!W) return;
+    ctx.clearRect(0, 0, W, H);
+    ctx.font = '11px system-ui';
+    const L = layout(), x = t => xOf(t, L), right = W - L.r;
+    const yT = v => L.top.t + (1 - v) * (L.top.b - L.top.t);
+    for (const v of [0, .25, .5, .75, 1]) { line(L.l, yT(v), right, yT(v), v === 0 ? '#9eaba0' : v === .5 ? '#d3dad0' : '#eef1ea'); text(v.toFixed(2), L.l - 6, yT(v) + 4, undefined, 'right'); }
+    for (let t = -3; t <= 3; t++) { line(x(t), L.top.t, x(t), L.top.b, '#eef1ea'); if (!L.bot) text(t, x(t), L.top.b + 15); }
+    ctx.save(); ctx.translate(12, (L.top.t + L.top.b) / 2); ctx.rotate(-Math.PI / 2); text('P(correct)'); ctx.restore();
+    if (!L.bot) text('Ability θ', (L.l + right) / 2, H - 4);
+    items.forEach((it, i) => curve(t => P(it, t), x, yT, COLORS[i], i === sel ? 3.2 : 2));
+    const s = items[sel];
+    if (step >= 1) {
+      const pb = P(s, s.b), slope = s.a * (1 - s.c) / 4;
+      line(x(s.b - .6), yT(pb - slope * .6), x(s.b + .6), yT(pb + slope * .6), '#243d32', 1.4, [4, 3]);
+    }
+    if (step === 2 && s.c > 0) { line(L.l, yT(s.c), right, yT(s.c), COLORS[sel], 1, [2, 4]); text('c = ' + s.c.toFixed(2), right - 4, yT(s.c) - 5, COLORS[sel], 'right'); }
+    line(x(theta), L.top.t, x(theta), L.bot ? L.bot.b : L.top.b, '#243d32', 1.2, [6, 5]);
+    items.forEach((it, i) => { ctx.beginPath(); ctx.arc(x(theta), yT(P(it, theta)), 4, 0, Math.PI * 2); ctx.fillStyle = COLORS[i]; ctx.fill(); });
+    ctx.beginPath(); ctx.arc(x(s.b), yT(P(s, s.b)), 7, 0, Math.PI * 2);
+    ctx.fillStyle = '#fdfdf9'; ctx.fill(); ctx.strokeStyle = COLORS[sel]; ctx.lineWidth = 2.5; ctx.stroke();
+    ctx.strokeStyle = '#9eaba0'; ctx.lineWidth = 1; ctx.strokeRect(L.l, L.top.t, right - L.l, L.top.b - L.top.t);
+
+    if (L.bot) {
+      let ymax = .5;
+      for (let t = -3; t <= 3; t += .05) ymax = Math.max(ymax, testInfo(t));
+      ymax = Math.ceil(ymax * 2) / 2;
+      const yB = v => L.bot.t + (1 - v / ymax) * (L.bot.b - L.bot.t);
+      const stepTick = ymax > 3 ? 1 : .5;
+      for (let v = 0; v <= ymax + 1e-9; v += stepTick) { line(L.l, yB(v), right, yB(v), v === 0 ? '#9eaba0' : '#eef1ea'); text(v.toFixed(1), L.l - 6, yB(v) + 4, undefined, 'right'); }
+      for (let t = -3; t <= 3; t++) { line(x(t), L.bot.t, x(t), L.bot.b, '#eef1ea'); text(t, x(t), L.bot.b + 15); }
+      text('Ability θ', (L.l + right) / 2, H - 4);
+      ctx.save(); ctx.translate(12, (L.bot.t + L.bot.b) / 2); ctx.rotate(-Math.PI / 2); text('Information'); ctx.restore();
+      items.forEach((it, i) => curve(t => info(it, t), x, yB, COLORS[i], i === sel ? 2.6 : 1.6));
+      curve(testInfo, x, yB, '#243d32', 2.2, [6, 4]);
+      ctx.strokeStyle = '#9eaba0'; ctx.lineWidth = 1; ctx.strokeRect(L.l, L.bot.t, right - L.l, L.bot.b - L.bot.t);
+    }
+  }
+
+  function resize() {
+    const b = canvas.getBoundingClientRect(), sc = devicePixelRatio || 1;
+    W = b.width; H = b.height; canvas.width = Math.round(W * sc); canvas.height = Math.round(H * sc);
+    ctx.setTransform(sc, 0, 0, sc, 0, 0); paint();
+  }
+
+  function update() {
+    const s = items[sel];
+    for (const [k, d] of [['a', 1], ['b', 1], ['c', 2]]) { byId(k).value = s[k]; byId(k + '-value').textContent = fmt(s[k], d); }
+    byId('theta').value = theta; byId('theta-value').textContent = fmt(theta, 1);
+    byId('item-legend').textContent = 'Item ' + (sel + 1) + ' parameters';
+    document.querySelectorAll('[data-item]').forEach(b => b.setAttribute('aria-pressed', String(Number(b.dataset.item) === sel)));
+    document.querySelectorAll('[data-preset]').forEach(btn => {
+      const p = presets[btn.dataset.preset];
+      btn.setAttribute('aria-pressed', String(p.every((o, i) => ['a', 'b', 'c'].every(k => Math.abs(o[k] - items[i][k]) < 1e-9))));
+    });
+    byId('m-theta').textContent = fmt(theta, 1);
+    items.forEach((it, i) => { byId('m-p' + i).textContent = P(it, theta).toFixed(2); });
+    byId('m-slope').textContent = (s.a * (1 - s.c) / 4).toFixed(2);
+    const I = testInfo(theta);
+    byId('m-info').textContent = I.toFixed(2);
+    byId('m-se').textContent = I > 1e-6 ? (1 / Math.sqrt(I)).toFixed(2) : '—';
+    let msg;
+    if (step === 0) msg = 'At θ = ' + fmt(theta, 1) + ', Item ' + (sel + 1) + ' is answered correctly with probability ' + P(s, theta).toFixed(2) + '. Its difficulty is b = ' + fmt(s.b, 1) + '.';
+    else if (step === 1) msg = 'Around b, the probability for Item ' + (sel + 1) + ' rises by about ' + (s.a * (1 - s.c) / 4).toFixed(2) + ' per unit of θ (dotted tangent). Steeper items separate nearby ability levels better.';
+    else {
+      let best = -3, bestI = 0;
+      for (let t = -3; t <= 3; t += .01) { const v = info(s, t); if (v > bestI) { bestI = v; best = t; } }
+      msg = 'Item ' + (sel + 1) + ' is most informative near θ = ' + fmt(best, 1) + (s.c > 0 ? ', a little above its b because of guessing' : '') + '. Where the test information is low, ability estimates are less precise.';
+    }
+    byId('interpretation').textContent = msg;
+    byId('chart-description').textContent = items.map((it, i) => 'Item ' + (i + 1) + ': a ' + fmt(it.a, 1) + ', b ' + fmt(it.b, 1) + ', c ' + it.c.toFixed(2)).join('; ') + '. θ line at ' + fmt(theta, 1) + '.';
+    paint();
+  }
+
+  function goTo(next) {
+    step = Math.max(0, Math.min(2, next));
+    document.querySelectorAll('[data-step]').forEach(b => { if (Number(b.dataset.step) === step) b.setAttribute('aria-current', 'step'); else b.removeAttribute('aria-current'); });
+    byId('step-title').textContent = steps[step].title;
+    byId('step-copy').textContent = steps[step].copy;
+    document.querySelectorAll('[data-from]').forEach(el => { el.hidden = step < Number(el.dataset.from); });
+    byId('inference').hidden = step !== 2;
+    byId('legend-test').hidden = step !== 2;
+    byId('back').disabled = step === 0;
+    byId('next').hidden = step === 2;
+    update();
+  }
+
+  const local = ev => { const b = canvas.getBoundingClientRect(); return { x:ev.clientX - b.left, y:ev.clientY - b.top }; };
+  function onHandle(pt) {
+    const L = layout(), s = items[sel];
+    const hy = L.top.t + (1 - P(s, s.b)) * (L.top.b - L.top.t);
+    return Math.hypot(pt.x - xOf(s.b, L), pt.y - hy) < 14;
+  }
+  const clampT = v => Math.max(-3, Math.min(3, Math.round(v * 10) / 10));
+  canvas.addEventListener('pointerdown', ev => {
+    if (!ev.isPrimary || ev.button !== 0) return;
+    const pt = local(ev);
+    drag = onHandle(pt) ? 'b' : 'theta';
+    canvas.setPointerCapture(ev.pointerId);
+    if (drag === 'theta') { theta = clampT(tOf(pt.x, layout())); update(); }
+  });
+  canvas.addEventListener('pointermove', ev => {
+    const pt = local(ev);
+    if (!drag) { canvas.style.cursor = onHandle(pt) ? 'grab' : 'crosshair'; return; }
+    const t = clampT(tOf(pt.x, layout()));
+    if (drag === 'b') items[sel].b = Math.max(-2.5, Math.min(2.5, t)); else theta = t;
+    update();
+  });
+  canvas.addEventListener('lostpointercapture', () => { drag = null; });
+
+  for (const k of ['a', 'b', 'c']) byId(k).addEventListener('input', e => { items[sel][k] = Number(e.target.value); update(); });
+  byId('theta').addEventListener('input', e => { theta = Number(e.target.value); update(); });
+  document.querySelectorAll('[data-item]').forEach(b => b.addEventListener('click', () => { sel = Number(b.dataset.item); update(); }));
+  document.querySelectorAll('[data-preset]').forEach(b => b.addEventListener('click', () => { items = presets[b.dataset.preset].map(o => ({ ...o })); update(); }));
+  document.querySelectorAll('[data-step]').forEach(b => b.addEventListener('click', () => goTo(Number(b.dataset.step))));
+  byId('next').addEventListener('click', () => { goTo(step + 1); if (step === 2) document.querySelector('[data-step="2"]').focus(); });
+  byId('back').addEventListener('click', () => { goTo(step - 1); if (step === 0) document.querySelector('[data-step="0"]').focus(); });
+
+  document.querySelectorAll('[data-check]').forEach(b => b.addEventListener('click', () => {
+    document.querySelectorAll('[data-check]').forEach(o => o.setAttribute('aria-pressed', String(o === b)));
+    byId('check-feedback').textContent = (b.dataset.check === 'near' ? 'Correct. ' : 'Not quite. ') +
+      'At θ = 0, Item 1 gives 2² / 4 = 1.00 and Item 2 gives 0.5² / 4 ≈ 0.06. Far from 0 the steep curve is almost flat, so at θ = 3 Item 1 gives about 0.01 and Item 2 about 0.04. Try it with the “Flat to steep” items.';
+  }));
+
+  goTo(0);
+  new ResizeObserver(resize).observe(canvas);
+  resize();
+})();
+</script>
+</body>
+</html>

@@ -16,6 +16,9 @@ The current visualizations include:
 - **Measurement Error & Attenuation**
 - **Measurement Invariance**
 - **Simple Slopes & Johnson–Neyman**
+- **How Many Factors? (Parallel Analysis)**
+- **Cronbach’s Alpha & Omega**
+- **Item Response Curves**
 
 ## Live demo
 
