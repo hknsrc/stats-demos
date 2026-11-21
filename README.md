@@ -13,6 +13,9 @@ The current visualizations include:
 - **ESEM Visualization / Mini Game** 
 - **Bonferroni & False Discovery Rate**
 - **Group × Time Interaction**
+- **Measurement Error & Attenuation**
+- **Measurement Invariance**
+- **Simple Slopes & Johnson–Neyman**
 
 ## Live demo
 
@@ -28,6 +31,7 @@ These visualizations were created purely for **educational purposes** to support
 - statistics
 - factor analysis
 - psychometrics
+- regression and moderation
 
 ## Author
 
