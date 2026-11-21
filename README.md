@@ -16,7 +16,10 @@ The demos are grouped into four topics:
 
 **Regression & Research Designs**
 - Group × Time Interaction
+- Regression to the Mean
+- Simpson’s Paradox
 - Simple Slopes & Johnson–Neyman
+- Direct & Indirect Effects (Mediation)
 
 **Measurement & Reliability**
 - Measurement Error & Attenuation
