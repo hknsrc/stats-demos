@@ -1,933 +1,416 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Rotation Intuition Demo</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="An interactive lesson on unrotated, orthogonal, and oblique factor solutions.">
+<meta name="theme-color" content="#f6f5ef">
+<title>Rotation Intuition | Interactive Research Methods Studio</title>
 <style>
-  :root { color-scheme: dark; }
-  * { box-sizing: border-box; }
-
-  body{
-    margin:0;
-    font-family: Arial, sans-serif;
-    background:#0f0f10;
-    color:#fff;
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-  }
-
-  header{
-    width:min(1320px, 96vw);
-    margin:18px 0 6px;
-  }
-
-  h1{
-    font-size:22px;
-    margin:0 0 8px;
-    font-weight:700;
-    letter-spacing:.2px;
-  }
-
-  .sub{
-    opacity:.82;
-    font-size:13px;
-    margin:0 0 14px;
-    line-height:1.4;
-    max-width:1000px;
-  }
-
-  .modeBar{
-    width:min(1320px, 96vw);
-    display:grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap:12px;
-    margin-bottom:12px;
-  }
-
-  .modeCard{
-    border:1px solid #27272d;
-    background:linear-gradient(180deg, #17171b 0%, #111116 100%);
-    border-radius:16px;
-    padding:14px 14px 12px;
-    cursor:pointer;
-    transition: transform .14s ease, border-color .18s ease, box-shadow .18s ease, background .18s ease;
-    min-height:120px;
-  }
-
-  .modeCard:hover{
-    transform: translateY(-2px);
-    background:linear-gradient(180deg, #1b1b20 0%, #121217 100%);
-  }
-
-  .modeCard.active{
-    border-color:#7aa2ff;
-    box-shadow:0 0 0 2px rgba(122,162,255,.14) inset, 0 10px 30px rgba(0,0,0,.25);
-  }
-
-  .modeCard h2{
-    margin:0 0 6px;
-    font-size:16px;
-  }
-
-  .modeCard p{
-    margin:0;
-    font-size:12px;
-    opacity:.8;
-    line-height:1.35;
-  }
-
-  .controls{
-    width:min(1320px, 96vw);
-    display:flex;
-    flex-wrap:wrap;
-    gap:10px;
-    align-items:center;
-    background:#151518;
-    border:1px solid #242428;
-    border-radius:12px;
-    padding:12px;
-    margin-bottom:12px;
-  }
-
-  button{
-    border:1px solid #2a2a2f;
-    background:#1e1e23;
-    color:#fff;
-    padding:10px 12px;
-    border-radius:10px;
-    cursor:pointer;
-    font-size:14px;
-    transition: background .18s ease, transform .12s ease, border-color .18s ease;
-  }
-
-  button:hover{ background:#25252b; }
-  button:active{ transform:translateY(1px); }
-
-  .spacer{ flex:1; }
-
-  .sliderWrap{
-    display:flex;
-    gap:10px;
-    align-items:center;
-  }
-
-  input[type="range"]{ width:190px; }
-
-  .badge{
-    font-size:12px;
-    opacity:.88;
-    padding:6px 10px;
-    border:1px solid #2a2a2f;
-    border-radius:999px;
-    background:#121216;
-    user-select:none;
-  }
-
-  .layout{
-    width:min(1320px, 96vw);
-    display:grid;
-    grid-template-columns: 1.1fr 340px;
-    gap:12px;
-    margin-bottom:24px;
-  }
-
-  .leftPanel{
-    display:grid;
-    grid-template-rows:auto 1fr;
-    gap:12px;
-  }
-
-  .infoBox{
-    background:#121216;
-    border:1px solid #242428;
-    border-radius:16px;
-    padding:14px;
-    box-shadow: 0 12px 35px rgba(0,0,0,.22);
-  }
-
-  .infoTitle{
-    font-size:14px;
-    margin:0 0 6px;
-    font-weight:700;
-  }
-
-  .infoText{
-    font-size:12px;
-    opacity:.82;
-    line-height:1.42;
-    margin:0;
-  }
-
-  .exampleBox{
-    margin-top:10px;
-    border:1px solid #282830;
-    background:#17171d;
-    border-radius:12px;
-    padding:10px 12px;
-  }
-
-  .exampleLabel{
-    font-size:11px;
-    opacity:.72;
-    margin-bottom:4px;
-  }
-
-  .exampleText{
-    font-size:12px;
-    line-height:1.35;
-    opacity:.9;
-  }
-
-  canvas{
-    width:100%;
-    height:620px;
-    background:radial-gradient(1200px 700px at 50% 42%, #1a1a20 0%, #101015 58%, #0c0c0f 100%);
-    border:1px solid #242428;
-    border-radius:16px;
-    box-shadow: 0 12px 35px rgba(0,0,0,.35);
-    display:block;
-  }
-
-  .rightPanel{
-    background:#121216;
-    border:1px solid #242428;
-    border-radius:16px;
-    box-shadow: 0 12px 35px rgba(0,0,0,.25);
-    padding:14px;
-    min-height:620px;
-  }
-
-  .sideTitle{
-    margin:0 0 8px;
-    font-size:14px;
-    font-weight:700;
-  }
-
-  .sideHint{
-    font-size:12px;
-    opacity:.75;
-    line-height:1.38;
-    margin-bottom:12px;
-  }
-
-  .miniStat{
-    margin-bottom:12px;
-    padding:10px;
-    border:1px solid #27272d;
-    border-radius:12px;
-    background:#17171c;
-  }
-
-  .miniStatLabel{
-    font-size:11px;
-    opacity:.72;
-    margin-bottom:4px;
-  }
-
-  .miniStatValue{
-    font-size:18px;
-    font-weight:700;
-  }
-
-  .table{
-    width:100%;
-    border-collapse:collapse;
-    table-layout:fixed;
-    font-size:12px;
-  }
-
-  .table th, .table td{
-    padding:6px 4px;
-    border-bottom:1px solid #23232a;
-    text-align:right;
-    white-space:nowrap;
-    overflow:hidden;
-    text-overflow:ellipsis;
-  }
-
-  .table th:first-child, .table td:first-child{
-    text-align:left;
-    width:48px;
-  }
-
-  .bar{
-    height:10px;
-    border-radius:999px;
-    background:rgba(255,255,255,.08);
-    overflow:hidden;
-  }
-
-  .fill{
-    height:100%;
-    width:0%;
-    border-radius:999px;
-    transition:width .18s ease-out;
-  }
-
-  .cell{
-    display:grid;
-    grid-template-columns: 1fr 42px;
-    gap:8px;
-    align-items:center;
-  }
-
-  .f1{ background:#6EE7B7; }
-  .f2{ background:#93C5FD; }
-
-  .legend{
-    display:flex;
-    flex-wrap:wrap;
-    gap:8px;
-    margin-top:12px;
-  }
-
-  .leg{
-    display:flex;
-    align-items:center;
-    gap:8px;
-    font-size:12px;
-    opacity:.84;
-  }
-
-  .sw{
-    width:14px;
-    height:14px;
-    border-radius:4px;
-    border:1px solid rgba(255,255,255,.18);
-  }
-
-  .foot{
-    margin-top:14px;
-    font-size:11px;
-    opacity:.64;
-    line-height:1.35;
-  }
-
-  @media (max-width: 980px){
-    .modeBar{ grid-template-columns:1fr; }
-    .layout{ grid-template-columns:1fr; }
-    canvas{ height:540px; }
-    .rightPanel{ min-height:auto; }
-  }
+:root {
+  --paper:#f6f5ef; --panel:#fdfdf9; --ink:#243d32; --muted:#52665b;
+  --line:#d9dfd4; --green:#176e60; --sage:#e9f0e7; --copper:#90522f;
+  --warm:#f5ece2; --red:#ac4050; --serif:Georgia,"Times New Roman",serif;
+  --sans:system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+* { box-sizing:border-box; }
+body { margin:0; background:var(--paper); color:var(--ink); font:15px/1.55 var(--sans); }
+button,input { font:inherit; }
+a { color:inherit; text-underline-offset:4px; }
+button { color:inherit; cursor:pointer; background:var(--panel); }
+button:disabled { cursor:default; opacity:.48; }
+:focus-visible { outline:3px solid var(--green); outline-offset:4px; }
+.shell { width:min(1120px,calc(100% - 80px)); margin-inline:auto; }
+.topbar { display:flex; justify-content:space-between; align-items:center; gap:20px; padding:20px 0; border-bottom:1px solid var(--line); font-size:.82rem; }
+.topbar a { text-decoration:none; font-weight:650; }
+.topbar a:hover { text-decoration:underline; }
+.topbar span { color:var(--muted); text-align:right; }
+.hero { padding:38px 0 26px; }
+.eyebrow { margin:0 0 8px; color:var(--green); font-size:.72rem; font-weight:750; letter-spacing:.13em; text-transform:uppercase; }
+h1,h2 { font-family:var(--serif); font-weight:400; line-height:1.08; margin:0; }
+h1 { font-size:clamp(34px,5.5vw,63px); letter-spacing:-.04em; }
+h2 { font-size:clamp(23px,3vw,32px); letter-spacing:-.025em; }
+.intro { margin:12px 0 0; color:var(--muted); max-width:720px; }
+.module { border:1px solid var(--line); border-radius:12px; background:var(--panel); overflow:hidden; }
+.steps { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); background:#f1f3ec; border-bottom:1px solid var(--line); }
+.steps button { position:relative; border:0; border-right:1px solid var(--line); min-height:52px; text-align:left; padding:10px 16px; background:transparent; font-weight:650; font-size:.83rem; }
+.steps button:last-child { border-right:0; }
+.steps button[aria-current="step"] { background:var(--sage); color:var(--green); box-shadow:inset 0 -3px var(--green); }
+.steps button:focus-visible { outline-offset:-5px; }
+.step-num { margin-right:.55em; font-variant-numeric:tabular-nums; }
+.workspace { display:grid; grid-template-columns:minmax(0,1fr) minmax(240px,315px); }
+.figure-pane { min-width:0; padding:22px 24px 18px; }
+.side { display:flex; flex-direction:column; padding:24px; border-left:1px solid var(--line); background:#f8f9f3; }
+.toolbar { display:flex; flex-wrap:wrap; gap:10px; justify-content:space-between; align-items:center; }
+.presets { display:flex; flex-wrap:wrap; gap:7px; }
+.presets button,.nav-button,.small-button { min-height:40px; padding:7px 13px; border:1px solid var(--line); border-radius:6px; font-size:.82rem; font-weight:600; }
+.presets button[aria-pressed="true"] { background:var(--sage); color:#154e43; border-color:#98b7a4; }
+.presets button:hover,.nav-button:hover:not(:disabled),.small-button:hover { border-color:var(--green); }
+figure { margin:17px 0 0; }
+figcaption { margin-bottom:7px; font-size:.82rem; font-weight:650; }
+canvas { display:block; width:100%; height:430px; touch-action:none; }
+.legend { display:flex; flex-wrap:wrap; gap:8px 22px; color:var(--muted); font-size:.81rem; margin-top:6px; }
+.legend span { display:inline-flex; align-items:center; gap:7px; }
+.dot { display:inline-block; width:10px; height:10px; border-radius:50%; background:var(--green); }
+.dot.observed { background:var(--copper); }
+.dot.ghost { background:#cfe0d6; }
+.side p { color:var(--muted); margin:9px 0 16px; line-height:1.5; font-size:.9rem; }
+.metric-area { display:grid; gap:1px; border-block:1px solid var(--line); padding:6px 0; }
+.metric { display:flex; gap:10px; justify-content:space-between; align-items:baseline; padding:7px 0; font-size:.83rem; }
+.metric output { font-size:1.15rem; font-weight:700; color:var(--green); white-space:nowrap; font-variant-numeric:tabular-nums; }
+.metric.observed output { color:var(--copper); }
+.metric.total { border-top:1px solid var(--line); margin-top:2px; }
+#formula { margin:9px 0 5px; font-size:.78rem; font-variant-numeric:tabular-nums; }
+#interpretation { margin-bottom:8px; color:var(--ink); }
+.inference { color:var(--muted); margin-top:0; font-size:.75rem; }
+.nav-buttons { display:flex; flex-wrap:wrap; gap:8px; margin-top:auto; padding-top:18px; }
+.nav-button.next { background:var(--ink); color:white; border-color:var(--ink); }
+.controls { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px 22px; border-top:1px solid var(--line); padding:15px 24px; }
+.controls fieldset { min-width:0; border:0; margin:0; padding:0; }
+.controls legend { font-size:.81rem; font-weight:700; color:var(--green); padding:0; }
+.controls fieldset + fieldset legend { color:var(--copper); }
+.slider-row { display:grid; grid-template-columns:110px minmax(40px,1fr) 40px; align-items:center; gap:7px; min-height:32px; font-size:.76rem; }
+.slider-row output { text-align:right; font-variant-numeric:tabular-nums; }
+input[type="range"] { width:100%; margin:0; accent-color:var(--green); }
+fieldset + fieldset input { accent-color:var(--copper); }
+.check-section { margin-top:28px; padding:22px 0 18px; border-top:1px solid var(--line); }
+.check-section h2 { font-size:clamp(22px,2.6vw,27px); margin-bottom:8px; }
+.check-section p { color:var(--muted); margin:0 0 14px; max-width:780px; font-size:.92rem; }
+.check-options { display:flex; flex-wrap:wrap; gap:8px; }
+.check-options button { min-height:40px; padding:7px 15px; border:1px solid var(--line); border-radius:6px; font-weight:600; font-size:.85rem; }
+.check-options button:hover { border-color:var(--green); }
+.check-options button[aria-pressed="true"] { background:var(--sage); border-color:var(--green); color:#154e43; }
+.check-feedback { min-height:24px; margin-top:12px; max-width:800px; font-size:.9rem; }
+details { border-top:1px solid var(--line); padding:15px 0; font-size:.86rem; }
+summary { cursor:pointer; font-weight:650; }
+details p { color:var(--muted); max-width:880px; }
+.sources { padding-left:20px; color:var(--muted); font-size:.8rem; max-width:880px; }
+.sources li { margin:7px 0; }
+.sources a { color:var(--green); }
+footer { display:flex; gap:8px 20px; flex-wrap:wrap; justify-content:space-between; padding:17px 0 26px; color:var(--muted); font-size:.76rem; border-top:1px solid var(--line); }
+.sr-only { position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap; }
+[hidden] { display:none!important; }
+@media (max-width:760px) {
+  .shell { width:calc(100% - 28px); }
+  .workspace { grid-template-columns:1fr; }
+  .side { border-left:0; border-top:1px solid var(--line); }
+  .figure-pane,.side,.controls { padding:17px; }
+  .hero { padding:28px 0 20px; }
+}
+@media (max-width:510px) {
+  .steps button { font-size:.72rem; padding:8px; }
+  .step-num { display:block; }
+  .controls { grid-template-columns:1fr; }
+  canvas { height:300px; }
+}
+:root { --blue:#386da3; }
+canvas { height:520px; }
+.toggles { display:flex; flex-wrap:wrap; gap:7px; }
+.toggles button { min-height:36px; padding:5px 12px; border:1px solid var(--line); border-radius:6px; font-size:.8rem; font-weight:600; }
+.toggles button:hover { border-color:var(--green); }
+.toggles button[aria-pressed="true"] { background:var(--sage); border-color:#98b7a4; color:#154e43; }
+.marker { display:inline-block; width:20px; border-top:3px solid var(--green); }
+.marker.f2 { border-top-color:var(--blue); }
+.dot { background:var(--copper); }
+.load-table { width:100%; border-collapse:collapse; font-size:.76rem; font-variant-numeric:tabular-nums; margin-top:14px; table-layout:fixed; }
+.load-table th,.load-table td { padding:4px 2px; border-bottom:1px solid var(--line); text-align:right; }
+.load-table th { color:var(--muted); font-weight:650; }
+.load-table th:first-child,.load-table td:first-child { text-align:left; width:30px; font-weight:700; }
+.load-table th.f1 { color:var(--green); }
+.load-table th.f2 { color:var(--blue); }
+.cell { display:grid; grid-template-columns:1fr 38px; gap:6px; align-items:center; }
+.bar { height:7px; border-radius:4px; background:#e7ebe3; overflow:hidden; }
+.fill { height:100%; width:0; border-radius:4px; background:var(--green); }
+.fill.f2 { background:var(--blue); }
+.table-note { font-size:.72rem; color:var(--muted); margin:6px 0 0; }
+.controls legend { color:var(--green)!important; }
+.controls input { accent-color:var(--green)!important; }
+@media (max-width:510px) { canvas { height:420px; } }
 </style>
 </head>
 <body>
-<header>
-  <h1>Rotation Intuition for EFA</h1>
-  <p class="sub">
-    This demo shows how the same broad structure can look different under unrotated, orthogonal, and oblique solutions.
-    The purpose is to make rotation easier to understand visually.
-  </p>
-</header>
+<div class="shell">
+  <header class="topbar">
+    <a href="./">← Interactive Research Methods Studio</a>
+    <span>Factor rotation</span>
+  </header>
+  <main>
+    <section class="hero" aria-labelledby="page-title">
+      <p class="eyebrow">An interactive teaching demo</p>
+      <h1 id="page-title">What does factor rotation change?</h1>
+      <p class="intro">Twelve items, two factors. Rotation moves the axes, not the items. Follow how the loadings change.</p>
+    </section>
 
-<div class="modeBar">
-  <div class="modeCard active" id="card-unrotated">
-    <h2>Unrotated</h2>
-    <p>Initial axes are not yet aligned with the main item pattern. Loadings often look more mixed and less interpretable.</p>
-  </div>
-  <div class="modeCard" id="card-orthogonal">
-    <h2>Orthogonal Rotation</h2>
-    <p>Axes rotate to improve simple structure, but they remain perpendicular. Factors are treated as uncorrelated.</p>
-  </div>
-  <div class="modeCard" id="card-oblique">
-    <h2>Oblique Rotation</h2>
-    <p>Axes rotate more freely and do not need to stay at 90°. This is useful when factors are expected to correlate.</p>
-  </div>
-</div>
-
-<div class="controls">
-  <button id="pauseBtn">Pause</button>
-  <button id="resetBtn">Reset motion</button>
-  <button id="projBtn">Show projections: ON</button>
-  <button id="labelsBtn">Show labels: ON</button>
-
-  <div class="spacer"></div>
-
-  <div class="sliderWrap">
-    <span class="badge">Motion</span>
-    <input id="motion" type="range" min="0.0" max="2.0" step="0.1" value="0.6" />
-    <span id="motionVal" class="badge">0.6</span>
-  </div>
-
-  <div class="sliderWrap">
-    <span class="badge">Axis animation</span>
-    <input id="axisEase" type="range" min="0.02" max="0.18" step="0.01" value="0.08" />
-    <span id="axisVal" class="badge">0.08</span>
-  </div>
-</div>
-
-<div class="layout">
-  <div class="leftPanel">
-    <div class="infoBox">
-      <div class="infoTitle" id="infoTitle">Unrotated solution</div>
-      <p class="infoText" id="infoText">
-        The axes are still in a default position. The cloud may contain two dimensions, but interpretation is still relatively mixed.
-      </p>
-      <div class="exampleBox">
-        <div class="exampleLabel">Example</div>
-        <div class="exampleText" id="exampleText">
-          Imagine two latent tendencies exist in the data, but the axes are not yet well aligned with them. Several items appear to load on both factors.
+    <section class="module" aria-label="Rotation walkthrough">
+      <nav class="steps" aria-label="Lesson steps">
+        <button type="button" data-step="0" aria-current="step"><span class="step-num">1.</span>Unrotated</button>
+        <button type="button" data-step="1"><span class="step-num">2.</span>Orthogonal rotation</button>
+        <button type="button" data-step="2"><span class="step-num">3.</span>Oblique rotation</button>
+      </nav>
+      <div class="workspace">
+        <div class="figure-pane">
+          <div class="toggles" role="group" aria-label="Display options">
+            <button type="button" id="pause" aria-pressed="false">Pause motion</button>
+            <button type="button" id="reset">Reset motion</button>
+            <button type="button" id="proj" aria-pressed="true">Projections</button>
+            <button type="button" id="labels" aria-pressed="true">Item labels</button>
+          </div>
+          <figure aria-labelledby="chart-title">
+            <figcaption id="chart-title">Items as points in the space of two factors</figcaption>
+            <canvas id="chart" role="img" aria-labelledby="chart-title" aria-describedby="chart-description"></canvas>
+            <p id="chart-description" class="sr-only"></p>
+            <div class="legend">
+              <span><i class="marker" aria-hidden="true"></i>Factor 1 axis</span>
+              <span><i class="marker f2" aria-hidden="true"></i>Factor 2 axis</span>
+              <span><i class="dot" aria-hidden="true"></i>Items A–L</span>
+            </div>
+          </figure>
         </div>
+        <section class="side" aria-labelledby="step-title">
+          <div id="lesson" aria-live="polite">
+            <h2 id="step-title">Unrotated</h2>
+            <p id="step-copy"></p>
+          </div>
+          <div class="metric-area">
+            <div class="metric"><span>Angle between axes</span><output id="m-angle"></output></div>
+            <div class="metric"><span>Factor correlation (cos of angle)</span><output id="m-corr"></output></div>
+          </div>
+          <table class="load-table">
+            <thead><tr><th scope="col">Item</th><th scope="col" class="f1">F1</th><th scope="col" class="f2">F2</th></tr></thead>
+            <tbody id="rows"></tbody>
+          </table>
+          <p class="table-note">Pattern coefficients: each item is read off along lines parallel to the other axis. With axes at 90° this is the same as a perpendicular projection.</p>
+          <div class="nav-buttons">
+            <button type="button" class="nav-button" id="back" disabled>← Back</button>
+            <button type="button" class="nav-button next" id="next">Next →</button>
+          </div>
+        </section>
       </div>
-    </div>
 
-    <canvas id="c"></canvas>
-  </div>
+      <div class="controls" aria-label="Animation settings">
+        <fieldset>
+          <legend>Item motion</legend>
+          <div class="slider-row"><label for="motion">Jitter</label><input id="motion" type="range" min="0" max="2" step=".1" value=".6"><output id="motion-value" for="motion"></output></div>
+        </fieldset>
+        <fieldset>
+          <legend>Axis motion</legend>
+          <div class="slider-row"><label for="ease">Rotation speed</label><input id="ease" type="range" min=".02" max=".18" step=".01" value=".08"><output id="ease-value" for="ease"></output></div>
+        </fieldset>
+      </div>
+    </section>
+    <noscript><p>Enable JavaScript to animate the factor axes.</p></noscript>
 
-  <aside class="rightPanel">
-    <h2 class="sideTitle">Loading View (Illustrative)</h2>
-    <div class="sideHint">
-      Each item’s loading is represented as its projection onto the current factor axes.
-      Rotation changes how clearly the structure is seen.
-    </div>
+    <section class="check-section" aria-labelledby="check-title">
+      <h2 id="check-title">Check your understanding</h2>
+      <p>In the oblique solution, the angle between the two axes is 70° instead of 90°. What does this say about the factor correlation?</p>
+      <div class="check-options" role="group" aria-labelledby="check-title">
+        <button type="button" data-check="zero" aria-pressed="false">It is zero</button>
+        <button type="button" data-check="positive" aria-pressed="false">It is positive, about .34</button>
+        <button type="button" data-check="negative" aria-pressed="false">It is negative</button>
+      </div>
+      <div class="check-feedback" id="check-feedback" role="status" aria-live="polite"></div>
+    </section>
 
-    <div class="miniStat">
-      <div class="miniStatLabel">Current mode</div>
-      <div class="miniStatValue" id="modeReadout">Unrotated</div>
-    </div>
-
-    <div class="miniStat">
-      <div class="miniStatLabel">Angle between factors</div>
-      <div class="miniStatValue" id="angleReadout">90°</div>
-    </div>
-
-    <table class="table">
-      <thead>
-        <tr><th>Item</th><th>F1</th><th>F2</th></tr>
-      </thead>
-      <tbody id="tbody"></tbody>
-    </table>
-
-    <div class="legend">
-      <div class="leg"><span class="sw" style="background:#6EE7B7"></span>Factor 1</div>
-      <div class="leg"><span class="sw" style="background:#93C5FD"></span>Factor 2</div>
-      <div class="leg"><span class="sw" style="background:#EAB308"></span>Item cloud</div>
-      <div class="leg"><span class="sw" style="background:#ffffff"></span>Axes / projections</div>
-    </div>
-
-    <div class="foot">
-      Developed by Hakan Sarac for educational purposes.
-    </div>
-  </aside>
+    <details>
+      <summary>Assumptions, interpretation, and references</summary>
+      <p><strong>What rotation keeps.</strong> Rotation changes the position of the axes, not the items. Item communalities and the fit of the factor model are the same before and after rotation; only the way the common variance is divided between factors changes.</p>
+      <p><strong>Orthogonal and oblique.</strong> Orthogonal rotations (for example, varimax) keep the factors uncorrelated. Oblique rotations (for example, oblimin, promax, geomin) allow a factor correlation, which equals the cosine of the angle between the axes. If the estimated correlation is near zero, the oblique and orthogonal solutions will look similar.</p>
+      <p><strong>Pattern and structure.</strong> The table shows pattern coefficients, which are usually reported as loadings: each item is projected onto one axis parallel to the other axis. A perpendicular projection gives the structure coefficient (the item–factor correlation) instead. The two are equal only when the factors are uncorrelated; with correlated factors, structure coefficients stay larger on the secondary factor.</p>
+      <p>Item positions and axis angles are illustrative. The references below credit the methods; no figures or text from them are reproduced.</p>
+      <ol class="sources">
+        <li>Thurstone, L. L. (1947). <em>Multiple-factor analysis.</em> University of Chicago Press.</li>
+        <li>Kaiser, H. F. (1958). The varimax criterion for analytic rotation in factor analysis. <em>Psychometrika, 23</em>(3), 187–200. <a href="https://doi.org/10.1007/BF02289233" target="_blank" rel="noopener noreferrer">doi:10.1007/BF02289233 ↗</a></li>
+        <li>Fabrigar, L. R., Wegener, D. T., MacCallum, R. C., &amp; Strahan, E. J. (1999). Evaluating the use of exploratory factor analysis in psychological research. <em>Psychological Methods, 4</em>(3), 272–299. <a href="https://doi.org/10.1037/1082-989X.4.3.272" target="_blank" rel="noopener noreferrer">doi:10.1037/1082-989X.4.3.272 ↗</a></li>
+        <li>Browne, M. W. (2001). An overview of analytic rotation in exploratory factor analysis. <em>Multivariate Behavioral Research, 36</em>(1), 111–150. <a href="https://doi.org/10.1207/S15327906MBR3601_05" target="_blank" rel="noopener noreferrer">doi:10.1207/S15327906MBR3601_05 ↗</a></li>
+      </ol>
+    </details>
+  </main>
+  <footer><span>Hakan Sarac</span><span>Illustrative structure for teaching</span></footer>
 </div>
-
 <script>
+'use strict';
 (() => {
-  const canvas = document.getElementById("c");
-  const ctx = canvas.getContext("2d");
+  const byId = id => document.getElementById(id);
+  const canvas = byId('chart');
+  const ctx = canvas.getContext('2d');
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)');
+  // Item coordinates in the basis of the two "true" factors (at 28° and 98°).
+  const items = [
+    ['A', .88, .04], ['B', .72, .10], ['C', .62, .22], ['D', .80, .14],
+    ['E', .04, .88], ['F', .12, .74], ['G', .22, .62], ['H', .10, .80],
+    ['I', .56, .36], ['J', .40, .28], ['K', .30, .52], ['L', .46, .46]
+  ];
+  const TRUE = [28, 98];
+  const targets = [[63, 153], [18, 108], [28, 98]];
+  const steps = [
+    { title:'Unrotated', copy:'The first solution places the axes by an extraction rule, not for interpretation. F1 runs through the middle of all items, so every item loads on it; F2 separates the two clusters with positive and negative loadings.' },
+    { title:'Orthogonal rotation', copy:'Both axes turn together and stay at 90°. Each axis now lies close to one cluster. Because the clusters are less than 90° apart, neither axis passes exactly through its cluster, and small secondary loadings remain.' },
+    { title:'Oblique rotation', copy:'Each axis can turn on its own. Both now pass through their clusters and the angle between them is smaller than 90°. Secondary loadings shrink, and the factors are allowed to correlate.' }
+  ];
+  const rad = d => d * Math.PI / 180;
+  const unit = d => ({ x:Math.cos(rad(d)), y:-Math.sin(rad(d)) });
+  const rand = (a, b) => a + Math.random() * (b - a);
+  const fmt = v => (v < -.005 ? '−' : '') + Math.abs(v).toFixed(2);
+  let W = 0, H = 0, R = 1, cx = 0, cy = 0;
+  let step = 0, paused = false, showProj = true, showLabels = true;
+  let a1 = targets[0][0], a2 = targets[0][1];
+  let pts = [], rows = [];
 
-  const motionEl = document.getElementById("motion");
-  const axisEaseEl = document.getElementById("axisEase");
-  const motionVal = document.getElementById("motionVal");
-  const axisVal = document.getElementById("axisVal");
-
-  const pauseBtn = document.getElementById("pauseBtn");
-  const resetBtn = document.getElementById("resetBtn");
-  const projBtn = document.getElementById("projBtn");
-  const labelsBtn = document.getElementById("labelsBtn");
-
-  const cards = {
-    unrotated: document.getElementById("card-unrotated"),
-    orthogonal: document.getElementById("card-orthogonal"),
-    oblique: document.getElementById("card-oblique"),
-  };
-
-  const infoTitle = document.getElementById("infoTitle");
-  const infoText = document.getElementById("infoText");
-  const exampleText = document.getElementById("exampleText");
-  const modeReadout = document.getElementById("modeReadout");
-  const angleReadout = document.getElementById("angleReadout");
-  const tbody = document.getElementById("tbody");
-
-  const labels = ["A","B","C","D","E","F","G","H","I","J","K","L"];
-  let rows = [];
-
-  let paused = false;
-  let showProj = true;
-  let showLabels = true;
-  let mode = "unrotated";
-
-  motionEl.addEventListener("input", () => motionVal.textContent = Number(motionEl.value).toFixed(1));
-  axisEaseEl.addEventListener("input", () => axisVal.textContent = Number(axisEaseEl.value).toFixed(2));
-
-  function resizeCanvasToDisplaySize() {
-    const dpr = window.devicePixelRatio || 1;
-    const rect = canvas.getBoundingClientRect();
-    const w = Math.max(300, Math.floor(rect.width * dpr));
-    const h = Math.max(300, Math.floor(rect.height * dpr));
-    if (canvas.width !== w || canvas.height !== h) {
-      canvas.width = w;
-      canvas.height = h;
-    }
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  function basePosition(f1, f2) {
+    const u1 = unit(TRUE[0]), u2 = unit(TRUE[1]);
+    return { x:(f1 * u1.x + f2 * u2.x), y:(f1 * u1.y + f2 * u2.y) };
+  }
+  function build() {
+    pts = items.map(([lab, f1, f2]) => {
+      const b = basePosition(f1, f2);
+      return { lab, bx:b.x, by:b.y, x:b.x, y:b.y, vx:0, vy:0, dx:rand(-1, 1), dy:rand(-1, 1), tx:rand(-1, 1), ty:rand(-1, 1) };
+    });
+  }
+  function buildRows() {
+    const body = byId('rows');
+    body.innerHTML = '';
+    rows = items.map(([lab]) => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = '<td>' + lab + '</td><td><div class="cell"><div class="bar"><div class="fill"></div></div><span>0.00</span></div></td><td><div class="cell"><div class="bar"><div class="fill f2"></div></div><span>0.00</span></div></td>';
+      body.appendChild(tr);
+      const fills = tr.querySelectorAll('.fill'), nums = tr.querySelectorAll('span');
+      return { f1:fills[0], f2:fills[1], n1:nums[0], n2:nums[1] };
+    });
   }
 
-  window.addEventListener("resize", resizeCanvasToDisplaySize);
-
-  function rand(min, max){ return min + Math.random() * (max - min); }
-  function lerp(a,b,t){ return a + (b-a)*t; }
-  function clamp(x, lo, hi){ return Math.max(lo, Math.min(hi, x)); }
-  function degToRad(d){ return d * Math.PI / 180; }
-  function radToDeg(r){ return r * 180 / Math.PI; }
-
-  const center = { x:0, y:0 };
-  let points = [];
-
-  const trueA1 = degToRad(28);
-  const trueA2 = degToRad(98);
-
-  let axisState = {
-    a1: degToRad(0),
-    a2: degToRad(90),
-    targetA1: degToRad(0),
-    targetA2: degToRad(90)
-  };
-
-  function unit(theta){
-    return { x: Math.cos(theta), y: -Math.sin(theta) };
+  function resize() {
+    const b = canvas.getBoundingClientRect(), s = devicePixelRatio || 1;
+    W = b.width; H = b.height; canvas.width = Math.round(W * s); canvas.height = Math.round(H * s);
+    ctx.setTransform(s, 0, 0, s, 0, 0);
+    R = Math.min(W / 2.35, H / 1.72); cx = W * .47; cy = 22 + R * 1.22; if (cy + R * .72 > H) { R = (H - 30) / 1.94; cy = 22 + R * 1.22; }
   }
 
-  function dot(ax, ay, bx, by){
-    return ax * bx + ay * by;
+  // Pattern coefficients: write each item as l1·u1 + l2·u2 (parallel projection).
+  function pattern(p, u1, u2) {
+    const det = u1.x * u2.y - u1.y * u2.x;
+    return [(p.x * u2.y - p.y * u2.x) / det, (u1.x * p.y - u1.y * p.x) / det];
+  }
+  function loadings() {
+    const u1 = unit(a1), u2 = unit(a2);
+    return pts.map(p => pattern(p, u1, u2));
   }
 
-  function getModeData(currentMode){
-    if (currentMode === "unrotated"){
-      return [
-        {lab:"A", f1:0.82, f2:0.28},
-        {lab:"B", f1:0.76, f2:0.24},
-        {lab:"C", f1:0.66, f2:0.36},
-        {lab:"D", f1:0.80, f2:0.20},
-        {lab:"E", f1:0.24, f2:0.76},
-        {lab:"F", f1:0.20, f2:0.82},
-        {lab:"G", f1:0.34, f2:0.66},
-        {lab:"H", f1:0.38, f2:0.62},
-        {lab:"I", f1:0.52, f2:0.48},
-        {lab:"J", f1:0.48, f2:0.42},
-        {lab:"K", f1:0.42, f2:0.54},
-        {lab:"L", f1:0.46, f2:0.50}
-      ];
-    }
-
-    if (currentMode === "orthogonal"){
-      return [
-        {lab:"A", f1:0.90, f2:0.10},
-        {lab:"B", f1:0.84, f2:0.08},
-        {lab:"C", f1:0.74, f2:0.18},
-        {lab:"D", f1:0.86, f2:0.12},
-        {lab:"E", f1:0.10, f2:0.88},
-        {lab:"F", f1:0.08, f2:0.92},
-        {lab:"G", f1:0.20, f2:0.76},
-        {lab:"H", f1:0.22, f2:0.72},
-        {lab:"I", f1:0.58, f2:0.30},
-        {lab:"J", f1:0.50, f2:0.24},
-        {lab:"K", f1:0.28, f2:0.56},
-        {lab:"L", f1:0.34, f2:0.50}
-      ];
-    }
-
-    return [
-      {lab:"A", f1:0.95, f2:0.12},
-      {lab:"B", f1:0.90, f2:0.14},
-      {lab:"C", f1:0.82, f2:0.24},
-      {lab:"D", f1:0.92, f2:0.16},
-
-      {lab:"E", f1:0.12, f2:0.94},
-      {lab:"F", f1:0.10, f2:0.98},
-      {lab:"G", f1:0.22, f2:0.84},
-      {lab:"H", f1:0.24, f2:0.80},
-
-      {lab:"I", f1:0.60, f2:0.38},
-      {lab:"J", f1:0.52, f2:0.32},
-      {lab:"K", f1:0.34, f2:0.58},
-      {lab:"L", f1:0.38, f2:0.54}
-    ];
+  function updatePanel() {
+    loadings().forEach(([l1, l2], i) => {
+      rows[i].f1.style.width = Math.min(100, Math.abs(l1) * 100) + '%';
+      rows[i].f2.style.width = Math.min(100, Math.abs(l2) * 100) + '%';
+      rows[i].n1.textContent = fmt(l1);
+      rows[i].n2.textContent = fmt(l2);
+    });
+    const angle = Math.abs(a2 - a1);
+    byId('m-angle').textContent = Math.round(angle) + '°';
+    byId('m-corr').textContent = fmt(Math.cos(rad(angle)));
   }
 
-  function buildPoints(currentMode = mode){
-    resizeCanvasToDisplaySize();
-    const W = canvas.getBoundingClientRect().width;
-    const H = canvas.getBoundingClientRect().height;
-    center.x = W * 0.5;
-    center.y = H * 0.56;
+  function axis(deg, color, label) {
+    const u = unit(deg), L = R * 1.18;
+    ctx.strokeStyle = color; ctx.lineWidth = 2.5;
+    ctx.beginPath(); ctx.moveTo(cx - u.x * L * .6, cy - u.y * L * .6); ctx.lineTo(cx + u.x * L, cy + u.y * L); ctx.stroke();
+    ctx.fillStyle = color; ctx.font = '600 13px system-ui'; ctx.textAlign = 'center';
+    ctx.fillText(label, cx + u.x * (L + 16), cy + u.y * (L + 16) + 4);
+  }
 
-    const u1 = unit(trueA1);
-    const u2 = unit(trueA2);
-    const modeData = getModeData(currentMode);
-
-    points = modeData.map((d, idx) => {
-      const scale = currentMode === "oblique" ? 202 : 178;
-
-      let spreadX = rand(-14, 14);
-      let spreadY = rand(-14, 14);
-
-      if (currentMode === "oblique") {
-        if (idx <= 3) {
-          spreadX += 28;
-          spreadY += 12;
-        } else if (idx >= 4 && idx <= 7) {
-          spreadX -= 28;
-          spreadY -= 16;
-        } else {
-          spreadX += rand(-6, 6);
-          spreadY += rand(-6, 6);
+  function draw() {
+    if (!W) return;
+    ctx.clearRect(0, 0, W, H);
+    ctx.strokeStyle = '#e7ebe3'; ctx.lineWidth = 1;
+    for (const r of [.25, .5, .75, 1]) { ctx.beginPath(); ctx.arc(cx, cy, R * r, 0, Math.PI * 2); ctx.stroke(); }
+    const u1 = unit(a1), u2 = unit(a2);
+    if (showProj) {
+      for (const p of pts) {
+        const l = pattern(p, u1, u2);
+        for (const [u, d, c] of [[u1, l[0], 'rgba(23,110,96,.35)'], [u2, l[1], 'rgba(56,109,163,.35)']]) {
+          ctx.strokeStyle = c; ctx.lineWidth = 1;
+          ctx.beginPath(); ctx.moveTo(cx + p.x * R, cy + p.y * R); ctx.lineTo(cx + d * u.x * R, cy + d * u.y * R); ctx.stroke();
         }
       }
-
-      const px = center.x + (d.f1 * scale * u1.x) + (d.f2 * scale * u2.x) + spreadX;
-      const py = center.y + (d.f1 * scale * u1.y) + (d.f2 * scale * u2.y) + spreadY;
-
-      return {
-        lab: d.lab,
-        x: px,
-        y: py,
-        baseX: px,
-        baseY: py,
-        vx: rand(-0.45, 0.45),
-        vy: rand(-0.45, 0.45),
-        driftX: rand(-1,1),
-        driftY: rand(-1,1),
-        targetDX: rand(-1,1),
-        targetDY: rand(-1,1)
-      };
-    });
-
-    initRows();
-  }
-
-  function initRows(){
-    tbody.innerHTML = "";
-    rows = [];
-    for (let i = 0; i < labels.length; i++){
-      const tr = document.createElement("tr");
-
-      const td0 = document.createElement("td");
-      td0.textContent = labels[i];
-      td0.style.fontWeight = "700";
-      tr.appendChild(td0);
-
-      const td1 = document.createElement("td");
-      td1.innerHTML = `
-        <div class="cell">
-          <div class="bar"><div class="fill f1"></div></div>
-          <div class="n1">0.00</div>
-        </div>`;
-      tr.appendChild(td1);
-
-      const td2 = document.createElement("td");
-      td2.innerHTML = `
-        <div class="cell">
-          <div class="bar"><div class="fill f2"></div></div>
-          <div class="n2">0.00</div>
-        </div>`;
-      tr.appendChild(td2);
-
-      tbody.appendChild(tr);
-
-      rows.push({
-        f1: td1.querySelector(".fill.f1"),
-        f2: td2.querySelector(".fill.f2"),
-        n1: td1.querySelector(".n1"),
-        n2: td2.querySelector(".n2")
-      });
     }
-  }
-
-  function setMode(next){
-    mode = next;
-
-    Object.entries(cards).forEach(([k,el]) => {
-      el.classList.toggle("active", k === next);
-    });
-
-    if (mode === "unrotated"){
-      axisState.targetA1 = degToRad(0);
-      axisState.targetA2 = degToRad(90);
-      infoTitle.textContent = "Unrotated solution";
-      infoText.textContent = "The axes are still close to their default orientation. The data may already contain two dimensions, but interpretation is still relatively mixed.";
-      exampleText.textContent = "Think of this as an initial raw factor solution. Items are not yet aligned very clearly with the most interpretable axis positions.";
-      modeReadout.textContent = "Unrotated";
-    }
-
-    if (mode === "orthogonal"){
-      axisState.targetA1 = degToRad(28);
-      axisState.targetA2 = degToRad(118);
-      infoTitle.textContent = "Orthogonal rotation";
-      infoText.textContent = "Both axes rotate to improve simple structure, but they remain perpendicular. This implies the rotated factors are constrained to be uncorrelated.";
-      exampleText.textContent = "The axes now align more clearly with the item cloud, so primary loadings become easier to interpret while the factors remain at 90°.";
-      modeReadout.textContent = "Orthogonal";
-    }
-
-    if (mode === "oblique"){
-      axisState.targetA1 = degToRad(28);
-      axisState.targetA2 = degToRad(98);
-      infoTitle.textContent = "Oblique rotation";
-      infoText.textContent = "The axes can rotate more freely and do not need to stay perpendicular. This is useful when the latent factors are related but still distinct.";
-      exampleText.textContent = "Here the two factors remain separable, but the angle between them suggests they share some overlap rather than being fully independent.";
-      modeReadout.textContent = "Oblique";
-    }
-
-    buildPoints(mode);
-  }
-
-  cards.unrotated.addEventListener("click", () => setMode("unrotated"));
-  cards.orthogonal.addEventListener("click", () => setMode("orthogonal"));
-  cards.oblique.addEventListener("click", () => setMode("oblique"));
-
-  pauseBtn.addEventListener("click", () => {
-    paused = !paused;
-    pauseBtn.textContent = paused ? "Resume" : "Pause";
-  });
-
-  resetBtn.addEventListener("click", () => {
-    buildPoints(mode);
-  });
-
-  projBtn.addEventListener("click", () => {
-    showProj = !showProj;
-    projBtn.textContent = `Show projections: ${showProj ? "ON" : "OFF"}`;
-  });
-
-  labelsBtn.addEventListener("click", () => {
-    showLabels = !showLabels;
-    labelsBtn.textContent = `Show labels: ${showLabels ? "ON" : "OFF"}`;
-  });
-
-  function updateAxes(){
-    const ease = parseFloat(axisEaseEl.value);
-    axisState.a1 = lerp(axisState.a1, axisState.targetA1, ease);
-    axisState.a2 = lerp(axisState.a2, axisState.targetA2, ease);
-  }
-
-  function normalizeToLoading(v){
-    return clamp(Math.abs(v) / 210, 0, 0.95);
-  }
-
-  function updateRows(){
-    const u1 = unit(axisState.a1);
-    const u2 = unit(axisState.a2);
-
-    for (let i=0;i<points.length;i++){
-      const p = points[i];
-      const dx = p.x - center.x;
-      const dy = p.y - center.y;
-
-      const l1 = normalizeToLoading(dot(dx, dy, u1.x, u1.y));
-      const l2 = normalizeToLoading(dot(dx, dy, u2.x, u2.y));
-
-      rows[i].f1.style.width = `${Math.round(l1 * 100)}%`;
-      rows[i].f2.style.width = `${Math.round(l2 * 100)}%`;
-      rows[i].n1.textContent = l1.toFixed(2);
-      rows[i].n2.textContent = l2.toFixed(2);
-    }
-
-    let diff = Math.abs(radToDeg(axisState.a2 - axisState.a1));
-    while (diff > 180) diff -= 180;
-    angleReadout.textContent = `${Math.round(diff)}°`;
-  }
-
-  function updateMotion(){
-    const motion = parseFloat(motionEl.value);
-
-    for (const p of points){
-      p.targetDX = lerp(p.targetDX, rand(-1,1), 0.03);
-      p.targetDY = lerp(p.targetDY, rand(-1,1), 0.03);
-      p.driftX = lerp(p.driftX, p.targetDX, 0.05);
-      p.driftY = lerp(p.driftY, p.targetDY, 0.05);
-
-      p.vx += p.driftX * 0.023 * (0.4 + motion);
-      p.vy += p.driftY * 0.023 * (0.4 + motion);
-
-      p.vx *= 0.965;
-      p.vy *= 0.965;
-
-      p.x += p.vx;
-      p.y += p.vy;
-
-      p.x += (p.baseX - p.x) * 0.03;
-      p.y += (p.baseY - p.y) * 0.03;
-    }
-  }
-
-  function drawAxis(theta, color, label){
-    const u = unit(theta);
-    const L = 240;
-    const x1 = center.x - u.x * L;
-    const y1 = center.y - u.y * L;
-    const x2 = center.x + u.x * L;
-    const y2 = center.y + u.y * L;
-
-    ctx.save();
-    ctx.strokeStyle = color;
-    ctx.lineWidth = 2.6;
-    ctx.beginPath();
-    ctx.moveTo(x1, y1);
-    ctx.lineTo(x2, y2);
-    ctx.stroke();
-
-    ctx.fillStyle = color;
-    ctx.font = "bold 13px Arial";
-    ctx.fillText(label, x2 + 8, y2 + 4);
-    ctx.restore();
-  }
-
-  function drawProjection(p, theta, color){
-    const u = unit(theta);
-    const dx = p.x - center.x;
-    const dy = p.y - center.y;
-    const proj = dot(dx, dy, u.x, u.y);
-
-    const px = center.x + proj * u.x;
-    const py = center.y + proj * u.y;
-
-    ctx.save();
-    ctx.strokeStyle = color;
-    ctx.lineWidth = 1.1;
-    ctx.globalAlpha = 0.42;
-    ctx.beginPath();
-    ctx.moveTo(p.x, p.y);
-    ctx.lineTo(px, py);
-    ctx.stroke();
-    ctx.restore();
-  }
-
-  function drawAngleHint(){
-    if (mode !== "oblique") return;
-
-    const r = 46;
-    ctx.save();
-    ctx.strokeStyle = "rgba(255,255,255,0.45)";
-    ctx.lineWidth = 1.2;
-    ctx.beginPath();
-    ctx.arc(center.x, center.y, r, -axisState.a2, -axisState.a1, false);
-    ctx.stroke();
-    ctx.fillStyle = "rgba(255,255,255,0.75)";
-    ctx.font = "12px Arial";
-    ctx.fillText("related factors", center.x + 14, center.y - 18);
-    ctx.restore();
-  }
-
-  function drawCloudHalo(){
-    ctx.save();
-    ctx.strokeStyle = "rgba(255,255,255,0.04)";
-    ctx.lineWidth = 1;
-
-    if (mode === "oblique"){
-      ctx.beginPath();
-      ctx.ellipse(center.x - 42, center.y + 18, 128, 92, -1.02, 0, Math.PI * 2);
-      ctx.stroke();
-
-      ctx.beginPath();
-      ctx.ellipse(center.x + 44, center.y - 26, 130, 94, -0.22, 0, Math.PI * 2);
-      ctx.stroke();
-    } else {
-      ctx.beginPath();
-      ctx.ellipse(center.x, center.y, 220, 155, -0.65, 0, Math.PI * 2);
-      ctx.stroke();
-    }
-
-    ctx.restore();
-  }
-
-  function drawCloud(){
-    for (const p of points){
-      ctx.save();
-      ctx.shadowColor = "rgba(0,0,0,0.35)";
-      ctx.shadowBlur = 10;
-      ctx.shadowOffsetY = 4;
-
-      ctx.fillStyle = "#EAB308";
-      ctx.globalAlpha = 0.94;
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, 10, 0, Math.PI * 2);
-      ctx.fill();
-
-      ctx.shadowBlur = 0;
-      ctx.shadowOffsetY = 0;
-
-      if (showLabels){
-        ctx.fillStyle = "#0b0b0d";
-        ctx.font = "bold 12px Arial";
-        ctx.textAlign = "center";
-        ctx.textBaseline = "middle";
-        ctx.fillText(p.lab, p.x, p.y + 0.5);
-      }
-      ctx.restore();
-    }
-  }
-
-  function drawCenter(){
-    ctx.save();
-    ctx.fillStyle = "rgba(255,255,255,0.8)";
-    ctx.beginPath();
-    ctx.arc(center.x, center.y, 4, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.restore();
-  }
-
-  function drawModeBox(){
-    ctx.save();
-    ctx.fillStyle = "rgba(255,255,255,0.07)";
-    ctx.fillRect(18, 18, 430, 62);
-    ctx.fillStyle = "rgba(255,255,255,0.94)";
-    ctx.font = "15px Arial";
-
-    let title = "Unrotated solution";
-    if (mode === "orthogonal") title = "Orthogonal rotation";
-    if (mode === "oblique") title = "Oblique rotation";
-
-    ctx.fillText(title, 32, 42);
-    ctx.font = "12px Arial";
-    ctx.fillStyle = "rgba(255,255,255,0.72)";
-
-    let desc = "Axes not yet aligned with the clearest structure";
-    if (mode === "orthogonal") desc = "Axes rotate but remain perpendicular";
-    if (mode === "oblique") desc = "Axes rotate more freely and may correlate";
-
-    ctx.fillText(desc, 32, 63);
-    ctx.restore();
-  }
-
-  function draw(){
-    resizeCanvasToDisplaySize();
-    const W = canvas.getBoundingClientRect().width;
-    const H = canvas.getBoundingClientRect().height;
-
-    ctx.clearRect(0, 0, W, H);
-
-    drawModeBox();
-    drawCloudHalo();
-
-    if (showProj){
-      for (const p of points){
-        drawProjection(p, axisState.a1, "rgba(110,231,183,0.9)");
-        drawProjection(p, axisState.a2, "rgba(147,197,253,0.9)");
+    axis(a1, '#176e60', 'F1');
+    axis(a2, '#386da3', 'F2');
+    ctx.strokeStyle = '#7d8a80'; ctx.lineWidth = 1.2;
+    ctx.beginPath(); ctx.arc(cx, cy, 34, -rad(a2), -rad(a1)); ctx.stroke();
+    ctx.fillStyle = '#52665b'; ctx.font = '12px system-ui'; ctx.textAlign = 'center';
+    const mid = unit((a1 + a2) / 2);
+    ctx.fillText(Math.round(Math.abs(a2 - a1)) + '°', cx + mid.x * 50, cy + mid.y * 50 + 4);
+    for (const p of pts) {
+      ctx.beginPath(); ctx.arc(cx + p.x * R, cy + p.y * R, 10, 0, Math.PI * 2);
+      ctx.fillStyle = '#90522f'; ctx.fill();
+      ctx.strokeStyle = '#fdfdf9'; ctx.lineWidth = 2; ctx.stroke();
+      if (showLabels) {
+        ctx.fillStyle = '#fff'; ctx.font = '700 11px system-ui'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.fillText(p.lab, cx + p.x * R, cy + p.y * R + .5);
+        ctx.textBaseline = 'alphabetic';
       }
     }
-
-    drawAxis(axisState.a1, "#6EE7B7", "F1");
-    drawAxis(axisState.a2, "#93C5FD", "F2");
-    drawAngleHint();
-    drawCenter();
-    drawCloud();
+    ctx.beginPath(); ctx.arc(cx, cy, 3.5, 0, Math.PI * 2); ctx.fillStyle = '#243d32'; ctx.fill();
   }
 
-  function step(){
-    if (!paused){
-      updateAxes();
-      updateMotion();
-      updateRows();
+  function move() {
+    const raw = Number(byId('motion').value);
+    const m = raw === 0 ? 0 : (.4 + raw) / 220;
+    for (const p of pts) {
+      p.tx += (rand(-1, 1) - p.tx) * .03; p.ty += (rand(-1, 1) - p.ty) * .03;
+      p.dx += (p.tx - p.dx) * .05; p.dy += (p.ty - p.dy) * .05;
+      p.vx = (p.vx + p.dx * .02 * m) * .96; p.vy = (p.vy + p.dy * .02 * m) * .96;
+      p.x += p.vx + (p.bx - p.x) * .03; p.y += p.vy + (p.by - p.y) * .03;
     }
+  }
 
+  function frame() {
+    if (!paused) {
+      const e = Number(byId('ease').value);
+      a1 += (targets[step][0] - a1) * e;
+      a2 += (targets[step][1] - a2) * e;
+      move();
+      updatePanel();
+    }
     draw();
-    requestAnimationFrame(step);
+    requestAnimationFrame(frame);
   }
 
-  buildPoints("unrotated");
-  setMode("unrotated");
-  requestAnimationFrame(step);
+  function goTo(next) {
+    step = Math.max(0, Math.min(2, next));
+    document.querySelectorAll('[data-step]').forEach(b => { if (Number(b.dataset.step) === step) b.setAttribute('aria-current', 'step'); else b.removeAttribute('aria-current'); });
+    byId('step-title').textContent = steps[step].title;
+    byId('step-copy').textContent = steps[step].copy;
+    byId('back').disabled = step === 0;
+    byId('next').hidden = step === 2;
+    if (paused || reduced.matches) { a1 = targets[step][0]; a2 = targets[step][1]; updatePanel(); }
+    byId('chart-description').textContent = steps[step].title + ': factor axes at ' + targets[step][0] + '° and ' + targets[step][1] + '°, ' + Math.abs(targets[step][1] - targets[step][0]) + '° apart.';
+  }
+
+  function toggle(btn, current) { btn.setAttribute('aria-pressed', String(!current)); return !current; }
+  byId('pause').addEventListener('click', e => { paused = toggle(e.currentTarget, paused); e.currentTarget.textContent = paused ? 'Resume motion' : 'Pause motion'; });
+  byId('reset').addEventListener('click', () => { build(); updatePanel(); });
+  byId('proj').addEventListener('click', e => { showProj = toggle(e.currentTarget, showProj); });
+  byId('labels').addEventListener('click', e => { showLabels = toggle(e.currentTarget, showLabels); });
+  for (const id of ['motion', 'ease']) {
+    const out = () => { byId(id + '-value').textContent = Number(byId(id).value).toFixed(id === 'ease' ? 2 : 1); };
+    byId(id).addEventListener('input', out); out();
+  }
+  document.querySelectorAll('[data-step]').forEach(b => b.addEventListener('click', () => goTo(Number(b.dataset.step))));
+  byId('next').addEventListener('click', () => { goTo(step + 1); if (step === 2) document.querySelector('[data-step="2"]').focus(); });
+  byId('back').addEventListener('click', () => { goTo(step - 1); if (step === 0) document.querySelector('[data-step="0"]').focus(); });
+
+  document.querySelectorAll('[data-check]').forEach(b => b.addEventListener('click', () => {
+    document.querySelectorAll('[data-check]').forEach(o => o.setAttribute('aria-pressed', String(o === b)));
+    byId('check-feedback').textContent = (b.dataset.check === 'positive' ? 'Correct. ' : 'Not quite. ') +
+      'The factor correlation equals the cosine of the angle between the axes: cos 70° ≈ .34. At 90° the cosine is 0, which is why orthogonal factors are uncorrelated.';
+  }));
+
+  if (reduced.matches) byId('motion').value = 0;
+  build();
+  buildRows();
+  goTo(0);
+  new ResizeObserver(() => { resize(); draw(); }).observe(canvas);
+  resize();
+  updatePanel();
+  requestAnimationFrame(frame);
 })();
 </script>
 </body>

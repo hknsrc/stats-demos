@@ -1,0 +1,426 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="An interactive lesson on configural, metric, and scalar measurement invariance across two groups.">
+<meta name="theme-color" content="#f6f5ef">
+<title>Measurement Invariance | Interactive Research Methods Studio</title>
+<style>
+:root {
+  --paper:#f6f5ef; --panel:#fdfdf9; --ink:#243d32; --muted:#52665b;
+  --line:#d9dfd4; --green:#176e60; --sage:#e9f0e7; --copper:#90522f;
+  --warm:#f5ece2; --red:#ac4050; --serif:Georgia,"Times New Roman",serif;
+  --sans:system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+* { box-sizing:border-box; }
+body { margin:0; background:var(--paper); color:var(--ink); font:15px/1.55 var(--sans); }
+button,input { font:inherit; }
+a { color:inherit; text-underline-offset:4px; }
+button { color:inherit; cursor:pointer; background:var(--panel); }
+button:disabled { cursor:default; opacity:.48; }
+:focus-visible { outline:3px solid var(--green); outline-offset:4px; }
+.shell { width:min(1120px,calc(100% - 80px)); margin-inline:auto; }
+.topbar { display:flex; justify-content:space-between; align-items:center; gap:20px; padding:20px 0; border-bottom:1px solid var(--line); font-size:.82rem; }
+.topbar a { text-decoration:none; font-weight:650; }
+.topbar a:hover { text-decoration:underline; }
+.topbar span { color:var(--muted); text-align:right; }
+.hero { padding:38px 0 26px; }
+.eyebrow { margin:0 0 8px; color:var(--green); font-size:.72rem; font-weight:750; letter-spacing:.13em; text-transform:uppercase; }
+h1,h2 { font-family:var(--serif); font-weight:400; line-height:1.08; margin:0; }
+h1 { font-size:clamp(34px,5.5vw,63px); letter-spacing:-.04em; }
+h2 { font-size:clamp(23px,3vw,32px); letter-spacing:-.025em; }
+.intro { margin:12px 0 0; color:var(--muted); max-width:720px; }
+.module { border:1px solid var(--line); border-radius:12px; background:var(--panel); overflow:hidden; }
+.steps { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); background:#f1f3ec; border-bottom:1px solid var(--line); }
+.steps button { position:relative; border:0; border-right:1px solid var(--line); min-height:52px; text-align:left; padding:10px 16px; background:transparent; font-weight:650; font-size:.83rem; }
+.steps button:last-child { border-right:0; }
+.steps button[aria-current="step"] { background:var(--sage); color:var(--green); box-shadow:inset 0 -3px var(--green); }
+.steps button:focus-visible { outline-offset:-5px; }
+.step-num { margin-right:.55em; font-variant-numeric:tabular-nums; }
+.workspace { display:grid; grid-template-columns:minmax(0,1fr) minmax(240px,315px); }
+.figure-pane { min-width:0; padding:22px 24px 18px; }
+.side { display:flex; flex-direction:column; padding:24px; border-left:1px solid var(--line); background:#f8f9f3; }
+.toolbar { display:flex; flex-wrap:wrap; gap:10px; justify-content:space-between; align-items:center; }
+.presets { display:flex; flex-wrap:wrap; gap:7px; }
+.presets button,.nav-button,.small-button { min-height:40px; padding:7px 13px; border:1px solid var(--line); border-radius:6px; font-size:.82rem; font-weight:600; }
+.presets button[aria-pressed="true"] { background:var(--sage); color:#154e43; border-color:#98b7a4; }
+.presets button:hover,.nav-button:hover:not(:disabled),.small-button:hover { border-color:var(--green); }
+figure { margin:17px 0 0; }
+figcaption { margin-bottom:7px; font-size:.82rem; font-weight:650; }
+canvas { display:block; width:100%; height:430px; touch-action:none; }
+.legend { display:flex; flex-wrap:wrap; gap:8px 22px; color:var(--muted); font-size:.81rem; margin-top:6px; }
+.legend span { display:inline-flex; align-items:center; gap:7px; }
+.dot { display:inline-block; width:10px; height:10px; border-radius:50%; background:var(--green); }
+.dot.observed { background:var(--copper); }
+.dot.ghost { background:#cfe0d6; }
+.side p { color:var(--muted); margin:9px 0 16px; line-height:1.5; font-size:.9rem; }
+.metric-area { display:grid; gap:1px; border-block:1px solid var(--line); padding:6px 0; }
+.metric { display:flex; gap:10px; justify-content:space-between; align-items:baseline; padding:7px 0; font-size:.83rem; }
+.metric output { font-size:1.15rem; font-weight:700; color:var(--green); white-space:nowrap; font-variant-numeric:tabular-nums; }
+.metric.observed output { color:var(--copper); }
+.metric.total { border-top:1px solid var(--line); margin-top:2px; }
+#formula { margin:9px 0 5px; font-size:.78rem; font-variant-numeric:tabular-nums; }
+#interpretation { margin-bottom:8px; color:var(--ink); }
+.inference { color:var(--muted); margin-top:0; font-size:.75rem; }
+.nav-buttons { display:flex; flex-wrap:wrap; gap:8px; margin-top:auto; padding-top:18px; }
+.nav-button.next { background:var(--ink); color:white; border-color:var(--ink); }
+.controls { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px 22px; border-top:1px solid var(--line); padding:15px 24px; }
+.controls fieldset { min-width:0; border:0; margin:0; padding:0; }
+.controls legend { font-size:.81rem; font-weight:700; color:var(--green); padding:0; }
+.controls fieldset + fieldset legend { color:var(--copper); }
+.slider-row { display:grid; grid-template-columns:110px minmax(40px,1fr) 40px; align-items:center; gap:7px; min-height:32px; font-size:.76rem; }
+.slider-row output { text-align:right; font-variant-numeric:tabular-nums; }
+input[type="range"] { width:100%; margin:0; accent-color:var(--green); }
+fieldset + fieldset input { accent-color:var(--copper); }
+.check-section { margin-top:28px; padding:22px 0 18px; border-top:1px solid var(--line); }
+.check-section h2 { font-size:clamp(22px,2.6vw,27px); margin-bottom:8px; }
+.check-section p { color:var(--muted); margin:0 0 14px; max-width:780px; font-size:.92rem; }
+.check-options { display:flex; flex-wrap:wrap; gap:8px; }
+.check-options button { min-height:40px; padding:7px 15px; border:1px solid var(--line); border-radius:6px; font-weight:600; font-size:.85rem; }
+.check-options button:hover { border-color:var(--green); }
+.check-options button[aria-pressed="true"] { background:var(--sage); border-color:var(--green); color:#154e43; }
+.check-feedback { min-height:24px; margin-top:12px; max-width:800px; font-size:.9rem; }
+details { border-top:1px solid var(--line); padding:15px 0; font-size:.86rem; }
+summary { cursor:pointer; font-weight:650; }
+details p { color:var(--muted); max-width:880px; }
+.sources { padding-left:20px; color:var(--muted); font-size:.8rem; max-width:880px; }
+.sources li { margin:7px 0; }
+.sources a { color:var(--green); }
+footer { display:flex; gap:8px 20px; flex-wrap:wrap; justify-content:space-between; padding:17px 0 26px; color:var(--muted); font-size:.76rem; border-top:1px solid var(--line); }
+.sr-only { position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap; }
+[hidden] { display:none!important; }
+@media (max-width:760px) {
+  .shell { width:calc(100% - 28px); }
+  .workspace { grid-template-columns:1fr; }
+  .side { border-left:0; border-top:1px solid var(--line); }
+  .figure-pane,.side,.controls { padding:17px; }
+  .hero { padding:28px 0 20px; }
+}
+@media (max-width:510px) {
+  .steps button { font-size:.72rem; padding:8px; }
+  .step-num { display:block; }
+  .controls { grid-template-columns:1fr; }
+  canvas { height:300px; }
+}
+.marker { display:inline-block; width:20px; border-top:3px solid var(--green); }
+.marker.group-b { border-top:3px dashed var(--copper); }
+.item-picks { display:flex; flex-wrap:wrap; gap:6px; align-items:center; margin-top:14px; font-size:.8rem; color:var(--muted); }
+.item-picks span { margin-right:4px; }
+.item-picks button { min-height:34px; padding:4px 11px; border:1px solid var(--line); border-radius:6px; font-weight:600; font-size:.8rem; }
+.item-picks button:hover { border-color:var(--copper); }
+.item-picks button[aria-pressed="true"] { background:var(--warm); border-color:var(--copper); color:#6e3d22; }
+.param-table { width:100%; border-collapse:collapse; font-size:.78rem; font-variant-numeric:tabular-nums; margin-top:16px; }
+.param-table caption { text-align:left; font-weight:650; font-size:.8rem; margin-bottom:6px; }
+.param-table th,.param-table td { padding:6px 8px; border-bottom:1px solid var(--line); text-align:right; }
+.param-table th { font-weight:650; color:var(--muted); }
+.param-table th:first-child,.param-table td:first-child { text-align:left; }
+.param-table tr.selected td { background:#f7f0e7; }
+.param-table td.diff { color:var(--copper); font-weight:700; }
+.metric output.fails { color:var(--red); }
+.metric output.muted { color:var(--muted); font-size:.9rem; }
+.hint { color:var(--muted); font-size:.76rem; margin:8px 0 0; }
+</style>
+</head>
+<body>
+<div class="shell">
+  <header class="topbar">
+    <a href="./">← Interactive Research Methods Studio</a>
+    <span>Multi-group CFA</span>
+  </header>
+  <main>
+    <section class="hero" aria-labelledby="page-title">
+      <p class="eyebrow">An interactive teaching demo</p>
+      <h1 id="page-title">When can two groups be compared on a latent mean?</h1>
+      <p class="intro">Four items measure one factor in Group A and Group B. Do the items work the same way in both groups?</p>
+    </section>
+
+    <section class="module" aria-label="Measurement invariance walkthrough">
+      <nav class="steps" aria-label="Lesson steps">
+        <button type="button" data-step="0" aria-current="step"><span class="step-num">1.</span>Configural</button>
+        <button type="button" data-step="1"><span class="step-num">2.</span>Metric: equal loadings</button>
+        <button type="button" data-step="2"><span class="step-num">3.</span>Scalar: equal intercepts</button>
+      </nav>
+      <div class="workspace">
+        <div class="figure-pane">
+          <div class="presets" role="group" aria-label="Example scenarios">
+            <button type="button" data-preset="full" aria-pressed="true">Full invariance</button>
+            <button type="button" data-preset="loading" aria-pressed="false">Different loading</button>
+            <button type="button" data-preset="intercept" aria-pressed="false">Different intercept</button>
+          </div>
+          <div class="item-picks" role="group" aria-label="Item shown in the chart">
+            <span>Show item:</span>
+            <button type="button" data-item="0" aria-pressed="true">Item 1</button>
+            <button type="button" data-item="1" aria-pressed="false">Item 2</button>
+            <button type="button" data-item="2" aria-pressed="false">Item 3</button>
+            <button type="button" data-item="3" aria-pressed="false">Item 4</button>
+          </div>
+          <figure aria-labelledby="chart-title">
+            <figcaption id="chart-title">Expected score on Item 1 at each level of the factor</figcaption>
+            <canvas id="chart" role="img" aria-labelledby="chart-title" aria-describedby="chart-description"></canvas>
+            <p id="chart-description" class="sr-only"></p>
+            <div class="legend">
+              <span><i class="marker" aria-hidden="true"></i>Group A (reference)</span>
+              <span><i class="marker group-b" aria-hidden="true"></i>Group B</span>
+            </div>
+            <p class="hint">Drag the two handles on the Group B line: the left one moves the intercept, the right one changes the loading.</p>
+          </figure>
+          <table class="param-table">
+            <caption>Item parameters (λ = loading, τ = intercept)</caption>
+            <thead><tr><th scope="col">Item</th><th scope="col">λ A</th><th scope="col">λ B</th><th scope="col">τ A</th><th scope="col">τ B</th></tr></thead>
+            <tbody id="param-rows"></tbody>
+          </table>
+        </div>
+        <section class="side" aria-labelledby="step-title">
+          <div id="lesson" aria-live="polite">
+            <h2 id="step-title">Configural</h2>
+            <p id="step-copy"></p>
+            <div class="metric-area">
+              <div class="metric"><span>Configural (same pattern)</span><output id="m-config"></output></div>
+              <div class="metric" data-from="1"><span>Metric (equal λ)</span><output id="m-metric"></output></div>
+              <div class="metric" data-from="2"><span>Scalar (equal τ)</span><output id="m-scalar"></output></div>
+              <div class="metric total" data-from="2"><span>Latent mean difference, B − A</span><output id="m-kappa"></output></div>
+              <div class="metric observed" data-from="2"><span>Expected sum-score difference</span><output id="m-delta"></output></div>
+              <div class="metric observed" data-from="2"><span>… from the latent difference</span><output id="m-latent-part"></output></div>
+              <div class="metric observed" data-from="2"><span>… from intercept differences</span><output id="m-tau-part"></output></div>
+            </div>
+            <p id="interpretation"></p>
+            <div class="inference" id="inference" hidden>In practice, each level is tested by fitting nested multi-group CFA models and comparing their fit. Here the population values are shown directly.</div>
+          </div>
+          <div class="nav-buttons">
+            <button type="button" class="nav-button" id="back" disabled>← Back</button>
+            <button type="button" class="nav-button next" id="next">Next →</button>
+          </div>
+        </section>
+      </div>
+
+      <div class="controls" aria-label="Adjust Group B parameters">
+        <fieldset>
+          <legend>Latent means</legend>
+          <div class="slider-row"><label for="kappa">Group B mean</label><input id="kappa" type="range" min="-1.5" max="1.5" step=".1" value=".5"><output id="kappa-value" for="kappa"></output></div>
+        </fieldset>
+        <fieldset>
+          <legend id="b-legend">Group B, Item 1</legend>
+          <div class="slider-row"><label for="lambda">Loading λ</label><input id="lambda" type="range" min=".2" max="1.2" step=".05" value=".8"><output id="lambda-value" for="lambda"></output></div>
+          <div class="slider-row"><label for="tau">Intercept τ</label><input id="tau" type="range" min="1.5" max="4.5" step=".1" value="3"><output id="tau-value" for="tau"></output></div>
+        </fieldset>
+      </div>
+    </section>
+    <noscript><p>Enable JavaScript to adjust the item parameters.</p></noscript>
+
+    <section class="check-section" aria-labelledby="check-title">
+      <h2 id="check-title">Check your understanding</h2>
+      <p>All loadings are equal across groups, but the intercept of Item 2 is higher in Group B. Can you compare latent means using all four items as they are?</p>
+      <div class="check-options" role="group" aria-labelledby="check-title">
+        <button type="button" data-check="yes" aria-pressed="false">Yes</button>
+        <button type="button" data-check="no" aria-pressed="false">No</button>
+      </div>
+      <div class="check-feedback" id="check-feedback" role="status" aria-live="polite"></div>
+    </section>
+
+    <details>
+      <summary>Assumptions, interpretation, and references</summary>
+      <p><strong>The model.</strong> For item j in group g, y = τ<sub>jg</sub> + λ<sub>jg</sub>η + ε. Group A is the reference group: its latent mean is fixed at 0 and both latent variances are 1 in this demo. The expected sum score in a group is Σ(τ<sub>j</sub> + λ<sub>j</sub>κ), where κ is that group’s latent mean.</p>
+      <p><strong>Levels.</strong> Configural: same number of factors and same pattern of loadings. Metric (weak): equal loadings, which supports comparing factor variances, covariances, and regression slopes. Scalar (strong): equal loadings and intercepts, which supports comparing latent means. Strict invariance adds equal residual variances and is needed if observed-score variances are compared; it is not shown here.</p>
+      <p><strong>Partial invariance.</strong> When one or two parameters differ, they can be freed while the rest stay equal. Latent means are then identified by the invariant items. Freeing parameters should have a substantive justification, not only a fit-based one.</p>
+      <p><strong>Testing.</strong> Researchers usually compare nested models with χ² difference tests and changes in fit indices such as ΔCFI. Fit-change cutoffs are rules of thumb and depend on sample size and model size.</p>
+      <p>Parameter values are illustrative. The references below credit the methods; no figures or text from them are reproduced.</p>
+      <ol class="sources">
+        <li>Meredith, W. (1993). Measurement invariance, factor analysis and factorial invariance. <em>Psychometrika, 58</em>(4), 525–543. <a href="https://doi.org/10.1007/BF02294825" target="_blank" rel="noopener noreferrer">doi:10.1007/BF02294825 ↗</a></li>
+        <li>Vandenberg, R. J., &amp; Lance, C. E. (2000). A review and synthesis of the measurement invariance literature. <em>Organizational Research Methods, 3</em>(1), 4–70. <a href="https://doi.org/10.1177/109442810031002" target="_blank" rel="noopener noreferrer">doi:10.1177/109442810031002 ↗</a></li>
+        <li>Byrne, B. M., Shavelson, R. J., &amp; Muthén, B. (1989). Testing for the equivalence of factor covariance and mean structures: The issue of partial measurement invariance. <em>Psychological Bulletin, 105</em>(3), 456–466. <a href="https://doi.org/10.1037/0033-2909.105.3.456" target="_blank" rel="noopener noreferrer">doi:10.1037/0033-2909.105.3.456 ↗</a></li>
+        <li>Chen, F. F. (2007). Sensitivity of goodness of fit indexes to lack of measurement invariance. <em>Structural Equation Modeling, 14</em>(3), 464–504. <a href="https://doi.org/10.1080/10705510701301834" target="_blank" rel="noopener noreferrer">doi:10.1080/10705510701301834 ↗</a></li>
+        <li>Putnick, D. L., &amp; Bornstein, M. H. (2016). Measurement invariance conventions and reporting: The state of the art and future directions for psychological research. <em>Developmental Review, 41</em>, 71–90. <a href="https://doi.org/10.1016/j.dr.2016.06.004" target="_blank" rel="noopener noreferrer">doi:10.1016/j.dr.2016.06.004 ↗</a></li>
+      </ol>
+    </details>
+  </main>
+  <footer><span>Hakan Sarac</span><span>Illustrative parameters for teaching</span></footer>
+</div>
+<script>
+'use strict';
+(() => {
+  const byId = id => document.getElementById(id);
+  const A = { lambda:[.8, .7, .9, .6], tau:[3, 2.8, 3.2, 2.6] };
+  const presets = {
+    full:{ kappa:.5, lambda:[.8, .7, .9, .6], tau:[3, 2.8, 3.2, 2.6], item:0 },
+    loading:{ kappa:.5, lambda:[.8, .7, .45, .6], tau:[3, 2.8, 3.2, 2.6], item:2 },
+    intercept:{ kappa:0, lambda:[.8, .7, .9, .6], tau:[3, 3.5, 3.2, 2.6], item:1 }
+  };
+  const steps = [
+    { title:'Configural', copy:'Both groups measure one factor with the same four items. Each line shows the expected item score at each level of the factor. At this level the lines may differ in slope and height.' },
+    { title:'Metric: equal loadings', copy:'Equal loadings give parallel lines: a one-unit difference on the factor changes the item score by the same amount in both groups. The triangles show the change for one unit.' },
+    { title:'Scalar: equal intercepts', copy:'Equal intercepts make the lines coincide: people with the same factor score have the same expected item score in both groups. The curves at the bottom show each group’s latent distribution and the item mean it implies.' }
+  ];
+  const canvas = byId('chart');
+  const ctx = canvas.getContext('2d');
+  let B = structuredClone(presets.full);
+  delete B.item;
+  let item = 0, step = 0, W = 0, H = 0, drag = null;
+  const pad = { l:46, r:16, t:12, b:34 };
+  const eq = (a, b) => Math.abs(a - b) < 1e-6;
+  const r2 = v => Math.round(v * 100) / 100;
+  const fmt = (v, d = 2) => (v < -1e-9 ? '−' : v > 1e-9 ? '+' : '') + Math.abs(v).toFixed(d);
+  const x = e => pad.l + (e + 3) / 6 * (W - pad.l - pad.r);
+  const y = v => pad.t + (6 - v) / 6 * (H - pad.t - pad.b);
+  const eta = px => (px - pad.l) / (W - pad.l - pad.r) * 6 - 3;
+  const val = py => 6 - (py - pad.t) / (H - pad.t - pad.b) * 6;
+  const diffItems = key => [0, 1, 2, 3].filter(j => !eq(A[key][j], B[key][j]));
+  const names = list => list.map(j => 'Item ' + (j + 1)).join(', ');
+
+  function line(x1, y1, x2, y2, color, width = 1, dash = []) {
+    ctx.beginPath(); ctx.strokeStyle = color; ctx.lineWidth = width; ctx.setLineDash(dash);
+    ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke(); ctx.setLineDash([]);
+  }
+  function text(t, px, py, color, align = 'center') { ctx.fillStyle = color; ctx.textAlign = align; ctx.fillText(t, px, py); }
+
+  function paint() {
+    if (!W) return;
+    ctx.clearRect(0, 0, W, H);
+    ctx.font = '11px system-ui';
+    for (let v = 0; v <= 6; v++) { line(pad.l, y(v), W - pad.r, y(v), v === 0 ? '#9eaba0' : '#e7ebe3'); text(v, pad.l - 8, y(v) + 4, '#52665b', 'right'); }
+    for (let e = -3; e <= 3; e++) { line(x(e), pad.t, x(e), y(0), e === 0 ? '#c3ccc0' : '#eef1ea'); text(e, x(e), y(0) + 15, '#52665b'); }
+    text('Factor score (η)', (pad.l + W - pad.r) / 2, H - 3, '#52665b');
+    ctx.save(); ctx.translate(12, (pad.t + y(0)) / 2); ctx.rotate(-Math.PI / 2); text('Expected item score', 0, 0, '#52665b'); ctx.restore();
+
+    const lA = A.lambda[item], tA = A.tau[item], lB = B.lambda[item], tB = B.tau[item];
+    if (step === 2) {
+      const amp = (H - pad.t - pad.b) * 0.16;
+      for (const [mean, color, fill] of [[0, '#176e60', 'rgba(23,110,96,.10)'], [B.kappa, '#90522f', 'rgba(144,82,47,.10)']]) {
+        ctx.beginPath(); ctx.moveTo(x(-3), y(0));
+        for (let e = -3; e <= 3.001; e += .05) ctx.lineTo(x(e), y(0) - amp * Math.exp(-((e - mean) ** 2) / 2));
+        ctx.lineTo(x(3), y(0)); ctx.fillStyle = fill; ctx.fill();
+        ctx.strokeStyle = color; ctx.lineWidth = 1.2; ctx.stroke();
+      }
+    }
+    ctx.save(); ctx.beginPath(); ctx.rect(pad.l, pad.t, W - pad.l - pad.r, y(0) - pad.t); ctx.clip();
+    line(x(-3), y(tA - 3 * lA), x(3), y(tA + 3 * lA), '#176e60', 3);
+    line(x(-3), y(tB - 3 * lB), x(3), y(tB + 3 * lB), '#90522f', 3, [8, 6]);
+    if (step === 1) {
+      for (const [l, t, c, ex] of [[lA, tA, '#176e60', -2.2], [lB, tB, '#90522f', 1.2]]) {
+        const y0 = t + l * ex, y1 = t + l * (ex + 1);
+        line(x(ex), y(y0), x(ex + 1), y(y0), c, 1.5, [3, 3]);
+        line(x(ex + 1), y(y0), x(ex + 1), y(y1), c, 2);
+        text('λ = ' + l.toFixed(2), x(ex + 1) + 6, y((y0 + y1) / 2) + 4, c, 'left');
+      }
+    }
+    if (step === 2) {
+      for (const [k, l, t, c] of [[0, lA, tA, '#176e60'], [B.kappa, lB, tB, '#90522f']]) {
+        const m = t + l * k;
+        line(x(k), y(0), x(k), y(m), c, 1.2, [3, 4]);
+        line(pad.l, y(m), x(k), y(m), c, 1.2, [3, 4]);
+        ctx.beginPath(); ctx.arc(pad.l + 4, y(m), 4.5, 0, 7); ctx.fillStyle = c; ctx.fill();
+      }
+    }
+    ctx.restore();
+    for (const e of [0, 2]) {
+      ctx.beginPath(); ctx.arc(x(e), y(tB + lB * e), 7, 0, 7);
+      ctx.fillStyle = '#fdfdf9'; ctx.fill(); ctx.strokeStyle = '#90522f'; ctx.lineWidth = 2.5; ctx.stroke();
+    }
+  }
+
+  function resize() {
+    const b = canvas.getBoundingClientRect(), s = devicePixelRatio || 1;
+    W = b.width; H = b.height; canvas.width = Math.round(W * s); canvas.height = Math.round(H * s);
+    ctx.setTransform(s, 0, 0, s, 0, 0); paint();
+  }
+
+  function update() {
+    byId('kappa').value = B.kappa; byId('kappa-value').textContent = fmt(B.kappa, 1);
+    byId('lambda').value = B.lambda[item]; byId('lambda-value').textContent = B.lambda[item].toFixed(2);
+    byId('tau').value = B.tau[item]; byId('tau-value').textContent = B.tau[item].toFixed(1);
+    byId('b-legend').textContent = 'Group B, Item ' + (item + 1);
+    byId('chart-title').textContent = 'Expected score on Item ' + (item + 1) + ' at each level of the factor';
+    document.querySelectorAll('[data-item]').forEach(b => b.setAttribute('aria-pressed', String(Number(b.dataset.item) === item)));
+    document.querySelectorAll('[data-preset]').forEach(btn => {
+      const p = presets[btn.dataset.preset];
+      const same = eq(p.kappa, B.kappa) && p.lambda.every((v, j) => eq(v, B.lambda[j])) && p.tau.every((v, j) => eq(v, B.tau[j]));
+      btn.setAttribute('aria-pressed', String(same));
+    });
+    byId('param-rows').innerHTML = [0, 1, 2, 3].map(j => {
+      const dl = !eq(A.lambda[j], B.lambda[j]), dt = !eq(A.tau[j], B.tau[j]);
+      return '<tr' + (j === item ? ' class="selected"' : '') + '><td>Item ' + (j + 1) + '</td><td>' + A.lambda[j].toFixed(2) + '</td><td' + (dl ? ' class="diff"' : '') + '>' + B.lambda[j].toFixed(2) + '</td><td>' + A.tau[j].toFixed(1) + '</td><td' + (dt ? ' class="diff"' : '') + '>' + B.tau[j].toFixed(1) + '</td></tr>';
+    }).join('');
+
+    const dL = diffItems('lambda'), dT = diffItems('tau');
+    const setOut = (id, ok, okText, badText, muted) => { const o = byId(id); o.textContent = ok ? okText : badText; o.className = ok ? '' : muted ? 'muted' : 'fails'; };
+    setOut('m-config', true, 'Holds', '');
+    setOut('m-metric', dL.length === 0, 'Holds', 'Fails: ' + names(dL));
+    if (dL.length) setOut('m-scalar', false, '', 'Needs metric first', true);
+    else setOut('m-scalar', dT.length === 0, 'Holds', 'Fails: ' + names(dT));
+
+    const tauPart = r2([0, 1, 2, 3].reduce((s, j) => s + B.tau[j] - A.tau[j], 0));
+    const latentPart = r2(B.kappa * B.lambda.reduce((s, v) => s + v, 0));
+    const delta = r2(tauPart + latentPart);
+    byId('m-kappa').textContent = fmt(B.kappa, 1);
+    byId('m-delta').textContent = fmt(delta);
+    byId('m-latent-part').textContent = fmt(latentPart);
+    byId('m-tau-part').textContent = fmt(tauPart);
+
+    let msg;
+    if (step === 0) msg = 'Both groups load on one factor through the same items, so configural invariance holds. This alone does not make scores comparable.';
+    else if (step === 1) msg = dL.length
+      ? 'The loading of ' + names(dL) + ' differs. A one-unit difference on the factor does not mean the same thing in both groups.'
+      : 'All loadings are equal. Relationships with other variables can be compared across groups; means cannot yet.';
+    else if (dL.length) msg = 'Loadings differ, so the factor has a different metric in each group. Latent means are not comparable until metric invariance holds (or is handled with partial invariance).';
+    else if (dT.length === 0) msg = 'Loadings and intercepts are equal. The whole sum-score difference comes from the latent mean difference.';
+    else msg = (eq(B.kappa, 0) ? 'The latent means are equal' : 'The latent means differ by ' + fmt(B.kappa, 1)) +
+      ', but the expected sum scores differ by ' + fmt(delta) + '. Of this, ' + fmt(tauPart) + ' comes from the intercept of ' + names(dT) + ', not from the factor.';
+    byId('interpretation').textContent = msg;
+    byId('chart-description').textContent = 'Item ' + (item + 1) + '. Group A: intercept ' + A.tau[item].toFixed(1) + ', loading ' + A.lambda[item].toFixed(2) + '. Group B: intercept ' + B.tau[item].toFixed(1) + ', loading ' + B.lambda[item].toFixed(2) + '. Group B latent mean ' + fmt(B.kappa, 1) + '.';
+    paint();
+  }
+
+  function goTo(next) {
+    step = Math.max(0, Math.min(2, next));
+    document.querySelectorAll('[data-step]').forEach(b => { if (Number(b.dataset.step) === step) b.setAttribute('aria-current', 'step'); else b.removeAttribute('aria-current'); });
+    byId('step-title').textContent = steps[step].title;
+    byId('step-copy').textContent = steps[step].copy;
+    document.querySelectorAll('[data-from]').forEach(el => { el.hidden = step < Number(el.dataset.from); });
+    byId('inference').hidden = step !== 2;
+    byId('back').disabled = step === 0;
+    byId('next').hidden = step === 2;
+    update();
+  }
+
+  const local = ev => { const b = canvas.getBoundingClientRect(); return { px:ev.clientX - b.left, py:ev.clientY - b.top }; };
+  const handleAt = ({ px, py }) => [0, 2].find(e => Math.hypot(px - x(e), py - y(B.tau[item] + B.lambda[item] * e)) < 15);
+  canvas.addEventListener('pointerdown', ev => {
+    if (!ev.isPrimary || ev.button !== 0) return;
+    const h = handleAt(local(ev)); if (h === undefined) return;
+    drag = h; canvas.setPointerCapture(ev.pointerId); canvas.style.cursor = 'grabbing';
+  });
+  canvas.addEventListener('pointermove', ev => {
+    const p = local(ev);
+    if (drag === null) { canvas.style.cursor = handleAt(p) === undefined ? '' : 'grab'; return; }
+    const v = val(p.py);
+    if (drag === 0) B.tau[item] = Math.min(4.5, Math.max(1.5, Math.round(v * 10) / 10));
+    else B.lambda[item] = Math.min(1.2, Math.max(.2, Math.round((v - B.tau[item]) / 2 * 20) / 20));
+    update();
+  });
+  canvas.addEventListener('lostpointercapture', () => { drag = null; canvas.style.cursor = ''; });
+
+  byId('kappa').addEventListener('input', e => { B.kappa = Number(e.target.value); update(); });
+  byId('lambda').addEventListener('input', e => { B.lambda[item] = Number(e.target.value); update(); });
+  byId('tau').addEventListener('input', e => { B.tau[item] = Number(e.target.value); update(); });
+  document.querySelectorAll('[data-item]').forEach(b => b.addEventListener('click', () => { item = Number(b.dataset.item); update(); }));
+  document.querySelectorAll('[data-preset]').forEach(b => b.addEventListener('click', () => {
+    const p = structuredClone(presets[b.dataset.preset]);
+    item = p.item; delete p.item; B = p; update();
+  }));
+  document.querySelectorAll('[data-step]').forEach(b => b.addEventListener('click', () => goTo(Number(b.dataset.step))));
+  byId('next').addEventListener('click', () => { goTo(step + 1); if (step === 2) document.querySelector('[data-step="2"]').focus(); });
+  byId('back').addEventListener('click', () => { goTo(step - 1); if (step === 0) document.querySelector('[data-step="0"]').focus(); });
+
+  document.querySelectorAll('[data-check]').forEach(b => b.addEventListener('click', () => {
+    document.querySelectorAll('[data-check]').forEach(o => o.setAttribute('aria-pressed', String(o === b)));
+    byId('check-feedback').textContent = (b.dataset.check === 'no' ? 'Correct. ' : 'Not quite. ') +
+      'Scalar invariance does not hold for Item 2, so its intercept difference would be read as a latent mean difference. One option is partial invariance: free that intercept, keep the others equal, and compare latent means through the invariant items, if there is a substantive reason for the difference.';
+  }));
+
+  goTo(0);
+  new ResizeObserver(resize).observe(canvas);
+  resize();
+})();
+</script>
+</body>
+</html>
