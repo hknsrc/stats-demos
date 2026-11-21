@@ -19,6 +19,9 @@ The current visualizations include:
 - **How Many Factors? (Parallel Analysis)**
 - **Cronbach’s Alpha & Omega**
 - **Item Response Curves**
+- **What Determines Power?**
+- **What 95% Confidence Means**
+- **Optional Stopping**
 
 ## Live demo
 

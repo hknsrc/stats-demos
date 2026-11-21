@@ -1,0 +1,407 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="An interactive lesson on statistical power, Type I and Type II errors, and sample size for a two-group comparison.">
+<meta name="theme-color" content="#f6f5ef">
+<title>Statistical Power | Interactive Research Methods Studio</title>
+<style>
+:root {
+  --paper:#f6f5ef; --panel:#fdfdf9; --ink:#243d32; --muted:#52665b;
+  --line:#d9dfd4; --green:#176e60; --sage:#e9f0e7; --copper:#90522f;
+  --warm:#f5ece2; --red:#ac4050; --serif:Georgia,"Times New Roman",serif;
+  --sans:system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+* { box-sizing:border-box; }
+body { margin:0; background:var(--paper); color:var(--ink); font:15px/1.55 var(--sans); }
+button,input { font:inherit; }
+a { color:inherit; text-underline-offset:4px; }
+button { color:inherit; cursor:pointer; background:var(--panel); }
+button:disabled { cursor:default; opacity:.48; }
+:focus-visible { outline:3px solid var(--green); outline-offset:4px; }
+.shell { width:min(1120px,calc(100% - 80px)); margin-inline:auto; }
+.topbar { display:flex; justify-content:space-between; align-items:center; gap:20px; padding:20px 0; border-bottom:1px solid var(--line); font-size:.82rem; }
+.topbar a { text-decoration:none; font-weight:650; }
+.topbar a:hover { text-decoration:underline; }
+.topbar span { color:var(--muted); text-align:right; }
+.hero { padding:38px 0 26px; }
+.eyebrow { margin:0 0 8px; color:var(--green); font-size:.72rem; font-weight:750; letter-spacing:.13em; text-transform:uppercase; }
+h1,h2 { font-family:var(--serif); font-weight:400; line-height:1.08; margin:0; }
+h1 { font-size:clamp(34px,5.5vw,63px); letter-spacing:-.04em; }
+h2 { font-size:clamp(23px,3vw,32px); letter-spacing:-.025em; }
+.intro { margin:12px 0 0; color:var(--muted); max-width:720px; }
+.module { border:1px solid var(--line); border-radius:12px; background:var(--panel); overflow:hidden; }
+.steps { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); background:#f1f3ec; border-bottom:1px solid var(--line); }
+.steps button { position:relative; border:0; border-right:1px solid var(--line); min-height:52px; text-align:left; padding:10px 16px; background:transparent; font-weight:650; font-size:.83rem; }
+.steps button:last-child { border-right:0; }
+.steps button[aria-current="step"] { background:var(--sage); color:var(--green); box-shadow:inset 0 -3px var(--green); }
+.steps button:focus-visible { outline-offset:-5px; }
+.step-num { margin-right:.55em; font-variant-numeric:tabular-nums; }
+.workspace { display:grid; grid-template-columns:minmax(0,1fr) minmax(240px,315px); }
+.figure-pane { min-width:0; padding:22px 24px 18px; }
+.side { display:flex; flex-direction:column; padding:24px; border-left:1px solid var(--line); background:#f8f9f3; }
+.toolbar { display:flex; flex-wrap:wrap; gap:10px; justify-content:space-between; align-items:center; }
+.presets { display:flex; flex-wrap:wrap; gap:7px; }
+.presets button,.nav-button,.small-button { min-height:40px; padding:7px 13px; border:1px solid var(--line); border-radius:6px; font-size:.82rem; font-weight:600; }
+.presets button[aria-pressed="true"] { background:var(--sage); color:#154e43; border-color:#98b7a4; }
+.presets button:hover,.nav-button:hover:not(:disabled),.small-button:hover { border-color:var(--green); }
+figure { margin:17px 0 0; }
+figcaption { margin-bottom:7px; font-size:.82rem; font-weight:650; }
+canvas { display:block; width:100%; height:430px; touch-action:none; }
+.legend { display:flex; flex-wrap:wrap; gap:8px 22px; color:var(--muted); font-size:.81rem; margin-top:6px; }
+.legend span { display:inline-flex; align-items:center; gap:7px; }
+.dot { display:inline-block; width:10px; height:10px; border-radius:50%; background:var(--green); }
+.dot.observed { background:var(--copper); }
+.dot.ghost { background:#cfe0d6; }
+.side p { color:var(--muted); margin:9px 0 16px; line-height:1.5; font-size:.9rem; }
+.metric-area { display:grid; gap:1px; border-block:1px solid var(--line); padding:6px 0; }
+.metric { display:flex; gap:10px; justify-content:space-between; align-items:baseline; padding:7px 0; font-size:.83rem; }
+.metric output { font-size:1.15rem; font-weight:700; color:var(--green); white-space:nowrap; font-variant-numeric:tabular-nums; }
+.metric.observed output { color:var(--copper); }
+.metric.total { border-top:1px solid var(--line); margin-top:2px; }
+#formula { margin:9px 0 5px; font-size:.78rem; font-variant-numeric:tabular-nums; }
+#interpretation { margin-bottom:8px; color:var(--ink); }
+.inference { color:var(--muted); margin-top:0; font-size:.75rem; }
+.nav-buttons { display:flex; flex-wrap:wrap; gap:8px; margin-top:auto; padding-top:18px; }
+.nav-button.next { background:var(--ink); color:white; border-color:var(--ink); }
+.controls { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px 22px; border-top:1px solid var(--line); padding:15px 24px; }
+.controls fieldset { min-width:0; border:0; margin:0; padding:0; }
+.controls legend { font-size:.81rem; font-weight:700; color:var(--green); padding:0; }
+.controls fieldset + fieldset legend { color:var(--copper); }
+.slider-row { display:grid; grid-template-columns:110px minmax(40px,1fr) 40px; align-items:center; gap:7px; min-height:32px; font-size:.76rem; }
+.slider-row output { text-align:right; font-variant-numeric:tabular-nums; }
+input[type="range"] { width:100%; margin:0; accent-color:var(--green); }
+fieldset + fieldset input { accent-color:var(--copper); }
+.check-section { margin-top:28px; padding:22px 0 18px; border-top:1px solid var(--line); }
+.check-section h2 { font-size:clamp(22px,2.6vw,27px); margin-bottom:8px; }
+.check-section p { color:var(--muted); margin:0 0 14px; max-width:780px; font-size:.92rem; }
+.check-options { display:flex; flex-wrap:wrap; gap:8px; }
+.check-options button { min-height:40px; padding:7px 15px; border:1px solid var(--line); border-radius:6px; font-weight:600; font-size:.85rem; }
+.check-options button:hover { border-color:var(--green); }
+.check-options button[aria-pressed="true"] { background:var(--sage); border-color:var(--green); color:#154e43; }
+.check-feedback { min-height:24px; margin-top:12px; max-width:800px; font-size:.9rem; }
+details { border-top:1px solid var(--line); padding:15px 0; font-size:.86rem; }
+summary { cursor:pointer; font-weight:650; }
+details p { color:var(--muted); max-width:880px; }
+.sources { padding-left:20px; color:var(--muted); font-size:.8rem; max-width:880px; }
+.sources li { margin:7px 0; }
+.sources a { color:var(--green); }
+footer { display:flex; gap:8px 20px; flex-wrap:wrap; justify-content:space-between; padding:17px 0 26px; color:var(--muted); font-size:.76rem; border-top:1px solid var(--line); }
+.sr-only { position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap; }
+[hidden] { display:none!important; }
+@media (max-width:760px) {
+  .shell { width:calc(100% - 28px); }
+  .workspace { grid-template-columns:1fr; }
+  .side { border-left:0; border-top:1px solid var(--line); }
+  .figure-pane,.side,.controls { padding:17px; }
+  .hero { padding:28px 0 20px; }
+}
+@media (max-width:510px) {
+  .steps button { font-size:.72rem; padding:8px; }
+  .step-num { display:block; }
+  .controls { grid-template-columns:1fr; }
+  canvas { height:300px; }
+}
+canvas { height:440px; }
+.sq { display:inline-block; width:14px; height:10px; border-radius:2px; }
+.sq.alpha { background:#e7c3a9; border:1px solid var(--copper); }
+.sq.beta { background:#dfe3dc; border:1px solid #8a968e; }
+.sq.power { background:#b9d8cb; border:1px solid var(--green); }
+.marker { display:inline-block; width:20px; border-top:3px solid #8a968e; }
+.marker.h1 { border-top-color:var(--green); }
+.controls { grid-template-columns:repeat(3,minmax(0,1fr)); }
+.controls legend { color:var(--green)!important; }
+.controls input { accent-color:var(--green)!important; }
+.slider-row { grid-template-columns:86px minmax(40px,1fr) 40px; }
+@media (max-width:760px) { .controls { grid-template-columns:1fr; } }
+</style>
+</head>
+<body>
+<div class="shell">
+  <header class="topbar">
+    <a href="./">← Interactive Research Methods Studio</a>
+    <span>Statistical power</span>
+  </header>
+  <main>
+    <section class="hero" aria-labelledby="page-title">
+      <p class="eyebrow">An interactive teaching demo</p>
+      <h1 id="page-title">What determines statistical power?</h1>
+      <p class="intro">Two groups are compared with a two-sided test. How likely is the study to detect a true difference of size d?</p>
+    </section>
+
+    <section class="module" aria-label="Power walkthrough">
+      <nav class="steps" aria-label="Lesson steps">
+        <button type="button" data-step="0" aria-current="step"><span class="step-num">1.</span>Two distributions</button>
+        <button type="button" data-step="1"><span class="step-num">2.</span>Two kinds of error</button>
+        <button type="button" data-step="2"><span class="step-num">3.</span>Sample size</button>
+      </nav>
+      <div class="workspace">
+        <div class="figure-pane">
+          <div class="presets" role="group" aria-label="Example effect sizes">
+            <button type="button" data-preset="small" aria-pressed="false">Small effect (d = .2)</button>
+            <button type="button" data-preset="medium" aria-pressed="true">Medium effect (d = .5)</button>
+            <button type="button" data-preset="large" aria-pressed="false">Large effect (d = .8)</button>
+          </div>
+          <figure aria-labelledby="chart-title">
+            <figcaption id="chart-title">Distribution of the test statistic without an effect (H₀) and with an effect of size d (H₁)</figcaption>
+            <canvas id="chart" role="img" aria-labelledby="chart-title" aria-describedby="chart-description"></canvas>
+            <p id="chart-description" class="sr-only"></p>
+            <div class="legend">
+              <span><i class="marker" aria-hidden="true"></i>H₀: no effect</span>
+              <span><i class="marker h1" aria-hidden="true"></i>H₁: effect d</span>
+              <span class="err" hidden><i class="sq alpha" aria-hidden="true"></i>α</span>
+              <span class="err" hidden><i class="sq beta" aria-hidden="true"></i>β</span>
+              <span class="err" hidden><i class="sq power" aria-hidden="true"></i>Power</span>
+            </div>
+          </figure>
+        </div>
+        <section class="side" aria-labelledby="step-title">
+          <div id="lesson" aria-live="polite">
+            <h2 id="step-title">Two distributions</h2>
+            <p id="step-copy"></p>
+            <div class="metric-area">
+              <div class="metric"><span>Effect size d</span><output id="m-d"></output></div>
+              <div class="metric"><span>Shift δ = d · √(n/2)</span><output id="m-delta"></output></div>
+              <div class="metric observed" data-from="1"><span>α (Type I error)</span><output id="m-alpha"></output></div>
+              <div class="metric" data-from="1"><span>β (Type II error)</span><output id="m-beta"></output></div>
+              <div class="metric total" data-from="1"><span>Power (1 − β)</span><output id="m-power"></output></div>
+              <div class="metric" data-from="2"><span>n per group for 80% power</span><output id="m-n80"></output></div>
+            </div>
+            <p id="interpretation"></p>
+            <div class="inference">Uses the normal approximation. For small samples, exact t-test power is slightly lower.</div>
+          </div>
+          <div class="nav-buttons">
+            <button type="button" class="nav-button" id="back" disabled>← Back</button>
+            <button type="button" class="nav-button next" id="next">Next →</button>
+          </div>
+        </section>
+      </div>
+
+      <div class="controls" aria-label="Adjust the design">
+        <fieldset>
+          <legend>Effect</legend>
+          <div class="slider-row"><label for="d">Effect size d</label><input id="d" type="range" min="0" max="1.2" step=".05" value=".5"><output id="d-value" for="d"></output></div>
+        </fieldset>
+        <fieldset>
+          <legend>Sample</legend>
+          <div class="slider-row"><label for="n">n per group</label><input id="n" type="range" min="5" max="300" step="1" value="50"><output id="n-value" for="n"></output></div>
+        </fieldset>
+        <fieldset>
+          <legend>Decision rule</legend>
+          <div class="slider-row"><label for="alpha">α</label><input id="alpha" type="range" min=".01" max=".1" step=".01" value=".05"><output id="alpha-value" for="alpha"></output></div>
+        </fieldset>
+      </div>
+    </section>
+    <noscript><p>Enable JavaScript to adjust the design.</p></noscript>
+
+    <section class="check-section" aria-labelledby="check-title">
+      <h2 id="check-title">Check your understanding</h2>
+      <p>A study with d = .5 and 32 people per group has about 50% power. If the sample size is doubled to 64 per group, does power double?</p>
+      <div class="check-options" role="group" aria-labelledby="check-title">
+        <button type="button" data-check="yes" aria-pressed="false">Yes, to about 100%</button>
+        <button type="button" data-check="no" aria-pressed="false">No</button>
+      </div>
+      <div class="check-feedback" id="check-feedback" role="status" aria-live="polite"></div>
+    </section>
+
+    <details>
+      <summary>Assumptions, interpretation, and references</summary>
+      <p><strong>The setting.</strong> Two independent groups of equal size n, normally distributed outcomes with equal variances, and a two-sided test. Under H₀ the standardized test statistic is centred at 0; under H₁ it is centred at δ = d · √(n/2). Power is P(|Z| &gt; z<sub>1−α/2</sub>) under H₁.</p>
+      <p><strong>Choosing d.</strong> Power depends on the true effect, which is unknown. Effect sizes from small published studies tend to be overestimated, so planning with them gives optimistic power. A smallest effect size of interest is often a better basis.</p>
+      <p><strong>Low power and published results.</strong> When power is low, significant results are more likely to overestimate the effect, and a larger share of them can be false positives.</p>
+      <p>Values are computed, not simulated. The references below credit the methods; no figures or text from them are reproduced.</p>
+      <ol class="sources">
+        <li>Cohen, J. (1988). <em>Statistical power analysis for the behavioral sciences</em> (2nd ed.). Lawrence Erlbaum.</li>
+        <li>Cohen, J. (1992). A power primer. <em>Psychological Bulletin, 112</em>(1), 155–159. <a href="https://doi.org/10.1037/0033-2909.112.1.155" target="_blank" rel="noopener noreferrer">doi:10.1037/0033-2909.112.1.155 ↗</a></li>
+        <li>Faul, F., Erdfelder, E., Lang, A.-G., &amp; Buchner, A. (2007). G*Power 3: A flexible statistical power analysis program for the social, behavioral, and biomedical sciences. <em>Behavior Research Methods, 39</em>(2), 175–191. <a href="https://doi.org/10.3758/BF03193146" target="_blank" rel="noopener noreferrer">doi:10.3758/BF03193146 ↗</a></li>
+        <li>Button, K. S., et al. (2013). Power failure: Why small sample size undermines the reliability of neuroscience. <em>Nature Reviews Neuroscience, 14</em>(5), 365–376. <a href="https://doi.org/10.1038/nrn3475" target="_blank" rel="noopener noreferrer">doi:10.1038/nrn3475 ↗</a></li>
+      </ol>
+    </details>
+  </main>
+  <footer><span>Hakan Sarac</span><span>Computed values for teaching</span></footer>
+</div>
+<script>
+'use strict';
+(() => {
+  const byId = id => document.getElementById(id);
+  const presets = { small:{ d:.2, n:50 }, medium:{ d:.5, n:50 }, large:{ d:.8, n:50 } };
+  const steps = [
+    { title:'Two distributions', copy:'Without an effect (H₀), the test statistic follows the grey curve centred at 0. With a true effect of size d (H₁), it follows the green curve, shifted by δ. The farther apart the curves, the easier the effect is to detect.' },
+    { title:'Two kinds of error', copy:'The critical values cut off α of the grey curve; results beyond them are called significant. The part of the green curve between them is β, the chance of missing a real effect. Power is the rest of the green curve.' },
+    { title:'Sample size', copy:'Power grows with sample size, but not in a straight line. The lower panel shows power across sample sizes for the current d and α.' }
+  ];
+  const canvas = byId('chart');
+  const ctx = canvas.getContext('2d');
+  let d = .5, n = 50, alpha = .05, step = 0, W = 0, H = 0;
+
+  function phi(x) {
+    const t = 1 / (1 + .3275911 * Math.abs(x) / Math.SQRT2);
+    const e = 1 - (((((1.061405429 * t - 1.453152027) * t) + 1.421413741) * t - .284496736) * t + .254829592) * t * Math.exp(-x * x / 2);
+    return x >= 0 ? .5 * (1 + e) : .5 * (1 - e);
+  }
+  function zq(p) {
+    const a = [-39.69683028665376, 220.9460984245205, -275.9285104469687, 138.357751867269, -30.66479806614716, 2.506628277459239];
+    const b = [-54.47609879822406, 161.5858368580409, -155.6989798598866, 66.80131188771972, -13.28068155288572];
+    const c = [-.007784894002430293, -.3223964580411365, -2.400758277161838, -2.549732539343734, 4.374664141464968, 2.938163982698783];
+    const dd = [.007784695709041462, .3224671290700398, 2.445134137142996, 3.754408661907416];
+    const lo = .02425;
+    if (p < lo) { const q = Math.sqrt(-2 * Math.log(p)); return (((((c[0] * q + c[1]) * q + c[2]) * q + c[3]) * q + c[4]) * q + c[5]) / ((((dd[0] * q + dd[1]) * q + dd[2]) * q + dd[3]) * q + 1); }
+    if (p > 1 - lo) return -zq(1 - p);
+    const q = p - .5, r = q * q;
+    return (((((a[0] * r + a[1]) * r + a[2]) * r + a[3]) * r + a[4]) * r + a[5]) * q / (((((b[0] * r + b[1]) * r + b[2]) * r + b[3]) * r + b[4]) * r + 1);
+  }
+  const pdf = x => Math.exp(-x * x / 2) / Math.sqrt(2 * Math.PI);
+  const zc = () => zq(1 - alpha / 2);
+  const delta = nn => d * Math.sqrt(nn / 2);
+  const power = nn => { const z = zc(), dl = delta(nn); return phi(dl - z) + phi(-dl - z); };
+  function n80() {
+    if (d <= 0) return null;
+    for (let m = 2; m <= 100000; m++) if (power(m) >= .8) return m;
+    return null;
+  }
+  const f2 = v => v.toFixed(2).replace(/^0\./, '.');
+  const pct = v => (v * 100).toFixed(v < .1 ? 1 : 0) + '%';
+
+  function layout() {
+    const l = 46, r = 16;
+    if (step < 2) return { l, r, top:{ t:12, b:H - 34 }, bot:null };
+    return { l, r, top:{ t:12, b:H * .56 }, bot:{ t:H * .56 + 30, b:H - 34 } };
+  }
+
+  function paint() {
+    if (!W) return;
+    ctx.clearRect(0, 0, W, H);
+    ctx.font = '11px system-ui';
+    const L = layout(), right = W - L.r, dl = delta(n), z = zc();
+    const xmin = -4, xmax = Math.max(6, dl + 4);
+    const x = v => L.l + (v - xmin) / (xmax - xmin) * (right - L.l);
+    const y = v => L.top.b - v / .54 * (L.top.b - L.top.t);
+    ctx.strokeStyle = '#9eaba0'; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(L.l, L.top.b); ctx.lineTo(right, L.top.b); ctx.stroke();
+    const tickStep = xmax - xmin > 14 ? 2 : 1;
+    ctx.fillStyle = '#52665b'; ctx.textAlign = 'center';
+    for (let v = Math.ceil(xmin); v <= xmax; v += tickStep) ctx.fillText(v, x(v), L.top.b + 15);
+    if (!L.bot) ctx.fillText('Standardized test statistic', (L.l + right) / 2, H - 4);
+
+    const area = (mu, from, to, color) => {
+      const a = Math.max(from, xmin), b = Math.min(to, xmax); if (a >= b) return;
+      ctx.beginPath(); ctx.moveTo(x(a), y(0));
+      for (let v = a; v <= b + 1e-9; v += .02) ctx.lineTo(x(v), y(pdf(v - mu)));
+      ctx.lineTo(x(b), y(0)); ctx.closePath(); ctx.fillStyle = color; ctx.fill();
+    };
+    if (step >= 1) {
+      area(dl, -z, z, 'rgba(138,150,142,.28)');
+      area(dl, z, Infinity, 'rgba(23,110,96,.30)');
+      area(dl, -Infinity, -z, 'rgba(23,110,96,.30)');
+      area(0, z, Infinity, 'rgba(144,82,47,.45)');
+      area(0, -Infinity, -z, 'rgba(144,82,47,.45)');
+    }
+    const curve = (mu, color, w) => {
+      ctx.strokeStyle = color; ctx.lineWidth = w; ctx.beginPath();
+      for (let v = xmin; v <= xmax + 1e-9; v += .02) { const px = x(v), py = y(pdf(v - mu)); v === xmin ? ctx.moveTo(px, py) : ctx.lineTo(px, py); }
+      ctx.stroke();
+    };
+    curve(0, '#8a968e', 2.2);
+    curve(dl, '#176e60', 2.6);
+    ctx.fillStyle = '#52665b'; ctx.fillText('H₀', x(0), y(pdf(0)) - 8);
+    ctx.fillStyle = '#176e60'; ctx.fillText('H₁', x(dl), y(pdf(0)) - 8);
+    if (dl > .3) {
+      ctx.strokeStyle = '#243d32'; ctx.lineWidth = 1.2;
+      const yy = y(pdf(0)) - 24;
+      ctx.beginPath(); ctx.moveTo(x(0), yy); ctx.lineTo(x(dl), yy); ctx.stroke();
+      ctx.fillStyle = '#243d32'; ctx.fillText('δ = ' + dl.toFixed(2), (x(0) + x(dl)) / 2, yy - 5);
+    }
+    if (step >= 1) for (const c of [-z, z]) {
+      if (c < xmin || c > xmax) continue;
+      ctx.strokeStyle = '#90522f'; ctx.lineWidth = 1.4; ctx.setLineDash([5, 4]);
+      ctx.beginPath(); ctx.moveTo(x(c), L.top.t + 10); ctx.lineTo(x(c), L.top.b); ctx.stroke(); ctx.setLineDash([]);
+      ctx.fillStyle = '#90522f'; ctx.fillText((c < 0 ? '−' : '') + Math.abs(c).toFixed(2), x(c), L.top.t + 6);
+    }
+
+    if (L.bot) {
+      const nmax = Math.max(300, Math.min(2000, (n80() || 300) * 1.3));
+      const bx = v => L.l + (v - 2) / (nmax - 2) * (right - L.l);
+      const by = v => L.bot.b - v * (L.bot.b - L.bot.t);
+      for (const v of [0, .2, .4, .6, .8, 1]) {
+        ctx.strokeStyle = v === 0 ? '#9eaba0' : v === .8 ? '#c9b19e' : '#eef1ea'; ctx.lineWidth = 1; ctx.setLineDash(v === .8 ? [4, 4] : []);
+        ctx.beginPath(); ctx.moveTo(L.l, by(v)); ctx.lineTo(right, by(v)); ctx.stroke(); ctx.setLineDash([]);
+        ctx.fillStyle = '#52665b'; ctx.textAlign = 'right'; ctx.fillText(Math.round(v * 100) + '%', L.l - 6, by(v) + 4);
+      }
+      ctx.textAlign = 'center';
+      const tick = nmax > 1000 ? 500 : nmax > 500 ? 100 : 50;
+      for (let v = tick; v <= nmax; v += tick) ctx.fillText(v, bx(v), L.bot.b + 15);
+      ctx.fillText('n per group', (L.l + right) / 2, H - 4);
+      ctx.save(); ctx.translate(12, (L.bot.t + L.bot.b) / 2); ctx.rotate(-Math.PI / 2); ctx.fillText('Power', 0, 0); ctx.restore();
+      ctx.strokeStyle = '#176e60'; ctx.lineWidth = 2.4; ctx.beginPath();
+      for (let m = 2; m <= nmax; m += Math.max(1, Math.round(nmax / 400))) { const px = bx(m), py = by(power(m)); m === 2 ? ctx.moveTo(px, py) : ctx.lineTo(px, py); }
+      ctx.stroke();
+      ctx.beginPath(); ctx.arc(bx(n), by(power(n)), 6, 0, Math.PI * 2);
+      ctx.fillStyle = '#fdfdf9'; ctx.fill(); ctx.strokeStyle = '#243d32'; ctx.lineWidth = 2.5; ctx.stroke();
+      ctx.strokeStyle = '#9eaba0'; ctx.lineWidth = 1; ctx.strokeRect(L.l, L.bot.t, right - L.l, L.bot.b - L.bot.t);
+    }
+  }
+
+  function resize() {
+    const b = canvas.getBoundingClientRect(), sc = devicePixelRatio || 1;
+    W = b.width; H = b.height; canvas.width = Math.round(W * sc); canvas.height = Math.round(H * sc);
+    ctx.setTransform(sc, 0, 0, sc, 0, 0); paint();
+  }
+
+  function update() {
+    byId('d').value = d; byId('d-value').textContent = d.toFixed(2);
+    byId('n').value = n; byId('n-value').textContent = n;
+    byId('alpha').value = alpha; byId('alpha-value').textContent = f2(alpha);
+    document.querySelectorAll('[data-preset]').forEach(btn => {
+      const p = presets[btn.dataset.preset];
+      btn.setAttribute('aria-pressed', String(Math.abs(p.d - d) < 1e-9 && p.n === n));
+    });
+    const pw = power(n), need = n80();
+    byId('m-d').textContent = d.toFixed(2);
+    byId('m-delta').textContent = delta(n).toFixed(2);
+    byId('m-alpha').textContent = f2(alpha);
+    byId('m-beta').textContent = pct(1 - pw);
+    byId('m-power').textContent = pct(pw);
+    byId('m-n80').textContent = need ? String(need) : '—';
+    let msg;
+    if (step === 0) msg = d === 0 ? 'With d = 0 the two curves are the same: there is nothing to detect.' : 'With ' + n + ' people per group, the H₁ curve sits ' + delta(n).toFixed(2) + ' units to the right of the H₀ curve.';
+    else if (step === 1) msg = d === 0 ? 'With no true effect, every significant result is a Type I error, and they occur at rate α.' : 'This study would detect an effect of d = ' + d.toFixed(2) + ' ' + pct(pw) + ' of the time and miss it ' + pct(1 - pw) + ' of the time. Lowering α moves the critical values outward and reduces power.';
+    else msg = !need ? 'Choose d > 0 to see the sample size needed.' : need <= n ? 'The current sample (' + n + ' per group) already reaches 80% power; ' + need + ' per group would be enough.' : 'For 80% power at d = ' + d.toFixed(2) + ' and α = ' + f2(alpha) + ', about ' + need + ' people per group are needed.';
+    byId('interpretation').textContent = msg;
+    byId('chart-description').textContent = 'Effect size ' + d.toFixed(2) + ', ' + n + ' per group, alpha ' + f2(alpha) + '. Power ' + pct(pw) + '.';
+    paint();
+  }
+
+  function goTo(next) {
+    step = Math.max(0, Math.min(2, next));
+    document.querySelectorAll('[data-step]').forEach(b => { if (Number(b.dataset.step) === step) b.setAttribute('aria-current', 'step'); else b.removeAttribute('aria-current'); });
+    byId('step-title').textContent = steps[step].title;
+    byId('step-copy').textContent = steps[step].copy;
+    document.querySelectorAll('[data-from]').forEach(el => { el.hidden = step < Number(el.dataset.from); });
+    document.querySelectorAll('.err').forEach(el => { el.hidden = step < 1; });
+    byId('back').disabled = step === 0;
+    byId('next').hidden = step === 2;
+    update();
+  }
+
+  byId('d').addEventListener('input', e => { d = Number(e.target.value); update(); });
+  byId('n').addEventListener('input', e => { n = Number(e.target.value); update(); });
+  byId('alpha').addEventListener('input', e => { alpha = Math.round(Number(e.target.value) * 100) / 100; update(); });
+  document.querySelectorAll('[data-preset]').forEach(b => b.addEventListener('click', () => { ({ d, n } = presets[b.dataset.preset]); update(); }));
+  document.querySelectorAll('[data-step]').forEach(b => b.addEventListener('click', () => goTo(Number(b.dataset.step))));
+  byId('next').addEventListener('click', () => { goTo(step + 1); if (step === 2) document.querySelector('[data-step="2"]').focus(); });
+  byId('back').addEventListener('click', () => { goTo(step - 1); if (step === 0) document.querySelector('[data-step="0"]').focus(); });
+
+  document.querySelectorAll('[data-check]').forEach(b => b.addEventListener('click', () => {
+    document.querySelectorAll('[data-check]').forEach(o => o.setAttribute('aria-pressed', String(o === b)));
+    byId('check-feedback').textContent = (b.dataset.check === 'no' ? 'Correct. ' : 'Not quite. ') +
+      'Power rises to about 81%, not 100%. The shift δ grows with √n, and power follows the normal curve, so each additional person adds less. Set d = .50 and move n from 32 to 64 to check.';
+  }));
+
+  goTo(0);
+  new ResizeObserver(resize).observe(canvas);
+  resize();
+})();
+</script>
+</body>
+</html>
