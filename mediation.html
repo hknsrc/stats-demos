@@ -1,0 +1,434 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="An interactive lesson on simple mediation: total, direct, and indirect effects, and a bootstrap confidence interval for the indirect effect.">
+<meta name="theme-color" content="#f6f5ef">
+<title>Mediation | Interactive Research Methods Studio</title>
+<style>
+:root {
+  --paper:#f6f5ef; --panel:#fdfdf9; --ink:#243d32; --muted:#52665b;
+  --line:#d9dfd4; --green:#176e60; --sage:#e9f0e7; --copper:#90522f;
+  --warm:#f5ece2; --red:#ac4050; --serif:Georgia,"Times New Roman",serif;
+  --sans:system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+* { box-sizing:border-box; }
+body { margin:0; background:var(--paper); color:var(--ink); font:15px/1.55 var(--sans); }
+button,input { font:inherit; }
+a { color:inherit; text-underline-offset:4px; }
+button { color:inherit; cursor:pointer; background:var(--panel); }
+button:disabled { cursor:default; opacity:.48; }
+:focus-visible { outline:3px solid var(--green); outline-offset:4px; }
+.shell { width:min(1120px,calc(100% - 80px)); margin-inline:auto; }
+.topbar { display:flex; justify-content:space-between; align-items:center; gap:20px; padding:20px 0; border-bottom:1px solid var(--line); font-size:.82rem; }
+.topbar a { text-decoration:none; font-weight:650; }
+.topbar a:hover { text-decoration:underline; }
+.topbar span { color:var(--muted); text-align:right; }
+.hero { padding:38px 0 26px; }
+.eyebrow { margin:0 0 8px; color:var(--green); font-size:.72rem; font-weight:750; letter-spacing:.13em; text-transform:uppercase; }
+h1,h2 { font-family:var(--serif); font-weight:400; line-height:1.08; margin:0; }
+h1 { font-size:clamp(34px,5.5vw,63px); letter-spacing:-.04em; }
+h2 { font-size:clamp(23px,3vw,32px); letter-spacing:-.025em; }
+.intro { margin:12px 0 0; color:var(--muted); max-width:720px; }
+.module { border:1px solid var(--line); border-radius:12px; background:var(--panel); overflow:hidden; }
+.steps { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); background:#f1f3ec; border-bottom:1px solid var(--line); }
+.steps button { position:relative; border:0; border-right:1px solid var(--line); min-height:52px; text-align:left; padding:10px 16px; background:transparent; font-weight:650; font-size:.83rem; }
+.steps button:last-child { border-right:0; }
+.steps button[aria-current="step"] { background:var(--sage); color:var(--green); box-shadow:inset 0 -3px var(--green); }
+.steps button:focus-visible { outline-offset:-5px; }
+.step-num { margin-right:.55em; font-variant-numeric:tabular-nums; }
+.workspace { display:grid; grid-template-columns:minmax(0,1fr) minmax(240px,315px); }
+.figure-pane { min-width:0; padding:22px 24px 18px; }
+.side { display:flex; flex-direction:column; padding:24px; border-left:1px solid var(--line); background:#f8f9f3; }
+.toolbar { display:flex; flex-wrap:wrap; gap:10px; justify-content:space-between; align-items:center; }
+.presets { display:flex; flex-wrap:wrap; gap:7px; }
+.presets button,.nav-button,.small-button { min-height:40px; padding:7px 13px; border:1px solid var(--line); border-radius:6px; font-size:.82rem; font-weight:600; }
+.presets button[aria-pressed="true"] { background:var(--sage); color:#154e43; border-color:#98b7a4; }
+.presets button:hover,.nav-button:hover:not(:disabled),.small-button:hover { border-color:var(--green); }
+figure { margin:17px 0 0; }
+figcaption { margin-bottom:7px; font-size:.82rem; font-weight:650; }
+canvas { display:block; width:100%; height:430px; touch-action:none; }
+.legend { display:flex; flex-wrap:wrap; gap:8px 22px; color:var(--muted); font-size:.81rem; margin-top:6px; }
+.legend span { display:inline-flex; align-items:center; gap:7px; }
+.dot { display:inline-block; width:10px; height:10px; border-radius:50%; background:var(--green); }
+.dot.observed { background:var(--copper); }
+.dot.ghost { background:#cfe0d6; }
+.side p { color:var(--muted); margin:9px 0 16px; line-height:1.5; font-size:.9rem; }
+.metric-area { display:grid; gap:1px; border-block:1px solid var(--line); padding:6px 0; }
+.metric { display:flex; gap:10px; justify-content:space-between; align-items:baseline; padding:7px 0; font-size:.83rem; }
+.metric output { font-size:1.15rem; font-weight:700; color:var(--green); white-space:nowrap; font-variant-numeric:tabular-nums; }
+.metric.observed output { color:var(--copper); }
+.metric.total { border-top:1px solid var(--line); margin-top:2px; }
+#formula { margin:9px 0 5px; font-size:.78rem; font-variant-numeric:tabular-nums; }
+#interpretation { margin-bottom:8px; color:var(--ink); }
+.inference { color:var(--muted); margin-top:0; font-size:.75rem; }
+.nav-buttons { display:flex; flex-wrap:wrap; gap:8px; margin-top:auto; padding-top:18px; }
+.nav-button.next { background:var(--ink); color:white; border-color:var(--ink); }
+.controls { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px 22px; border-top:1px solid var(--line); padding:15px 24px; }
+.controls fieldset { min-width:0; border:0; margin:0; padding:0; }
+.controls legend { font-size:.81rem; font-weight:700; color:var(--green); padding:0; }
+.controls fieldset + fieldset legend { color:var(--copper); }
+.slider-row { display:grid; grid-template-columns:110px minmax(40px,1fr) 40px; align-items:center; gap:7px; min-height:32px; font-size:.76rem; }
+.slider-row output { text-align:right; font-variant-numeric:tabular-nums; }
+input[type="range"] { width:100%; margin:0; accent-color:var(--green); }
+fieldset + fieldset input { accent-color:var(--copper); }
+.check-section { margin-top:28px; padding:22px 0 18px; border-top:1px solid var(--line); }
+.check-section h2 { font-size:clamp(22px,2.6vw,27px); margin-bottom:8px; }
+.check-section p { color:var(--muted); margin:0 0 14px; max-width:780px; font-size:.92rem; }
+.check-options { display:flex; flex-wrap:wrap; gap:8px; }
+.check-options button { min-height:40px; padding:7px 15px; border:1px solid var(--line); border-radius:6px; font-weight:600; font-size:.85rem; }
+.check-options button:hover { border-color:var(--green); }
+.check-options button[aria-pressed="true"] { background:var(--sage); border-color:var(--green); color:#154e43; }
+.check-feedback { min-height:24px; margin-top:12px; max-width:800px; font-size:.9rem; }
+details { border-top:1px solid var(--line); padding:15px 0; font-size:.86rem; }
+summary { cursor:pointer; font-weight:650; }
+details p { color:var(--muted); max-width:880px; }
+.sources { padding-left:20px; color:var(--muted); font-size:.8rem; max-width:880px; }
+.sources li { margin:7px 0; }
+.sources a { color:var(--green); }
+footer { display:flex; gap:8px 20px; flex-wrap:wrap; justify-content:space-between; padding:17px 0 26px; color:var(--muted); font-size:.76rem; border-top:1px solid var(--line); }
+.sr-only { position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap; }
+[hidden] { display:none!important; }
+@media (max-width:760px) {
+  .shell { width:calc(100% - 28px); }
+  .workspace { grid-template-columns:1fr; }
+  .side { border-left:0; border-top:1px solid var(--line); }
+  .figure-pane,.side,.controls { padding:17px; }
+  .hero { padding:28px 0 20px; }
+}
+@media (max-width:510px) {
+  .steps button { font-size:.72rem; padding:8px; }
+  .step-num { display:block; }
+  .controls { grid-template-columns:1fr; }
+  canvas { height:300px; }
+}
+canvas { height:460px; }
+.marker { display:inline-block; width:20px; border-top:3px solid var(--green); }
+.marker.neg { border-top-color:var(--copper); }
+.marker.zero { border-top:2px dashed #9eaba0; }
+.controls { grid-template-columns:repeat(2,minmax(0,1fr)); }
+.controls legend { color:var(--green)!important; }
+.controls input { accent-color:var(--green)!important; }
+.slider-row { grid-template-columns:150px minmax(40px,1fr) 44px; }
+.metric output.ns { color:var(--muted); }
+.status-note { min-height:1.2em; color:var(--muted); font-size:.74rem; margin:4px 0 0; }
+</style>
+</head>
+<body>
+<div class="shell">
+  <header class="topbar">
+    <a href="./">← Interactive Research Methods Studio</a>
+    <span>Regression</span>
+  </header>
+  <main>
+    <section class="hero" aria-labelledby="page-title">
+      <p class="eyebrow">An interactive teaching demo</p>
+      <h1 id="page-title">How much of an effect runs through a mediator?</h1>
+      <p class="intro">Attitude toward exercise (X) may increase weekly physical activity (Y) partly because it increases the intention to exercise (M). Separate the total effect into a direct and an indirect part.</p>
+    </section>
+
+    <section class="module" aria-label="Mediation walkthrough">
+      <nav class="steps" aria-label="Lesson steps">
+        <button type="button" data-step="0" aria-current="step"><span class="step-num">1.</span>Total effect</button>
+        <button type="button" data-step="1"><span class="step-num">2.</span>Direct and indirect</button>
+        <button type="button" data-step="2"><span class="step-num">3.</span>Testing the indirect effect</button>
+      </nav>
+      <div class="workspace">
+        <div class="figure-pane">
+          <div class="toolbar">
+            <div class="presets" role="group" aria-label="Example patterns">
+              <button type="button" data-preset="partial" aria-pressed="true">Partial mediation</button>
+              <button type="button" data-preset="full" aria-pressed="false">Full mediation</button>
+              <button type="button" data-preset="none" aria-pressed="false">No indirect effect</button>
+              <button type="button" data-preset="opposite" aria-pressed="false">Opposite signs</button>
+            </div>
+            <button type="button" class="small-button" id="resample">New sample ↻</button>
+          </div>
+          <figure aria-labelledby="chart-title">
+            <figcaption id="chart-title">Path diagram with estimates from one simulated sample</figcaption>
+            <canvas id="chart" role="img" aria-labelledby="chart-title" aria-describedby="chart-description"></canvas>
+            <p id="chart-description" class="sr-only"></p>
+            <div class="legend">
+              <span><i class="marker" aria-hidden="true"></i>Positive path</span>
+              <span><i class="marker neg" aria-hidden="true"></i>Negative path</span>
+              <span><i class="marker zero" aria-hidden="true"></i>Near zero</span>
+            </div>
+            <p class="status-note" id="status" aria-live="polite"></p>
+          </figure>
+        </div>
+        <section class="side" aria-labelledby="step-title">
+          <div id="lesson" aria-live="polite">
+            <h2 id="step-title">Total effect</h2>
+            <p id="step-copy"></p>
+            <div class="metric-area">
+              <div class="metric"><span>Total effect c</span><output id="m-c"></output></div>
+              <div class="metric" data-from="1"><span>a: X → M</span><output id="m-a"></output></div>
+              <div class="metric" data-from="1"><span>b: M → Y (controlling X)</span><output id="m-b"></output></div>
+              <div class="metric" data-from="1"><span>Direct effect c′</span><output id="m-cp"></output></div>
+              <div class="metric total" data-from="1"><span>Indirect effect a × b</span><output id="m-ab"></output></div>
+              <div class="metric" data-from="2"><span>95% bootstrap CI for a × b</span><output id="m-ci"></output></div>
+            </div>
+            <p id="interpretation"></p>
+            <div class="inference" id="inference" hidden>A mediation model is a causal claim. With cross-sectional data, the order X → M → Y is assumed, not shown, and unmeasured confounders of M and Y can bias b.</div>
+          </div>
+          <div class="nav-buttons">
+            <button type="button" class="nav-button" id="back" disabled>← Back</button>
+            <button type="button" class="nav-button next" id="next">Next →</button>
+          </div>
+        </section>
+      </div>
+
+      <div class="controls" aria-label="Adjust the population paths">
+        <fieldset>
+          <legend>Population paths</legend>
+          <div class="slider-row"><label for="a">a (attitude → intention)</label><input id="a" type="range" min="-.8" max=".8" step=".05" value=".5"><output id="a-value" for="a"></output></div>
+          <div class="slider-row"><label for="b">b (intention → activity)</label><input id="b" type="range" min="-.8" max=".8" step=".05" value=".4"><output id="b-value" for="b"></output></div>
+          <div class="slider-row"><label for="cp">c′ (direct)</label><input id="cp" type="range" min="-.8" max=".8" step=".05" value=".2"><output id="cp-value" for="cp"></output></div>
+        </fieldset>
+        <fieldset>
+          <legend>Sample</legend>
+          <div class="slider-row"><label for="n">Sample size N</label><input id="n" type="range" min="30" max="500" step="10" value="150"><output id="n-value" for="n"></output></div>
+        </fieldset>
+      </div>
+    </section>
+    <noscript><p>Enable JavaScript to run the simulation.</p></noscript>
+
+    <section class="check-section" aria-labelledby="check-title">
+      <h2 id="check-title">Check your understanding</h2>
+      <p>The total effect of X on Y is close to zero and not significant. Can there still be a meaningful indirect effect through M?</p>
+      <div class="check-options" role="group" aria-labelledby="check-title">
+        <button type="button" data-check="yes" aria-pressed="false">Yes</button>
+        <button type="button" data-check="no" aria-pressed="false">No</button>
+      </div>
+      <div class="check-feedback" id="check-feedback" role="status" aria-live="polite"></div>
+    </section>
+
+    <details>
+      <summary>Assumptions, interpretation, and references</summary>
+      <p><strong>Simulation.</strong> X is standard normal. M = aX + error and Y = c′X + bM + error, with standard normal errors. Estimates come from ordinary least squares in one simulated sample of size N: a from regressing M on X, b and c′ from regressing Y on X and M, and c from regressing Y on X alone. In linear models estimated this way, c = c′ + ab holds exactly in the sample.</p>
+      <p><strong>Bootstrap.</strong> The sample is resampled with replacement 1,000 times; a × b is re-estimated each time. The 2.5th and 97.5th percentiles form the 95% percentile interval. The bootstrap is preferred over the Sobel test because the sampling distribution of a × b is usually skewed.</p>
+      <p><strong>Older rules.</strong> The causal-steps approach required a significant total effect before testing mediation. Current recommendations test the indirect effect directly, because the total effect can be small when direct and indirect effects have opposite signs, or when the study has low power for c.</p>
+      <p>Data are simulated for teaching. The references below credit the methods; no figures or text from them are reproduced.</p>
+      <ol class="sources">
+        <li>Baron, R. M., &amp; Kenny, D. A. (1986). The moderator–mediator variable distinction in social psychological research. <em>Journal of Personality and Social Psychology, 51</em>(6), 1173–1182. <a href="https://doi.org/10.1037/0022-3514.51.6.1173" target="_blank" rel="noopener noreferrer">doi:10.1037/0022-3514.51.6.1173 ↗</a></li>
+        <li>Preacher, K. J., &amp; Hayes, A. F. (2008). Asymptotic and resampling strategies for assessing and comparing indirect effects in multiple mediator models. <em>Behavior Research Methods, 40</em>(3), 879–891. <a href="https://doi.org/10.3758/BRM.40.3.879" target="_blank" rel="noopener noreferrer">doi:10.3758/BRM.40.3.879 ↗</a></li>
+        <li>Hayes, A. F. (2009). Beyond Baron and Kenny: Statistical mediation analysis in the new millennium. <em>Communication Monographs, 76</em>(4), 408–420. <a href="https://doi.org/10.1080/03637750903310360" target="_blank" rel="noopener noreferrer">doi:10.1080/03637750903310360 ↗</a></li>
+        <li>Zhao, X., Lynch, J. G., &amp; Chen, Q. (2010). Reconsidering Baron and Kenny: Myths and truths about mediation analysis. <em>Journal of Consumer Research, 37</em>(2), 197–206. <a href="https://doi.org/10.1086/651257" target="_blank" rel="noopener noreferrer">doi:10.1086/651257 ↗</a></li>
+        <li>MacKinnon, D. P., Fairchild, A. J., &amp; Fritz, M. S. (2007). Mediation analysis. <em>Annual Review of Psychology, 58</em>, 593–614. <a href="https://doi.org/10.1146/annurev.psych.58.110405.085542" target="_blank" rel="noopener noreferrer">doi:10.1146/annurev.psych.58.110405.085542 ↗</a></li>
+      </ol>
+    </details>
+  </main>
+  <footer><span>Hakan Sarac</span><span>Simulated data for teaching</span></footer>
+</div>
+<script>
+'use strict';
+(() => {
+  const byId = id => document.getElementById(id);
+  const B = 1000;
+  const presets = {
+    partial:{ a:.5, b:.4, cp:.2 }, full:{ a:.5, b:.5, cp:0 },
+    none:{ a:.5, b:0, cp:.3 }, opposite:{ a:.5, b:.4, cp:-.2 }
+  };
+  const steps = [
+    { title:'Total effect', copy:'Start with the simple regression of weekly activity on attitude. Its slope, c, is the total effect: how much activity differs, on average, per unit of attitude.' },
+    { title:'Direct and indirect', copy:'Add intention as a mediator. Path a links attitude to intention; path b links intention to activity, holding attitude constant. The indirect effect is a × b; what remains of the total is the direct effect c′.' },
+    { title:'Testing the indirect effect', copy:'The indirect effect is a product, and its sampling distribution is often skewed. The bootstrap resamples the data many times and uses the spread of a × b to form a confidence interval.' }
+  ];
+  const canvas = byId('chart');
+  const ctx = canvas.getContext('2d');
+  let s = { ...presets.partial, n:150 }, seed = 8, step = 0, W = 0, H = 0, timer = 0;
+  let data = null, est = {}, boot = null;
+
+  function uniformFrom(v) { let a = v >>> 0; return () => { a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+  function normalFrom(u) { let spare = null; return () => { if (spare !== null) { const r = spare; spare = null; return r; } let x = 0; while (x === 0) x = u(); const r = Math.sqrt(-2 * Math.log(x)), th = 2 * Math.PI * u(); spare = r * Math.sin(th); return r * Math.cos(th); }; }
+
+  function simulate() {
+    const normal = normalFrom(uniformFrom(seed * 6151 + 5));
+    const n = s.n, X = new Float64Array(n), M = new Float64Array(n), Y = new Float64Array(n);
+    for (let i = 0; i < n; i++) { X[i] = normal(); M[i] = s.a * X[i] + normal(); Y[i] = s.cp * X[i] + s.b * M[i] + normal(); }
+    data = { X, M, Y, n };
+  }
+  function fit(idx) {
+    const { X, M, Y } = data, n = idx.length;
+    let mx = 0, mm = 0, my = 0;
+    for (const i of idx) { mx += X[i]; mm += M[i]; my += Y[i]; }
+    mx /= n; mm /= n; my /= n;
+    let sxx = 0, smm = 0, sxm = 0, sxy = 0, smy = 0;
+    for (const i of idx) { const dx = X[i] - mx, dm = M[i] - mm, dy = Y[i] - my; sxx += dx * dx; smm += dm * dm; sxm += dx * dm; sxy += dx * dy; smy += dm * dy; }
+    const det = sxx * smm - sxm * sxm;
+    const a = sxm / sxx, b = (sxx * smy - sxm * sxy) / det, cp = (smm * sxy - sxm * smy) / det, c = sxy / sxx;
+    return { a, b, cp, c, ab:a * b };
+  }
+  function estimate() { est = fit(Array.from({ length:data.n }, (_, i) => i)); }
+  function bootstrap() {
+    const u = uniformFrom(seed * 104723 + s.n), n = data.n, idx = new Array(n), vals = new Float64Array(B);
+    for (let r = 0; r < B; r++) { for (let i = 0; i < n; i++) idx[i] = Math.floor(u() * n); vals[r] = fit(idx).ab; }
+    const sorted = Array.from(vals).sort((x, y) => x - y);
+    boot = { vals:sorted, lo:sorted[Math.floor(.025 * B)], hi:sorted[Math.ceil(.975 * B) - 1] };
+  }
+  const fmt = v => (v < -.005 ? '−' : '') + Math.abs(v).toFixed(2);
+  const excludesZero = () => boot && (boot.lo > 0 || boot.hi < 0);
+
+  function arrowLine(x1, y1, x2, y2, value, label, faded) {
+    const color = faded ? '#c9d0c6' : Math.abs(value) < .05 ? '#9eaba0' : value > 0 ? '#176e60' : '#90522f';
+    const w = faded ? 1.5 : Math.max(1.5, Math.min(8, 1.5 + Math.abs(value) * 9));
+    const ang = Math.atan2(y2 - y1, x2 - x1);
+    ctx.strokeStyle = color; ctx.fillStyle = color; ctx.lineWidth = w; ctx.setLineDash(!faded && Math.abs(value) < .05 ? [6, 5] : []);
+    ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2 - Math.cos(ang) * 10, y2 - Math.sin(ang) * 10); ctx.stroke(); ctx.setLineDash([]);
+    ctx.beginPath(); ctx.moveTo(x2, y2); ctx.lineTo(x2 - Math.cos(ang - .4) * 16, y2 - Math.sin(ang - .4) * 16); ctx.lineTo(x2 - Math.cos(ang + .4) * 16, y2 - Math.sin(ang + .4) * 16); ctx.closePath(); ctx.fill();
+    if (label) {
+      const mx = (x1 + x2) / 2, my = (y1 + y2) / 2;
+      ctx.font = '600 13px system-ui';
+      const tw = ctx.measureText(label).width;
+      ctx.fillStyle = '#fdfdf9'; ctx.fillRect(mx - tw / 2 - 5, my - 11, tw + 10, 20);
+      ctx.fillStyle = faded ? '#9eaba0' : color; ctx.textAlign = 'center'; ctx.fillText(label, mx, my + 4);
+    }
+  }
+  function node(cx, cy, title, sub, faded) {
+    const w = 132, h = 50;
+    ctx.fillStyle = faded ? '#f6f5ef' : '#fdfdf9'; ctx.strokeStyle = faded ? '#d9dfd4' : '#7d8a80'; ctx.lineWidth = 1.5;
+    ctx.beginPath(); ctx.roundRect(cx - w / 2, cy - h / 2, w, h, 7); ctx.fill(); ctx.stroke();
+    ctx.fillStyle = faded ? '#a9b3ac' : '#243d32'; ctx.textAlign = 'center';
+    ctx.font = '600 13px system-ui'; ctx.fillText(title, cx, cy - 2);
+    ctx.font = '11px system-ui'; ctx.fillStyle = faded ? '#b9c1bb' : '#52665b'; ctx.fillText(sub, cx, cy + 14);
+  }
+
+  function paint() {
+    if (!W || !data) return;
+    ctx.clearRect(0, 0, W, H);
+    const topH = step === 0 ? H : H * .52;
+    const xL = Math.max(80, W * .14), xR = Math.min(W - 80, W * .86), yBase = topH * .74, yTop = topH * .22, xM = W / 2;
+    const hw = 66, hh = 25;
+    if (step === 0) {
+      node(xM, yTop, 'Intention', 'M', true);
+      arrowLine(xL + hw, yBase, xR - hw, yBase, est.c, 'c = ' + fmt(est.c), false);
+    } else {
+      arrowLine(xL + 30, yBase - hh, xM - hw + 4, yTop + hh - 2, est.a, 'a = ' + fmt(est.a), false);
+      arrowLine(xM + hw - 4, yTop + hh - 2, xR - 30, yBase - hh, est.b, 'b = ' + fmt(est.b), false);
+      arrowLine(xL + hw, yBase, xR - hw, yBase, est.cp, 'c′ = ' + fmt(est.cp), false);
+      node(xM, yTop, 'Intention', 'M');
+    }
+    node(xL, yBase, 'Attitude', 'X');
+    node(xR, yBase, 'Weekly activity', 'Y');
+    if (step === 0) return;
+
+    const l = 60, r = 24, t = topH + 26, bb = H - 34;
+    ctx.font = '11px system-ui';
+    if (step === 1) {
+      const parts = [['Direct c′', est.cp], ['Indirect a × b', est.ab]];
+      const vals = [0, est.c, est.cp, est.cp + est.ab];
+      let lo = Math.min(...vals), hi = Math.max(...vals);
+      const span = Math.max(.3, hi - lo); lo -= span * .08; hi += span * .08;
+      const x = v => l + 40 + (v - lo) / (hi - lo) * (W - l - r - 40);
+      const rows = [['Total c', [[est.c, '#243d32']]], ['c′ + a × b', [[est.cp, '#7d9a8c'], [est.ab, '#176e60']]]];
+      const rowH = Math.min(34, (bb - t) / 3);
+      ctx.strokeStyle = '#9eaba0'; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(x(0), t - 6); ctx.lineTo(x(0), t + rowH * 2.6); ctx.stroke();
+      ctx.fillStyle = '#52665b'; ctx.textAlign = 'center'; ctx.fillText('0', x(0), t - 10);
+      rows.forEach(([label, segs], i) => {
+        const yy = t + i * rowH * 1.4;
+        ctx.fillStyle = '#52665b'; ctx.textAlign = 'right'; ctx.fillText(label, l + 32, yy + rowH / 2 + 4);
+        let start = 0;
+        for (const [v, color] of segs) {
+          const x0 = x(start), x1 = x(start + v);
+          ctx.fillStyle = color; ctx.fillRect(Math.min(x0, x1), yy, Math.abs(x1 - x0), rowH);
+          start += v;
+        }
+      });
+      const ly = t + rowH * 3.2;
+      ctx.textAlign = 'left';
+      [['Direct c′ = ' + fmt(est.cp), '#7d9a8c'], ['Indirect a × b = ' + fmt(est.ab), '#176e60']].forEach(([txt, color], i) => {
+        const lx = l + 40 + i * 190; ctx.fillStyle = color; ctx.fillRect(lx, ly - 9, 12, 10); ctx.fillStyle = '#52665b'; ctx.fillText(txt, lx + 18, ly);
+      });
+      return;
+    }
+    if (!boot) return;
+    const lo = Math.min(boot.vals[0], 0), hi = Math.max(boot.vals[B - 1], 0), pad = (hi - lo) * .08 || .1;
+    const x = v => l + (v - (lo - pad)) / ((hi + pad) - (lo - pad)) * (W - l - r);
+    const bins = 40, counts = new Array(bins).fill(0), bw = ((hi + pad) - (lo - pad)) / bins;
+    for (const v of boot.vals) counts[Math.min(bins - 1, Math.floor((v - (lo - pad)) / bw))]++;
+    const cmax = Math.max(...counts), y = c => bb - c / cmax * (bb - t - 10);
+    ctx.fillStyle = 'rgba(23,110,96,.10)'; ctx.fillRect(x(boot.lo), t, x(boot.hi) - x(boot.lo), bb - t);
+    counts.forEach((c, i) => {
+      const v0 = lo - pad + i * bw, inCI = v0 + bw / 2 >= boot.lo && v0 + bw / 2 <= boot.hi;
+      ctx.fillStyle = inCI ? '#176e60' : '#b9c4bd';
+      ctx.fillRect(x(v0) + .5, y(c), Math.max(1, x(v0 + bw) - x(v0) - 1), bb - y(c));
+    });
+    ctx.strokeStyle = '#90522f'; ctx.lineWidth = 1.6; ctx.setLineDash([5, 4]);
+    ctx.beginPath(); ctx.moveTo(x(0), t); ctx.lineTo(x(0), bb); ctx.stroke(); ctx.setLineDash([]);
+    ctx.fillStyle = '#90522f'; ctx.textAlign = 'center'; ctx.fillText('0', x(0), t - 4);
+    ctx.strokeStyle = '#9eaba0'; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(l, bb); ctx.lineTo(W - r, bb); ctx.stroke();
+    ctx.fillStyle = '#52665b';
+    for (const v of [boot.lo, boot.hi]) ctx.fillText(fmt(v), x(v), bb + 15);
+    ctx.fillText('Bootstrap estimates of a × b (1,000 resamples); shaded: 95% interval', (l + W - r) / 2, H - 4);
+  }
+
+  function resize() {
+    const b = canvas.getBoundingClientRect(), sc = devicePixelRatio || 1;
+    W = b.width; H = b.height; canvas.width = Math.round(W * sc); canvas.height = Math.round(H * sc);
+    ctx.setTransform(sc, 0, 0, sc, 0, 0); paint();
+  }
+
+  function updateText() {
+    for (const k of ['a', 'b', 'cp']) { byId(k).value = s[k]; byId(k + '-value').textContent = fmt(s[k]); }
+    byId('n').value = s.n; byId('n-value').textContent = s.n;
+    document.querySelectorAll('[data-preset]').forEach(btn => {
+      const p = presets[btn.dataset.preset];
+      btn.setAttribute('aria-pressed', String(['a', 'b', 'cp'].every(k => Math.abs(p[k] - s[k]) < 1e-9)));
+    });
+    byId('m-c').textContent = fmt(est.c);
+    byId('m-a').textContent = fmt(est.a);
+    byId('m-b').textContent = fmt(est.b);
+    byId('m-cp').textContent = fmt(est.cp);
+    byId('m-ab').textContent = fmt(est.ab);
+    byId('m-ci').textContent = boot ? '[' + fmt(boot.lo) + ', ' + fmt(boot.hi) + ']' : '…';
+    byId('m-ci').className = boot && !excludesZero() ? 'ns' : '';
+    let msg;
+    if (step === 0) msg = 'In this sample, one unit higher attitude goes with ' + fmt(est.c) + ' units more weekly activity (population value: ' + fmt(s.cp + s.a * s.b) + ').';
+    else if (step === 1) msg = Math.abs(est.c) < .05 ? 'The total effect is near zero, but it hides a direct effect of ' + fmt(est.cp) + ' and an indirect effect of ' + fmt(est.ab) + ' that cancel out.' : 'Of the total effect (' + fmt(est.c) + '), ' + fmt(est.ab) + ' runs through intention and ' + fmt(est.cp) + ' remains direct. In the sample, c = c′ + a × b exactly.';
+    else msg = !boot ? 'Computing the bootstrap…' : excludesZero() ? 'The 95% interval excludes zero, so the data support an indirect effect through intention (under the model’s assumptions).' : 'The 95% interval includes zero, so these data do not clearly support an indirect effect. Try a larger N.';
+    byId('interpretation').textContent = msg;
+    byId('chart-description').textContent = 'Estimates: a ' + fmt(est.a) + ', b ' + fmt(est.b) + ', direct ' + fmt(est.cp) + ', indirect ' + fmt(est.ab) + ', total ' + fmt(est.c) + (boot ? '. Bootstrap 95% interval for the indirect effect: ' + fmt(boot.lo) + ' to ' + fmt(boot.hi) + '.' : '.');
+  }
+
+  function run() {
+    simulate(); estimate(); boot = null;
+    updateText(); paint();
+    clearTimeout(timer);
+    byId('status').textContent = step === 2 ? 'Resampling…' : '';
+    timer = setTimeout(() => { bootstrap(); byId('status').textContent = ''; updateText(); paint(); }, 40);
+  }
+
+  function goTo(next) {
+    step = Math.max(0, Math.min(2, next));
+    document.querySelectorAll('[data-step]').forEach(b => { if (Number(b.dataset.step) === step) b.setAttribute('aria-current', 'step'); else b.removeAttribute('aria-current'); });
+    byId('step-title').textContent = steps[step].title;
+    byId('step-copy').textContent = steps[step].copy;
+    document.querySelectorAll('[data-from]').forEach(el => { el.hidden = step < Number(el.dataset.from); });
+    byId('inference').hidden = step !== 2;
+    byId('back').disabled = step === 0;
+    byId('next').hidden = step === 2;
+    updateText(); paint();
+  }
+
+  for (const k of ['a', 'b', 'cp', 'n']) byId(k).addEventListener('input', e => { s[k] = Number(e.target.value); run(); });
+  document.querySelectorAll('[data-preset]').forEach(b => b.addEventListener('click', () => { Object.assign(s, presets[b.dataset.preset]); run(); }));
+  byId('resample').addEventListener('click', () => { seed++; run(); });
+  document.querySelectorAll('[data-step]').forEach(b => b.addEventListener('click', () => goTo(Number(b.dataset.step))));
+  byId('next').addEventListener('click', () => { goTo(step + 1); if (step === 2) document.querySelector('[data-step="2"]').focus(); });
+  byId('back').addEventListener('click', () => { goTo(step - 1); if (step === 0) document.querySelector('[data-step="0"]').focus(); });
+
+  document.querySelectorAll('[data-check]').forEach(b => b.addEventListener('click', () => {
+    document.querySelectorAll('[data-check]').forEach(o => o.setAttribute('aria-pressed', String(o === b)));
+    byId('check-feedback').textContent = (b.dataset.check === 'yes' ? 'Correct. ' : 'Not quite. ') +
+      'If the direct and indirect effects have opposite signs, they can cancel in the total effect. Choose “Opposite signs” and go to step 3: the total effect is near zero while the indirect effect’s interval can exclude zero.';
+  }));
+
+  goTo(0);
+  new ResizeObserver(resize).observe(canvas);
+  resize();
+  run();
+})();
+</script>
+</body>
+</html>

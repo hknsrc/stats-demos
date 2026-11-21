@@ -1,0 +1,376 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="An interactive lesson on Simpson's paradox: a relationship that reverses when data are split by a confounding variable.">
+<meta name="theme-color" content="#f6f5ef">
+<title>Simpson’s Paradox | Interactive Research Methods Studio</title>
+<style>
+:root {
+  --paper:#f6f5ef; --panel:#fdfdf9; --ink:#243d32; --muted:#52665b;
+  --line:#d9dfd4; --green:#176e60; --sage:#e9f0e7; --copper:#90522f;
+  --warm:#f5ece2; --red:#ac4050; --serif:Georgia,"Times New Roman",serif;
+  --sans:system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+* { box-sizing:border-box; }
+body { margin:0; background:var(--paper); color:var(--ink); font:15px/1.55 var(--sans); }
+button,input { font:inherit; }
+a { color:inherit; text-underline-offset:4px; }
+button { color:inherit; cursor:pointer; background:var(--panel); }
+button:disabled { cursor:default; opacity:.48; }
+:focus-visible { outline:3px solid var(--green); outline-offset:4px; }
+.shell { width:min(1120px,calc(100% - 80px)); margin-inline:auto; }
+.topbar { display:flex; justify-content:space-between; align-items:center; gap:20px; padding:20px 0; border-bottom:1px solid var(--line); font-size:.82rem; }
+.topbar a { text-decoration:none; font-weight:650; }
+.topbar a:hover { text-decoration:underline; }
+.topbar span { color:var(--muted); text-align:right; }
+.hero { padding:38px 0 26px; }
+.eyebrow { margin:0 0 8px; color:var(--green); font-size:.72rem; font-weight:750; letter-spacing:.13em; text-transform:uppercase; }
+h1,h2 { font-family:var(--serif); font-weight:400; line-height:1.08; margin:0; }
+h1 { font-size:clamp(34px,5.5vw,63px); letter-spacing:-.04em; }
+h2 { font-size:clamp(23px,3vw,32px); letter-spacing:-.025em; }
+.intro { margin:12px 0 0; color:var(--muted); max-width:720px; }
+.module { border:1px solid var(--line); border-radius:12px; background:var(--panel); overflow:hidden; }
+.steps { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); background:#f1f3ec; border-bottom:1px solid var(--line); }
+.steps button { position:relative; border:0; border-right:1px solid var(--line); min-height:52px; text-align:left; padding:10px 16px; background:transparent; font-weight:650; font-size:.83rem; }
+.steps button:last-child { border-right:0; }
+.steps button[aria-current="step"] { background:var(--sage); color:var(--green); box-shadow:inset 0 -3px var(--green); }
+.steps button:focus-visible { outline-offset:-5px; }
+.step-num { margin-right:.55em; font-variant-numeric:tabular-nums; }
+.workspace { display:grid; grid-template-columns:minmax(0,1fr) minmax(240px,315px); }
+.figure-pane { min-width:0; padding:22px 24px 18px; }
+.side { display:flex; flex-direction:column; padding:24px; border-left:1px solid var(--line); background:#f8f9f3; }
+.toolbar { display:flex; flex-wrap:wrap; gap:10px; justify-content:space-between; align-items:center; }
+.presets { display:flex; flex-wrap:wrap; gap:7px; }
+.presets button,.nav-button,.small-button { min-height:40px; padding:7px 13px; border:1px solid var(--line); border-radius:6px; font-size:.82rem; font-weight:600; }
+.presets button[aria-pressed="true"] { background:var(--sage); color:#154e43; border-color:#98b7a4; }
+.presets button:hover,.nav-button:hover:not(:disabled),.small-button:hover { border-color:var(--green); }
+figure { margin:17px 0 0; }
+figcaption { margin-bottom:7px; font-size:.82rem; font-weight:650; }
+canvas { display:block; width:100%; height:430px; touch-action:none; }
+.legend { display:flex; flex-wrap:wrap; gap:8px 22px; color:var(--muted); font-size:.81rem; margin-top:6px; }
+.legend span { display:inline-flex; align-items:center; gap:7px; }
+.dot { display:inline-block; width:10px; height:10px; border-radius:50%; background:var(--green); }
+.dot.observed { background:var(--copper); }
+.dot.ghost { background:#cfe0d6; }
+.side p { color:var(--muted); margin:9px 0 16px; line-height:1.5; font-size:.9rem; }
+.metric-area { display:grid; gap:1px; border-block:1px solid var(--line); padding:6px 0; }
+.metric { display:flex; gap:10px; justify-content:space-between; align-items:baseline; padding:7px 0; font-size:.83rem; }
+.metric output { font-size:1.15rem; font-weight:700; color:var(--green); white-space:nowrap; font-variant-numeric:tabular-nums; }
+.metric.observed output { color:var(--copper); }
+.metric.total { border-top:1px solid var(--line); margin-top:2px; }
+#formula { margin:9px 0 5px; font-size:.78rem; font-variant-numeric:tabular-nums; }
+#interpretation { margin-bottom:8px; color:var(--ink); }
+.inference { color:var(--muted); margin-top:0; font-size:.75rem; }
+.nav-buttons { display:flex; flex-wrap:wrap; gap:8px; margin-top:auto; padding-top:18px; }
+.nav-button.next { background:var(--ink); color:white; border-color:var(--ink); }
+.controls { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px 22px; border-top:1px solid var(--line); padding:15px 24px; }
+.controls fieldset { min-width:0; border:0; margin:0; padding:0; }
+.controls legend { font-size:.81rem; font-weight:700; color:var(--green); padding:0; }
+.controls fieldset + fieldset legend { color:var(--copper); }
+.slider-row { display:grid; grid-template-columns:110px minmax(40px,1fr) 40px; align-items:center; gap:7px; min-height:32px; font-size:.76rem; }
+.slider-row output { text-align:right; font-variant-numeric:tabular-nums; }
+input[type="range"] { width:100%; margin:0; accent-color:var(--green); }
+fieldset + fieldset input { accent-color:var(--copper); }
+.check-section { margin-top:28px; padding:22px 0 18px; border-top:1px solid var(--line); }
+.check-section h2 { font-size:clamp(22px,2.6vw,27px); margin-bottom:8px; }
+.check-section p { color:var(--muted); margin:0 0 14px; max-width:780px; font-size:.92rem; }
+.check-options { display:flex; flex-wrap:wrap; gap:8px; }
+.check-options button { min-height:40px; padding:7px 15px; border:1px solid var(--line); border-radius:6px; font-weight:600; font-size:.85rem; }
+.check-options button:hover { border-color:var(--green); }
+.check-options button[aria-pressed="true"] { background:var(--sage); border-color:var(--green); color:#154e43; }
+.check-feedback { min-height:24px; margin-top:12px; max-width:800px; font-size:.9rem; }
+details { border-top:1px solid var(--line); padding:15px 0; font-size:.86rem; }
+summary { cursor:pointer; font-weight:650; }
+details p { color:var(--muted); max-width:880px; }
+.sources { padding-left:20px; color:var(--muted); font-size:.8rem; max-width:880px; }
+.sources li { margin:7px 0; }
+.sources a { color:var(--green); }
+footer { display:flex; gap:8px 20px; flex-wrap:wrap; justify-content:space-between; padding:17px 0 26px; color:var(--muted); font-size:.76rem; border-top:1px solid var(--line); }
+.sr-only { position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap; }
+[hidden] { display:none!important; }
+@media (max-width:760px) {
+  .shell { width:calc(100% - 28px); }
+  .workspace { grid-template-columns:1fr; }
+  .side { border-left:0; border-top:1px solid var(--line); }
+  .figure-pane,.side,.controls { padding:17px; }
+  .hero { padding:28px 0 20px; }
+}
+@media (max-width:510px) {
+  .steps button { font-size:.72rem; padding:8px; }
+  .step-num { display:block; }
+  .controls { grid-template-columns:1fr; }
+  canvas { height:300px; }
+}
+:root { --blue:#386da3; }
+canvas { height:440px; }
+.dot { background:#8a968e; }
+.dot.g0 { background:var(--green); }
+.dot.g1 { background:var(--blue); }
+.dot.g2 { background:var(--copper); }
+.marker { display:inline-block; width:20px; border-top:3px solid var(--ink); }
+.dag { margin:4px 0 14px; }
+.dag svg { width:100%; height:auto; display:block; }
+.controls legend { color:var(--green)!important; }
+.controls input { accent-color:var(--green)!important; }
+.slider-row { grid-template-columns:120px minmax(40px,1fr) 44px; }
+.metric output.neg { color:var(--copper); }
+</style>
+</head>
+<body>
+<div class="shell">
+  <header class="topbar">
+    <a href="./">← Interactive Research Methods Studio</a>
+    <span>Research designs</span>
+  </header>
+  <main>
+    <section class="hero" aria-labelledby="page-title">
+      <p class="eyebrow">An interactive teaching demo</p>
+      <h1 id="page-title">Can a relationship reverse when you split the data?</h1>
+      <p class="intro">Weekly exercise and cholesterol in adults of three age groups. Does more exercise go with higher or lower cholesterol?</p>
+    </section>
+
+    <section class="module" aria-label="Simpson’s paradox walkthrough">
+      <nav class="steps" aria-label="Lesson steps">
+        <button type="button" data-step="0" aria-current="step"><span class="step-num">1.</span>All data together</button>
+        <button type="button" data-step="1"><span class="step-num">2.</span>Split by age</button>
+        <button type="button" data-step="2"><span class="step-num">3.</span>Why it happens</button>
+      </nav>
+      <div class="workspace">
+        <div class="figure-pane">
+          <div class="toolbar">
+            <div class="presets" role="group" aria-label="Example scenarios">
+              <button type="button" data-preset="strong" aria-pressed="true">Strong confounding</button>
+              <button type="button" data-preset="none" aria-pressed="false">No confounding</button>
+              <button type="button" data-preset="noeffect" aria-pressed="false">No effect within age</button>
+            </div>
+            <button type="button" class="small-button" id="resample">New sample ↻</button>
+          </div>
+          <figure aria-labelledby="chart-title">
+            <figcaption id="chart-title">Weekly exercise and total cholesterol, 210 simulated adults</figcaption>
+            <canvas id="chart" role="img" aria-labelledby="chart-title" aria-describedby="chart-description"></canvas>
+            <p id="chart-description" class="sr-only"></p>
+            <div class="legend">
+              <span id="legend-all"><i class="dot" aria-hidden="true"></i>Adults</span>
+              <span class="grp" hidden><i class="dot g0" aria-hidden="true"></i>Age 20–39</span>
+              <span class="grp" hidden><i class="dot g1" aria-hidden="true"></i>Age 40–59</span>
+              <span class="grp" hidden><i class="dot g2" aria-hidden="true"></i>Age 60+</span>
+              <span><i class="marker" aria-hidden="true"></i>Pooled regression line</span>
+            </div>
+          </figure>
+        </div>
+        <section class="side" aria-labelledby="step-title">
+          <div id="lesson" aria-live="polite">
+            <h2 id="step-title">All data together</h2>
+            <p id="step-copy"></p>
+            <div class="dag" id="dag" hidden aria-label="Causal diagram: age affects both exercise and cholesterol; exercise lowers cholesterol.">
+              <svg viewBox="0 0 260 120" role="img" aria-hidden="true">
+                <defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10Z" fill="#52665b"/></marker></defs>
+                <rect x="95" y="6" width="70" height="28" rx="5" fill="#f1eee6" stroke="#9a6644"/><text x="130" y="25" text-anchor="middle" font-size="12" fill="#243d32" font-family="system-ui">Age</text>
+                <rect x="6" y="84" width="88" height="28" rx="5" fill="#fdfdf9" stroke="#9eaba0"/><text x="50" y="103" text-anchor="middle" font-size="12" fill="#243d32" font-family="system-ui">Exercise</text>
+                <rect x="166" y="84" width="88" height="28" rx="5" fill="#fdfdf9" stroke="#9eaba0"/><text x="210" y="103" text-anchor="middle" font-size="12" fill="#243d32" font-family="system-ui">Cholesterol</text>
+                <path d="M110 34L62 82" stroke="#52665b" stroke-width="1.5" marker-end="url(#ah)"/><text x="72" y="56" font-size="12" fill="#9a6644" font-family="system-ui">+</text>
+                <path d="M150 34L198 82" stroke="#52665b" stroke-width="1.5" marker-end="url(#ah)"/><text x="182" y="56" font-size="12" fill="#9a6644" font-family="system-ui">+</text>
+                <path d="M96 98H164" stroke="#176e60" stroke-width="2" marker-end="url(#ah)"/><text x="130" y="92" text-anchor="middle" font-size="13" fill="#176e60" font-family="system-ui">−</text>
+              </svg>
+            </div>
+            <div class="metric-area">
+              <div class="metric"><span>Pooled slope</span><output id="m-pooled"></output></div>
+              <div class="metric" data-from="1"><span>Slope within age groups</span><output id="m-within"></output></div>
+            </div>
+            <p id="interpretation"></p>
+            <div class="inference" id="inference" hidden>Adjusting for age recovers the within-group slope here because age is the only confounder in the simulation. In real data, other confounders may remain.</div>
+          </div>
+          <div class="nav-buttons">
+            <button type="button" class="nav-button" id="back" disabled>← Back</button>
+            <button type="button" class="nav-button next" id="next">Next →</button>
+          </div>
+        </section>
+      </div>
+
+      <div class="controls" aria-label="Adjust the simulation">
+        <fieldset>
+          <legend>Confounding by age</legend>
+          <div class="slider-row"><label for="sep">How strongly age shifts both</label><input id="sep" type="range" min="0" max="1.5" step=".1" value="1.2"><output id="sep-value" for="sep"></output></div>
+        </fieldset>
+        <fieldset>
+          <legend>Effect of exercise</legend>
+          <div class="slider-row"><label for="bw">Within-age slope (mg/dL per hour)</label><input id="bw" type="range" min="-15" max="5" step="1" value="-8"><output id="bw-value" for="bw"></output></div>
+        </fieldset>
+      </div>
+    </section>
+    <noscript><p>Enable JavaScript to run the simulation.</p></noscript>
+
+    <section class="check-section" aria-labelledby="check-title">
+      <h2 id="check-title">Check your understanding</h2>
+      <p>The pooled slope is positive, but within every age group it is negative. Which slope answers the question “Among people of the same age, is more exercise associated with lower cholesterol?”</p>
+      <div class="check-options" role="group" aria-labelledby="check-title">
+        <button type="button" data-check="pooled" aria-pressed="false">The pooled slope</button>
+        <button type="button" data-check="within" aria-pressed="false">The within-age slope</button>
+        <button type="button" data-check="neither" aria-pressed="false">Neither</button>
+      </div>
+      <div class="check-feedback" id="check-feedback" role="status" aria-live="polite"></div>
+    </section>
+
+    <details>
+      <summary>Assumptions, interpretation, and references</summary>
+      <p><strong>Simulation.</strong> Three age groups of 70 people. Older groups exercise more on average and have higher cholesterol on average. Within each group, cholesterol changes by the chosen slope for each extra hour of weekly exercise, plus random noise. The numbers are illustrative, not estimates from real data.</p>
+      <p><strong>Pooled and within-group slopes.</strong> The pooled slope is an ordinary regression on all 210 people. The within-group slope is the regression slope after removing each group’s means, which equals the exercise coefficient in a regression that also includes age group.</p>
+      <p><strong>Which one to report.</strong> The data alone cannot say. If age influences both exercise and cholesterol (a confounder), the within-age slope is the relevant one. If the grouping variable were instead a consequence of exercise (a mediator or collider), adjusting for it could mislead. The choice depends on the causal structure assumed.</p>
+      <p>Data are simulated for teaching. The references below credit the methods; no figures or text from them are reproduced.</p>
+      <ol class="sources">
+        <li>Simpson, E. H. (1951). The interpretation of interaction in contingency tables. <em>Journal of the Royal Statistical Society: Series B, 13</em>(2), 238–241. <a href="https://doi.org/10.1111/j.2517-6161.1951.tb00088.x" target="_blank" rel="noopener noreferrer">doi:10.1111/j.2517-6161.1951.tb00088.x ↗</a></li>
+        <li>Kievit, R. A., Frankenhuis, W. E., Waldorp, L. J., &amp; Borsboom, D. (2013). Simpson’s paradox in psychological science: A practical guide. <em>Frontiers in Psychology, 4</em>, 513. <a href="https://doi.org/10.3389/fpsyg.2013.00513" target="_blank" rel="noopener noreferrer">doi:10.3389/fpsyg.2013.00513 ↗</a></li>
+        <li>Pearl, J. (2014). Comment: Understanding Simpson’s paradox. <em>The American Statistician, 68</em>(1), 8–13. <a href="https://doi.org/10.1080/00031305.2014.876829" target="_blank" rel="noopener noreferrer">doi:10.1080/00031305.2014.876829 ↗</a></li>
+      </ol>
+    </details>
+  </main>
+  <footer><span>Hakan Sarac</span><span>Simulated data for teaching</span></footer>
+</div>
+<script>
+'use strict';
+(() => {
+  const byId = id => document.getElementById(id);
+  const NG = 70, COLORS = ['#176e60', '#386da3', '#90522f'], NAMES = ['20–39', '40–59', '60+'];
+  const XMIN = 0, XMAX = 12, YMIN = 120, YMAX = 300;
+  const presets = { strong:{ sep:1.2, bw:-8 }, none:{ sep:0, bw:-8 }, noeffect:{ sep:1, bw:0 } };
+  const steps = [
+    { title:'All data together', copy:'Each point is one adult. With everyone in one cloud, the regression line suggests that people who exercise more have higher cholesterol.' },
+    { title:'Split by age', copy:'Colour the points by age group and fit a line within each group. Inside every group, more exercise goes with lower cholesterol: the direction has reversed.' },
+    { title:'Why it happens', copy:'Age is linked to both variables: in this example older adults exercise more and also have higher cholesterol. Mixing the groups lets the age difference dominate the pooled line.' }
+  ];
+  const canvas = byId('chart');
+  const ctx = canvas.getContext('2d');
+  let s = { ...presets.strong }, seed = 5, step = 0, W = 0, H = 0, base = [], pts = [], st = {};
+
+  function rng(v) {
+    let a = v >>> 0, spare = null;
+    const u = () => { a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
+    return () => { if (spare !== null) { const r = spare; spare = null; return r; } let x = 0; while (x === 0) x = u(); const r = Math.sqrt(-2 * Math.log(x)), th = 2 * Math.PI * u(); spare = r * Math.sin(th); return r * Math.cos(th); };
+  }
+  function sample() {
+    const normal = rng(seed * 4241 + 9);
+    base = [];
+    for (let g = 0; g < 3; g++) {
+      const grp = Array.from({ length:NG }, () => ({ g, ex:normal(), ey:normal() }));
+      // Remove the sample correlation between x-noise and y-noise so the within-group slope equals the setting.
+      const mx = grp.reduce((a, p) => a + p.ex, 0) / NG, my = grp.reduce((a, p) => a + p.ey, 0) / NG;
+      let sxy = 0, sxx = 0; grp.forEach(p => { sxy += (p.ex - mx) * (p.ey - my); sxx += (p.ex - mx) ** 2; });
+      grp.forEach(p => { p.ex -= mx; p.ey = p.ey - my - sxy / sxx * p.ex; });
+      base.push(...grp);
+    }
+  }
+  function compute() {
+    pts = base.map(p => {
+      const mx = 5 + s.sep * 1.8 * (p.g - 1), my = 205 + s.sep * 30 * (p.g - 1);
+      const dx = 1.1 * p.ex;
+      return { g:p.g, x:Math.max(0, mx + dx), y:my + s.bw * dx + 14 * p.ey };
+    });
+    const slope = arr => { const n = arr.length, mx = arr.reduce((a, p) => a + p.x, 0) / n, my = arr.reduce((a, p) => a + p.y, 0) / n; let sxy = 0, sxx = 0; for (const p of arr) { sxy += (p.x - mx) * (p.y - my); sxx += (p.x - mx) ** 2; } return { b:sxy / sxx, mx, my }; };
+    st.pooled = slope(pts);
+    st.groups = [0, 1, 2].map(g => slope(pts.filter(p => p.g === g)));
+    let sxy = 0, sxx = 0;
+    pts.forEach(p => { const gm = st.groups[p.g]; sxy += (p.x - gm.mx) * (p.y - gm.my); sxx += (p.x - gm.mx) ** 2; });
+    st.within = sxy / sxx;
+  }
+  const fmt = v => (v > .05 ? '+' : v < -.05 ? '−' : '') + Math.abs(v).toFixed(1);
+
+  function paint() {
+    if (!W) return;
+    ctx.clearRect(0, 0, W, H);
+    ctx.font = '11px system-ui';
+    const l = 52, r = 16, t = 10, b = H - 36;
+    const x = v => l + (v - XMIN) / (XMAX - XMIN) * (W - l - r), y = v => t + (YMAX - v) / (YMAX - YMIN) * (b - t);
+    for (let v = YMIN; v <= YMAX; v += 30) { ctx.strokeStyle = '#eef1ea'; ctx.beginPath(); ctx.moveTo(l, y(v)); ctx.lineTo(W - r, y(v)); ctx.stroke(); ctx.fillStyle = '#52665b'; ctx.textAlign = 'right'; ctx.fillText(v, l - 6, y(v) + 4); }
+    for (let v = 0; v <= 12; v += 2) { ctx.strokeStyle = '#eef1ea'; ctx.beginPath(); ctx.moveTo(x(v), t); ctx.lineTo(x(v), b); ctx.stroke(); ctx.fillStyle = '#52665b'; ctx.textAlign = 'center'; ctx.fillText(v, x(v), b + 15); }
+    ctx.fillText('Exercise (hours per week)', (l + W - r) / 2, H - 4);
+    ctx.save(); ctx.translate(13, (t + b) / 2); ctx.rotate(-Math.PI / 2); ctx.fillText('Cholesterol (mg/dL)', 0, 0); ctx.restore();
+    ctx.save(); ctx.beginPath(); ctx.rect(l, t, W - l - r, b - t); ctx.clip();
+    for (const p of pts) {
+      ctx.beginPath(); ctx.arc(x(p.x), y(p.y), 3.4, 0, Math.PI * 2);
+      ctx.fillStyle = step === 0 ? 'rgba(110,125,116,.6)' : COLORS[p.g] + 'cc'; ctx.fill();
+    }
+    if (step >= 1) st.groups.forEach((gm, g) => {
+      const x0 = gm.mx - 2.4, x1 = gm.mx + 2.4;
+      ctx.strokeStyle = COLORS[g]; ctx.lineWidth = 2.6;
+      ctx.beginPath(); ctx.moveTo(x(x0), y(gm.my + gm.b * (x0 - gm.mx))); ctx.lineTo(x(x1), y(gm.my + gm.b * (x1 - gm.mx))); ctx.stroke();
+    });
+    const P = st.pooled;
+    ctx.strokeStyle = '#243d32'; ctx.lineWidth = 2.6; ctx.setLineDash(step === 0 ? [] : [7, 5]);
+    ctx.beginPath(); ctx.moveTo(x(XMIN), y(P.my + P.b * (XMIN - P.mx))); ctx.lineTo(x(XMAX), y(P.my + P.b * (XMAX - P.mx))); ctx.stroke(); ctx.setLineDash([]);
+    if (step === 2) st.groups.forEach((gm, g) => {
+      ctx.beginPath(); ctx.arc(x(gm.mx), y(gm.my), 8, 0, Math.PI * 2);
+      ctx.fillStyle = '#fdfdf9'; ctx.fill(); ctx.strokeStyle = COLORS[g]; ctx.lineWidth = 3; ctx.stroke();
+      ctx.font = '600 11px system-ui'; ctx.textAlign = 'left';
+      const label = 'Mean, ' + NAMES[g], tw = ctx.measureText(label).width, lx = x(gm.mx) + 13, ly = y(gm.my) - 12;
+      ctx.fillStyle = 'rgba(253,253,249,.94)'; ctx.fillRect(lx - 3, ly - 11, tw + 6, 16);
+      ctx.fillStyle = COLORS[g]; ctx.fillText(label, lx, ly + 1); ctx.font = '11px system-ui';
+    });
+    ctx.restore();
+    ctx.strokeStyle = '#9eaba0'; ctx.lineWidth = 1; ctx.strokeRect(l, t, W - l - r, b - t);
+  }
+
+  function resize() {
+    const bb = canvas.getBoundingClientRect(), sc = devicePixelRatio || 1;
+    W = bb.width; H = bb.height; canvas.width = Math.round(W * sc); canvas.height = Math.round(H * sc);
+    ctx.setTransform(sc, 0, 0, sc, 0, 0); paint();
+  }
+
+  function update() {
+    compute();
+    byId('sep').value = s.sep; byId('sep-value').textContent = s.sep.toFixed(1);
+    byId('bw').value = s.bw; byId('bw-value').textContent = fmt(s.bw);
+    document.querySelectorAll('[data-preset]').forEach(btn => {
+      const p = presets[btn.dataset.preset];
+      btn.setAttribute('aria-pressed', String(Math.abs(p.sep - s.sep) < 1e-9 && p.bw === s.bw));
+    });
+    const po = byId('m-pooled'), wi = byId('m-within');
+    po.textContent = fmt(st.pooled.b) + ' per hour'; po.className = st.pooled.b < 0 ? '' : 'neg';
+    wi.textContent = fmt(st.within) + ' per hour'; wi.className = st.within < 0 ? '' : 'neg';
+    const sameSign = Math.sign(st.pooled.b) === Math.sign(st.within);
+    let msg;
+    if (step === 0) msg = st.pooled.b > 0 ? 'Taken at face value, each extra hour of exercise goes with ' + fmt(st.pooled.b) + ' mg/dL of cholesterol.' : 'Here the pooled line already slopes downward.';
+    else if (step === 1) msg = sameSign ? 'Pooled and within-age slopes point the same way here; confounding is weak or absent.' : 'Within age groups the slope is ' + fmt(st.within) + ' mg/dL per hour, the opposite sign of the pooled slope (' + fmt(st.pooled.b) + ').';
+    else msg = s.sep === 0 ? 'With no age shift, the groups overlap and the pooled slope matches the within-age slope.' : s.bw === 0 ? 'Exercise has no effect within age groups, yet the pooled slope is ' + fmt(st.pooled.b) + '. The whole pooled association comes from age.' : 'The group means (circles) climb from young to old. The pooled line follows the means; the coloured lines show the relationship among people of similar age.';
+    byId('interpretation').textContent = msg;
+    byId('chart-description').textContent = 'Pooled slope ' + fmt(st.pooled.b) + ' mg/dL per hour; slope within age groups ' + fmt(st.within) + '.';
+    paint();
+  }
+
+  function goTo(next) {
+    step = Math.max(0, Math.min(2, next));
+    document.querySelectorAll('[data-step]').forEach(b => { if (Number(b.dataset.step) === step) b.setAttribute('aria-current', 'step'); else b.removeAttribute('aria-current'); });
+    byId('step-title').textContent = steps[step].title;
+    byId('step-copy').textContent = steps[step].copy;
+    document.querySelectorAll('[data-from]').forEach(el => { el.hidden = step < Number(el.dataset.from); });
+    document.querySelectorAll('.grp').forEach(el => { el.hidden = step === 0; });
+    byId('legend-all').hidden = step !== 0;
+    byId('dag').hidden = byId('inference').hidden = step !== 2;
+    byId('back').disabled = step === 0;
+    byId('next').hidden = step === 2;
+    update();
+  }
+
+  byId('sep').addEventListener('input', e => { s.sep = Number(e.target.value); update(); });
+  byId('bw').addEventListener('input', e => { s.bw = Number(e.target.value); update(); });
+  document.querySelectorAll('[data-preset]').forEach(b => b.addEventListener('click', () => { s = { ...presets[b.dataset.preset] }; update(); }));
+  byId('resample').addEventListener('click', () => { seed++; sample(); update(); });
+  document.querySelectorAll('[data-step]').forEach(b => b.addEventListener('click', () => goTo(Number(b.dataset.step))));
+  byId('next').addEventListener('click', () => { goTo(step + 1); if (step === 2) document.querySelector('[data-step="2"]').focus(); });
+  byId('back').addEventListener('click', () => { goTo(step - 1); if (step === 0) document.querySelector('[data-step="0"]').focus(); });
+
+  document.querySelectorAll('[data-check]').forEach(b => b.addEventListener('click', () => {
+    document.querySelectorAll('[data-check]').forEach(o => o.setAttribute('aria-pressed', String(o === b)));
+    byId('check-feedback').textContent = (b.dataset.check === 'within' ? 'Correct. ' : 'Not quite. ') +
+      'The question compares people of the same age, so the within-age slope answers it. Whether that slope reflects a causal effect still depends on other confounders being absent.';
+  }));
+
+  sample();
+  goTo(0);
+  new ResizeObserver(resize).observe(canvas);
+  resize();
+})();
+</script>
+</body>
+</html>

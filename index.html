@@ -159,7 +159,7 @@ h1 .italic { font-style:italic; color:var(--green); }
       <h1><span>Interactive</span> <span class="italic">Research Methods</span> <span>Studio</span></h1>
       <p class="subtitle">Each demo takes one idea, lets you change the inputs, and shows what follows. They run in the browser, so they can be opened in class without installing anything.</p>
       <ul class="facts" aria-label="Collection summary">
-        <li><strong>14</strong> demos</li>
+        <li><strong>17</strong> demos</li>
         <li><strong>4</strong> topics</li>
       </ul>
     </div>
@@ -192,8 +192,8 @@ h1 .italic { font-style:italic; color:var(--green); }
       <li><a class="topic" href="#regression">
         <span class="topic-num">02</span>
         <span class="topic-name">Regression &amp; Research Designs</span>
-        <span class="topic-blurb">Interactions, moderators, and how a design shapes the conclusion.</span>
-        <span class="topic-count">2 demos</span>
+        <span class="topic-blurb">Interactions, confounding, mediation, and how a design shapes the conclusion.</span>
+        <span class="topic-count">5 demos</span>
       </a></li>
       <li><a class="topic" href="#measurement">
         <span class="topic-num">03</span>
@@ -293,7 +293,7 @@ h1 .italic { font-style:italic; color:var(--green); }
         <p class="section-num">02</p>
         <div>
           <h2 id="regression-title">Regression &amp; Research Designs</h2>
-          <p class="section-blurb">Interactions, moderators, and how a design shapes the conclusion.</p>
+          <p class="section-blurb">Interactions, confounding, mediation, and how a design shapes the conclusion.</p>
         </div>
         <a class="to-top" href="#topics">All Topics ↑</a>
       </header>
@@ -316,6 +316,24 @@ h1 .italic { font-style:italic; color:var(--green); }
         </div>
       </article>
       <article class="card">
+        <div class="thumb" aria-hidden="true"><svg viewBox="0 0 480 230" fill="none" aria-hidden="true" focusable="false"><path d="M60 40V195M120 40V195M180 40V195M240 40V195M300 40V195M360 40V195M420 40V195M60 55H420M60 95H420M60 135H420M60 175H420" stroke="currentColor" opacity=".075"/><path d="M110 200L370 30" stroke="#7d8a80" stroke-width="1.4" stroke-dasharray="6 5"/><g fill="#a9b3ac"><circle cx="230" cy="120" r="3.5"/><circle cx="250" cy="100" r="3.5"/><circle cx="270" cy="92" r="3.5"/><circle cx="290" cy="80" r="3.5"/><circle cx="260" cy="118" r="3.5"/><circle cx="300" cy="96" r="3.5"/><circle cx="320" cy="70" r="3.5"/><circle cx="240" cy="86" r="3.5"/><circle cx="280" cy="112" r="3.5"/><circle cx="310" cy="60" r="3.5"/></g><g fill="#90522f"><circle cx="150" cy="140" r="3.8"/><circle cx="160" cy="118" r="3.8"/><circle cx="170" cy="150" r="3.8"/><circle cx="176" cy="128" r="3.8"/><circle cx="186" cy="110" r="3.8"/><circle cx="160" cy="160" r="3.8"/><circle cx="182" cy="146" r="3.8"/></g><path d="M168 168V124" stroke="#90522f" stroke-width="2.4"/><path d="M168 116L162 128H174Z" fill="#90522f"/></svg></div>
+        <div class="card-body">
+          <p class="card-label">Research Designs</p>
+          <h3><a href="./regression-to-mean.html">Regression to the Mean</a></h3>
+          <p class="card-desc">Select the lowest scorers on a first test and watch them improve with no treatment, then add a control group.</p>
+          <span class="card-open" aria-hidden="true">Open Demo <span>→</span></span>
+        </div>
+      </article>
+      <article class="card">
+        <div class="thumb" aria-hidden="true"><svg viewBox="0 0 480 230" fill="none" aria-hidden="true" focusable="false"><path d="M60 40V195M120 40V195M180 40V195M240 40V195M300 40V195M360 40V195M420 40V195M60 55H420M60 95H420M60 135H420M60 175H420" stroke="currentColor" opacity=".075"/><path d="M80 190L410 40" stroke="#243d32" stroke-width="2" stroke-dasharray="7 5"/><path d="M100 150L190 182" stroke="#176e60" stroke-width="2.6"/><path d="M190 100L290 132" stroke="#386da3" stroke-width="2.6"/><path d="M290 50L390 82" stroke="#90522f" stroke-width="2.6"/><g fill="#176e60"><circle cx="116" cy="150" r="3.5"/><circle cx="140" cy="170" r="3.5"/><circle cx="160" cy="162" r="3.5"/><circle cx="178" cy="184" r="3.5"/></g><g fill="#386da3"><circle cx="206" cy="100" r="3.5"/><circle cx="230" cy="122" r="3.5"/><circle cx="250" cy="110" r="3.5"/><circle cx="274" cy="134" r="3.5"/></g><g fill="#90522f"><circle cx="306" cy="50" r="3.5"/><circle cx="330" cy="72" r="3.5"/><circle cx="350" cy="62" r="3.5"/><circle cx="374" cy="84" r="3.5"/></g></svg></div>
+        <div class="card-body">
+          <p class="card-label">Confounding</p>
+          <h3><a href="./simpsons-paradox.html">Simpson’s Paradox</a></h3>
+          <p class="card-desc">Exercise and cholesterol across three age groups: a pooled association that reverses within each group.</p>
+          <span class="card-open" aria-hidden="true">Open Demo <span>→</span></span>
+        </div>
+      </article>
+      <article class="card">
         <div class="thumb" aria-hidden="true"><svg viewBox="0 0 480 230" fill="none" aria-hidden="true" focusable="false">
       <rect x="70" y="35" width="66" height="146" fill="#dcebe2"/>
       <rect x="236" y="35" width="176" height="146" fill="#dcebe2"/>
@@ -331,6 +349,15 @@ h1 .italic { font-style:italic; color:var(--green); }
           <p class="card-label">Moderation</p>
           <h3><a href="./johnson-neyman.html">Simple Slopes &amp; Johnson–Neyman</a></h3>
           <p class="card-desc">Probe a continuous moderator: from slopes at ±1 SD to the full range of values where the effect of X differs from zero.</p>
+          <span class="card-open" aria-hidden="true">Open Demo <span>→</span></span>
+        </div>
+      </article>
+      <article class="card">
+        <div class="thumb" aria-hidden="true"><svg viewBox="0 0 480 230" fill="none" aria-hidden="true" focusable="false"><g fill="#fdfdf9" stroke="#7d8a80" stroke-width="1.4"><rect x="60" y="140" width="96" height="38" rx="6"/><rect x="192" y="40" width="96" height="38" rx="6"/><rect x="324" y="140" width="96" height="38" rx="6"/></g><path d="M130 140L200 82" stroke="#176e60" stroke-width="4"/><path d="M280 82L350 140" stroke="#176e60" stroke-width="4"/><path d="M156 159H318" stroke="#176e60" stroke-width="2"/><path d="M324 159L312 153V165Z" fill="#176e60"/><path d="M356 144L343 140L350 131Z" fill="#176e60"/><path d="M206 78L193 80L198 90Z" fill="#176e60"/><g fill="#52665b" font-family="monospace" font-size="12" text-anchor="middle"><text x="108" y="163">X</text><text x="240" y="63">M</text><text x="372" y="163">Y</text></g><g fill="#176e60" font-family="monospace" font-size="11"><text x="148" y="104">a</text><text x="324" y="104">b</text><text x="234" y="152">c′</text></g></svg></div>
+        <div class="card-body">
+          <p class="card-label">Mediation</p>
+          <h3><a href="./mediation.html">Direct & Indirect Effects</a></h3>
+          <p class="card-desc">Split the effect of attitude on activity into a direct part and a part through intention, with a bootstrap interval.</p>
           <span class="card-open" aria-hidden="true">Open Demo <span>→</span></span>
         </div>
       </article>
