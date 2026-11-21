@@ -1,0 +1,406 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="An interactive lesson comparing Cronbach's alpha and McDonald's omega under different loading patterns, scale lengths, and factor structures.">
+<meta name="theme-color" content="#f6f5ef">
+<title>Cronbach’s Alpha &amp; Omega | Interactive Research Methods Studio</title>
+<style>
+:root {
+  --paper:#f6f5ef; --panel:#fdfdf9; --ink:#243d32; --muted:#52665b;
+  --line:#d9dfd4; --green:#176e60; --sage:#e9f0e7; --copper:#90522f;
+  --warm:#f5ece2; --red:#ac4050; --serif:Georgia,"Times New Roman",serif;
+  --sans:system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+* { box-sizing:border-box; }
+body { margin:0; background:var(--paper); color:var(--ink); font:15px/1.55 var(--sans); }
+button,input { font:inherit; }
+a { color:inherit; text-underline-offset:4px; }
+button { color:inherit; cursor:pointer; background:var(--panel); }
+button:disabled { cursor:default; opacity:.48; }
+:focus-visible { outline:3px solid var(--green); outline-offset:4px; }
+.shell { width:min(1120px,calc(100% - 80px)); margin-inline:auto; }
+.topbar { display:flex; justify-content:space-between; align-items:center; gap:20px; padding:20px 0; border-bottom:1px solid var(--line); font-size:.82rem; }
+.topbar a { text-decoration:none; font-weight:650; }
+.topbar a:hover { text-decoration:underline; }
+.topbar span { color:var(--muted); text-align:right; }
+.hero { padding:38px 0 26px; }
+.eyebrow { margin:0 0 8px; color:var(--green); font-size:.72rem; font-weight:750; letter-spacing:.13em; text-transform:uppercase; }
+h1,h2 { font-family:var(--serif); font-weight:400; line-height:1.08; margin:0; }
+h1 { font-size:clamp(34px,5.5vw,63px); letter-spacing:-.04em; }
+h2 { font-size:clamp(23px,3vw,32px); letter-spacing:-.025em; }
+.intro { margin:12px 0 0; color:var(--muted); max-width:720px; }
+.module { border:1px solid var(--line); border-radius:12px; background:var(--panel); overflow:hidden; }
+.steps { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); background:#f1f3ec; border-bottom:1px solid var(--line); }
+.steps button { position:relative; border:0; border-right:1px solid var(--line); min-height:52px; text-align:left; padding:10px 16px; background:transparent; font-weight:650; font-size:.83rem; }
+.steps button:last-child { border-right:0; }
+.steps button[aria-current="step"] { background:var(--sage); color:var(--green); box-shadow:inset 0 -3px var(--green); }
+.steps button:focus-visible { outline-offset:-5px; }
+.step-num { margin-right:.55em; font-variant-numeric:tabular-nums; }
+.workspace { display:grid; grid-template-columns:minmax(0,1fr) minmax(240px,315px); }
+.figure-pane { min-width:0; padding:22px 24px 18px; }
+.side { display:flex; flex-direction:column; padding:24px; border-left:1px solid var(--line); background:#f8f9f3; }
+.toolbar { display:flex; flex-wrap:wrap; gap:10px; justify-content:space-between; align-items:center; }
+.presets { display:flex; flex-wrap:wrap; gap:7px; }
+.presets button,.nav-button,.small-button { min-height:40px; padding:7px 13px; border:1px solid var(--line); border-radius:6px; font-size:.82rem; font-weight:600; }
+.presets button[aria-pressed="true"] { background:var(--sage); color:#154e43; border-color:#98b7a4; }
+.presets button:hover,.nav-button:hover:not(:disabled),.small-button:hover { border-color:var(--green); }
+figure { margin:17px 0 0; }
+figcaption { margin-bottom:7px; font-size:.82rem; font-weight:650; }
+canvas { display:block; width:100%; height:430px; touch-action:none; }
+.legend { display:flex; flex-wrap:wrap; gap:8px 22px; color:var(--muted); font-size:.81rem; margin-top:6px; }
+.legend span { display:inline-flex; align-items:center; gap:7px; }
+.dot { display:inline-block; width:10px; height:10px; border-radius:50%; background:var(--green); }
+.dot.observed { background:var(--copper); }
+.dot.ghost { background:#cfe0d6; }
+.side p { color:var(--muted); margin:9px 0 16px; line-height:1.5; font-size:.9rem; }
+.metric-area { display:grid; gap:1px; border-block:1px solid var(--line); padding:6px 0; }
+.metric { display:flex; gap:10px; justify-content:space-between; align-items:baseline; padding:7px 0; font-size:.83rem; }
+.metric output { font-size:1.15rem; font-weight:700; color:var(--green); white-space:nowrap; font-variant-numeric:tabular-nums; }
+.metric.observed output { color:var(--copper); }
+.metric.total { border-top:1px solid var(--line); margin-top:2px; }
+#formula { margin:9px 0 5px; font-size:.78rem; font-variant-numeric:tabular-nums; }
+#interpretation { margin-bottom:8px; color:var(--ink); }
+.inference { color:var(--muted); margin-top:0; font-size:.75rem; }
+.nav-buttons { display:flex; flex-wrap:wrap; gap:8px; margin-top:auto; padding-top:18px; }
+.nav-button.next { background:var(--ink); color:white; border-color:var(--ink); }
+.controls { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px 22px; border-top:1px solid var(--line); padding:15px 24px; }
+.controls fieldset { min-width:0; border:0; margin:0; padding:0; }
+.controls legend { font-size:.81rem; font-weight:700; color:var(--green); padding:0; }
+.controls fieldset + fieldset legend { color:var(--copper); }
+.slider-row { display:grid; grid-template-columns:110px minmax(40px,1fr) 40px; align-items:center; gap:7px; min-height:32px; font-size:.76rem; }
+.slider-row output { text-align:right; font-variant-numeric:tabular-nums; }
+input[type="range"] { width:100%; margin:0; accent-color:var(--green); }
+fieldset + fieldset input { accent-color:var(--copper); }
+.check-section { margin-top:28px; padding:22px 0 18px; border-top:1px solid var(--line); }
+.check-section h2 { font-size:clamp(22px,2.6vw,27px); margin-bottom:8px; }
+.check-section p { color:var(--muted); margin:0 0 14px; max-width:780px; font-size:.92rem; }
+.check-options { display:flex; flex-wrap:wrap; gap:8px; }
+.check-options button { min-height:40px; padding:7px 15px; border:1px solid var(--line); border-radius:6px; font-weight:600; font-size:.85rem; }
+.check-options button:hover { border-color:var(--green); }
+.check-options button[aria-pressed="true"] { background:var(--sage); border-color:var(--green); color:#154e43; }
+.check-feedback { min-height:24px; margin-top:12px; max-width:800px; font-size:.9rem; }
+details { border-top:1px solid var(--line); padding:15px 0; font-size:.86rem; }
+summary { cursor:pointer; font-weight:650; }
+details p { color:var(--muted); max-width:880px; }
+.sources { padding-left:20px; color:var(--muted); font-size:.8rem; max-width:880px; }
+.sources li { margin:7px 0; }
+.sources a { color:var(--green); }
+footer { display:flex; gap:8px 20px; flex-wrap:wrap; justify-content:space-between; padding:17px 0 26px; color:var(--muted); font-size:.76rem; border-top:1px solid var(--line); }
+.sr-only { position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap; }
+[hidden] { display:none!important; }
+@media (max-width:760px) {
+  .shell { width:calc(100% - 28px); }
+  .workspace { grid-template-columns:1fr; }
+  .side { border-left:0; border-top:1px solid var(--line); }
+  .figure-pane,.side,.controls { padding:17px; }
+  .hero { padding:28px 0 20px; }
+}
+@media (max-width:510px) {
+  .steps button { font-size:.72rem; padding:8px; }
+  .step-num { display:block; }
+  .controls { grid-template-columns:1fr; }
+  canvas { height:300px; }
+}
+:root { --blue:#386da3; }
+canvas { height:380px; }
+.sq { display:inline-block; width:12px; height:12px; border-radius:2px; background:var(--green); }
+.sq.f2 { background:var(--blue); }
+.grad { display:inline-block; width:46px; height:10px; background:linear-gradient(90deg,#f6f5ef,#176e60); border:1px solid var(--line); }
+.toggle { min-height:34px; padding:5px 12px; border:1px solid var(--line); border-radius:6px; font-size:.78rem; font-weight:600; }
+.toggle[aria-pressed="true"] { background:var(--sage); border-color:#98b7a4; color:#154e43; }
+.toggle-row { display:flex; align-items:center; gap:10px; min-height:36px; font-size:.76rem; }
+.hint { color:var(--muted); font-size:.76rem; margin:8px 0 0; }
+.controls { grid-template-columns:repeat(3,minmax(0,1fr)); }
+.controls fieldset + fieldset + fieldset legend { color:var(--blue); }
+.slider-row { grid-template-columns:96px minmax(40px,1fr) 40px; }
+@media (max-width:900px) { .controls { grid-template-columns:1fr 1fr; } }
+@media (max-width:760px) { .controls { grid-template-columns:1fr; } }
+@media (max-width:510px) { canvas { height:560px; } }
+</style>
+</head>
+<body>
+<div class="shell">
+  <header class="topbar">
+    <a href="./">← Interactive Research Methods Studio</a>
+    <span>Reliability</span>
+  </header>
+  <main>
+    <section class="hero" aria-labelledby="page-title">
+      <p class="eyebrow">An interactive teaching demo</p>
+      <h1 id="page-title">When does Cronbach’s alpha mislead?</h1>
+      <p class="intro">Change the item loadings, the number of items, and the factor structure. Compare α with ω, the share of total-score variance explained by the factors.</p>
+    </section>
+
+    <section class="module" aria-label="Alpha and omega walkthrough">
+      <nav class="steps" aria-label="Lesson steps">
+        <button type="button" data-step="0" aria-current="step"><span class="step-num">1.</span>Equal loadings</button>
+        <button type="button" data-step="1"><span class="step-num">2.</span>Unequal loadings</button>
+        <button type="button" data-step="2"><span class="step-num">3.</span>Length and structure</button>
+      </nav>
+      <div class="workspace">
+        <div class="figure-pane">
+          <div class="presets" role="group" aria-label="Example scales">
+            <button type="button" data-preset="equal" aria-pressed="true">Equal loadings</button>
+            <button type="button" data-preset="unequal" aria-pressed="false">Unequal loadings</button>
+            <button type="button" data-preset="long" aria-pressed="false">Long scale, weak items</button>
+            <button type="button" data-preset="two" aria-pressed="false">Two related factors</button>
+          </div>
+          <figure aria-labelledby="chart-title">
+            <figcaption id="chart-title">Item loadings and the inter-item correlations they imply</figcaption>
+            <canvas id="chart" role="img" aria-labelledby="chart-title" aria-describedby="chart-description"></canvas>
+            <p id="chart-description" class="sr-only"></p>
+            <div class="legend">
+              <span><i class="sq" aria-hidden="true"></i>Items on factor 1</span>
+              <span id="legend-f2" hidden><i class="sq f2" aria-hidden="true"></i>Items on factor 2</span>
+              <span><i class="grad" aria-hidden="true"></i>Correlation 0 to 1</span>
+            </div>
+            <p class="hint">Drag a bar up or down to change that item’s loading.</p>
+          </figure>
+        </div>
+        <section class="side" aria-labelledby="step-title">
+          <div id="lesson" aria-live="polite">
+            <h2 id="step-title">Equal loadings</h2>
+            <p id="step-copy"></p>
+            <div class="metric-area">
+              <div class="metric observed"><span>Cronbach’s α</span><output id="m-alpha"></output></div>
+              <div class="metric"><span>McDonald’s ω</span><output id="m-omega"></output></div>
+              <div class="metric" data-from="1"><span>ω − α</span><output id="m-gap"></output></div>
+              <div class="metric total" data-from="2"><span>Mean inter-item r</span><output id="m-r"></output></div>
+            </div>
+            <p id="interpretation"></p>
+            <div class="inference">Values are population values computed from the loadings. Sample estimates vary around them.</div>
+          </div>
+          <div class="nav-buttons">
+            <button type="button" class="nav-button" id="back" disabled>← Back</button>
+            <button type="button" class="nav-button next" id="next">Next →</button>
+          </div>
+        </section>
+      </div>
+
+      <div class="controls" aria-label="Adjust the scale">
+        <fieldset>
+          <legend>Scale length</legend>
+          <div class="slider-row"><label for="k">Number of items</label><input id="k" type="range" min="3" max="20" step="1" value="6"><output id="k-value" for="k"></output></div>
+        </fieldset>
+        <fieldset>
+          <legend>Loadings</legend>
+          <div class="slider-row"><label for="mean">Average</label><input id="mean" type="range" min=".2" max=".9" step=".05" value=".7"><output id="mean-value" for="mean"></output></div>
+          <div class="slider-row"><label for="spread">Spread</label><input id="spread" type="range" min="0" max=".4" step=".05" value="0"><output id="spread-value" for="spread"></output></div>
+        </fieldset>
+        <fieldset>
+          <legend>Factor structure</legend>
+          <div class="toggle-row"><button type="button" class="toggle" id="two" aria-pressed="false">Two factors</button></div>
+          <div class="slider-row"><label for="phi">Factor correlation</label><input id="phi" type="range" min="0" max="1" step=".05" value=".4" disabled><output id="phi-value" for="phi"></output></div>
+        </fieldset>
+      </div>
+    </section>
+    <noscript><p>Enable JavaScript to adjust the item loadings.</p></noscript>
+
+    <section class="check-section" aria-labelledby="check-title">
+      <h2 id="check-title">Check your understanding</h2>
+      <p>A 20-item scale has α = .80. What can you conclude from this value alone?</p>
+      <div class="check-options" role="group" aria-labelledby="check-title">
+        <button type="button" data-check="uni" aria-pressed="false">The items measure one factor</button>
+        <button type="button" data-check="high" aria-pressed="false">The items correlate strongly with each other</button>
+        <button type="button" data-check="neither" aria-pressed="false">Neither</button>
+      </div>
+      <div class="check-feedback" id="check-feedback" role="status" aria-live="polite"></div>
+    </section>
+
+    <details>
+      <summary>Assumptions, interpretation, and references</summary>
+      <p><strong>The model.</strong> Items are standardized. In the one-factor case, item j has loading λ<sub>j</sub> and unique variance 1 − λ<sub>j</sub><sup>2</sup>; errors are uncorrelated. In the two-factor case, the first half of the items load on factor 1 and the rest on factor 2, and the factors correlate φ.</p>
+      <p><strong>Formulas.</strong> α = k / (k − 1) · (1 − Σσ<sub>j</sub><sup>2</sup> / σ<sub>X</sub><sup>2</sup>), where σ<sub>X</sub><sup>2</sup> is the variance of the total score. ω = (variance of the total score explained by the factors) / σ<sub>X</sub><sup>2</sup>; with one factor, ω = (Σλ)<sup>2</sup> / [(Σλ)<sup>2</sup> + Σ(1 − λ<sup>2</sup>)]. In the two-factor case the demo shows ω total, which counts both factors as true-score variance.</p>
+      <p><strong>When α and ω differ.</strong> With one factor and uncorrelated errors, α ≤ ω, with equality when all loadings are equal. Correlated errors (for example, similarly worded items) can push α above the reliability it is meant to estimate. Neither coefficient tests whether a scale is unidimensional; that requires a factor analysis.</p>
+      <p>Loadings are illustrative. The references below credit the methods; no figures or text from them are reproduced.</p>
+      <ol class="sources">
+        <li>Cronbach, L. J. (1951). Coefficient alpha and the internal structure of tests. <em>Psychometrika, 16</em>(3), 297–334. <a href="https://doi.org/10.1007/BF02310555" target="_blank" rel="noopener noreferrer">doi:10.1007/BF02310555 ↗</a></li>
+        <li>McDonald, R. P. (1999). <em>Test theory: A unified treatment.</em> Lawrence Erlbaum.</li>
+        <li>Cortina, J. M. (1993). What is coefficient alpha? An examination of theory and applications. <em>Journal of Applied Psychology, 78</em>(1), 98–104. <a href="https://doi.org/10.1037/0021-9010.78.1.98" target="_blank" rel="noopener noreferrer">doi:10.1037/0021-9010.78.1.98 ↗</a></li>
+        <li>Sijtsma, K. (2009). On the use, the misuse, and the very limited usefulness of Cronbach’s alpha. <em>Psychometrika, 74</em>(1), 107–120. <a href="https://doi.org/10.1007/s11336-008-9101-0" target="_blank" rel="noopener noreferrer">doi:10.1007/s11336-008-9101-0 ↗</a></li>
+        <li>McNeish, D. (2018). Thanks coefficient alpha, we’ll take it from here. <em>Psychological Methods, 23</em>(3), 412–433. <a href="https://doi.org/10.1037/met0000144" target="_blank" rel="noopener noreferrer">doi:10.1037/met0000144 ↗</a></li>
+      </ol>
+    </details>
+  </main>
+  <footer><span>Hakan Sarac</span><span>Illustrative loadings for teaching</span></footer>
+</div>
+<script>
+'use strict';
+(() => {
+  const byId = id => document.getElementById(id);
+  const presets = {
+    equal:{ lam:Array(6).fill(.7), two:false, phi:.4 },
+    unequal:{ lam:[.9, .85, .8, .45, .35, .25], two:false, phi:.4 },
+    long:{ lam:Array(20).fill(.4), two:false, phi:.4 },
+    two:{ lam:Array(10).fill(.7), two:true, phi:.4 }
+  };
+  const steps = [
+    { title:'Equal loadings', copy:'When every item loads equally on one factor, α equals ω: both give the share of total-score variance that comes from the factor.' },
+    { title:'Unequal loadings', copy:'When loadings differ, α is lower than ω. Drag the bars or choose “Unequal loadings”. The gap is often small unless loadings vary a lot.' },
+    { title:'Length and structure', copy:'α rises with the number of items even when items correlate weakly, and it can be high when the items measure two related factors. A high α does not show that a scale is unidimensional.' }
+  ];
+  const canvas = byId('chart');
+  const ctx = canvas.getContext('2d');
+  let lam = [...presets.equal.lam], two = false, phi = .4, step = 0, W = 0, H = 0, drag = null;
+  const f2 = v => v.toFixed(2).replace(/^0\./, '.').replace(/^-0\./, '−.');
+  const clamp = v => Math.min(.95, Math.max(.05, v));
+  const groupOf = j => two && j >= Math.ceil(lam.length / 2) ? 1 : 0;
+
+  function corr(i, j) {
+    if (i === j) return 1;
+    return lam[i] * lam[j] * (groupOf(i) === groupOf(j) ? 1 : phi);
+  }
+  function stats() {
+    const k = lam.length;
+    let total = 0, offSum = 0;
+    for (let i = 0; i < k; i++) for (let j = 0; j < k; j++) { const c = corr(i, j); total += c; if (i !== j) offSum += c; }
+    const alpha = k / (k - 1) * (1 - k / total);
+    const unique = lam.reduce((a, l) => a + 1 - l * l, 0);
+    const omega = (total - unique) / total;
+    return { alpha, omega, meanR:offSum / (k * (k - 1)) };
+  }
+
+  function layout() {
+    const side = W >= 560;
+    if (side) {
+      const size = Math.min(H - 40, W * .42);
+      return { bars:{ l:40, r:W - size - 40, t:12, b:H - 30 }, heat:{ x:W - size - 8, y:(H - size) / 2 - 6, size } };
+    }
+    const size = Math.min(W - 40, H * .48);
+    return { bars:{ l:40, r:W - 10, t:12, b:H * .42 }, heat:{ x:(W - size) / 2, y:H * .42 + 34, size } };
+  }
+
+  function paint() {
+    if (!W) return;
+    ctx.clearRect(0, 0, W, H);
+    ctx.font = '11px system-ui';
+    const { bars, heat } = layout(), k = lam.length;
+    const by = v => bars.t + (1 - v) * (bars.b - bars.t);
+    for (const v of [0, .2, .4, .6, .8, 1]) {
+      ctx.strokeStyle = v === 0 ? '#9eaba0' : '#e7ebe3'; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(bars.l, by(v)); ctx.lineTo(bars.r, by(v)); ctx.stroke();
+      ctx.fillStyle = '#52665b'; ctx.textAlign = 'right'; ctx.fillText(v.toFixed(1), bars.l - 6, by(v) + 4);
+    }
+    const slot = (bars.r - bars.l) / k, bw = Math.min(34, slot * .7);
+    lam.forEach((l, j) => {
+      const cx = bars.l + slot * (j + .5);
+      ctx.fillStyle = groupOf(j) ? '#386da3' : '#176e60';
+      ctx.fillRect(cx - bw / 2, by(l), bw, by(0) - by(l));
+      ctx.fillStyle = '#fdfdf9'; ctx.strokeStyle = groupOf(j) ? '#386da3' : '#176e60'; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.arc(cx, by(l), Math.min(6, bw / 2), 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+      if (k <= 12 || j % 2 === 0) { ctx.fillStyle = '#52665b'; ctx.textAlign = 'center'; ctx.fillText(j + 1, cx, by(0) + 14); }
+    });
+    ctx.fillStyle = '#52665b'; ctx.textAlign = 'center';
+    ctx.save(); ctx.translate(11, (bars.t + bars.b) / 2); ctx.rotate(-Math.PI / 2); ctx.fillText('Loading', 0, 0); ctx.restore();
+    const cell = heat.size / k;
+    for (let i = 0; i < k; i++) for (let j = 0; j < k; j++) {
+      const c = corr(i, j);
+      if (i === j) ctx.fillStyle = '#d9dfd4';
+      else { const a = Math.min(1, c); ctx.fillStyle = 'rgb(' + Math.round(246 - (246 - 23) * a) + ',' + Math.round(245 - (245 - 110) * a) + ',' + Math.round(239 - (239 - 96) * a) + ')'; }
+      ctx.fillRect(heat.x + j * cell, heat.y + i * cell, cell - .5, cell - .5);
+      if (k <= 8 && i !== j) { ctx.fillStyle = c > .45 ? '#fff' : '#243d32'; ctx.font = '10px system-ui'; ctx.fillText(f2(c), heat.x + (j + .5) * cell, heat.y + (i + .5) * cell + 3); }
+    }
+    ctx.font = '11px system-ui'; ctx.fillStyle = '#52665b';
+    ctx.fillText('Item correlations', heat.x + heat.size / 2, heat.y + heat.size + 16);
+  }
+
+  function resize() {
+    const b = canvas.getBoundingClientRect(), s = devicePixelRatio || 1;
+    W = b.width; H = b.height; canvas.width = Math.round(W * s); canvas.height = Math.round(H * s);
+    ctx.setTransform(s, 0, 0, s, 0, 0); paint();
+  }
+
+  function fromSliders() {
+    const k = Number(byId('k').value), m = Number(byId('mean').value), sp = Number(byId('spread').value);
+    lam = Array.from({ length:k }, (_, j) => clamp(Math.round((m + sp * (k > 1 ? 1 - 2 * j / (k - 1) : 0)) * 100) / 100));
+  }
+
+  function update() {
+    const k = lam.length, mean = lam.reduce((a, b) => a + b, 0) / k;
+    const spread = (Math.max(...lam) - Math.min(...lam)) / 2;
+    byId('k').value = k; byId('k-value').textContent = k;
+    byId('mean').value = mean; byId('mean-value').textContent = mean.toFixed(2);
+    byId('spread').value = spread; byId('spread-value').textContent = spread.toFixed(2);
+    byId('phi').value = phi; byId('phi-value').textContent = phi.toFixed(2);
+    byId('phi').disabled = !two;
+    byId('two').setAttribute('aria-pressed', String(two));
+    byId('legend-f2').hidden = !two;
+    document.querySelectorAll('[data-preset]').forEach(btn => {
+      const p = presets[btn.dataset.preset];
+      const same = p.lam.length === k && p.lam.every((v, j) => Math.abs(v - lam[j]) < 1e-9) && p.two === two && (!two || Math.abs(p.phi - phi) < 1e-9);
+      btn.setAttribute('aria-pressed', String(same));
+    });
+    const { alpha, omega, meanR } = stats(), gap = omega - alpha;
+    byId('m-alpha').textContent = f2(alpha);
+    byId('m-omega').textContent = f2(omega);
+    byId('m-gap').textContent = f2(gap);
+    byId('m-r').textContent = f2(meanR);
+    let msg;
+    if (step === 0) msg = Math.abs(gap) < .005 ? 'Here α and ω agree.' : 'The loadings are not equal, so α is below ω. Choose “Equal loadings” to see them agree.';
+    else if (step === 1) msg = Math.abs(gap) < .005 ? 'The loadings are equal, so there is no gap. Drag one bar down to create one.' : 'α underestimates ω by ' + f2(gap) + '. The more the loadings differ, the larger the gap.';
+    else if (two && phi < .999) msg = 'The heat map shows two blocks of items, yet α = ' + f2(alpha) + '. A high α is compatible with more than one factor.';
+    else msg = 'With ' + k + ' items, an average inter-item correlation of ' + f2(meanR) + ' gives α = ' + f2(alpha) + '. Adding items raises α even when each item adds little.';
+    byId('interpretation').textContent = msg;
+    byId('chart-description').textContent = k + ' items, loadings ' + lam.map(f2).join(', ') + (two ? '; two factors correlating ' + f2(phi) : '; one factor') + '. Alpha ' + f2(alpha) + ', omega ' + f2(omega) + '.';
+    paint();
+  }
+
+  function goTo(next) {
+    step = Math.max(0, Math.min(2, next));
+    document.querySelectorAll('[data-step]').forEach(b => { if (Number(b.dataset.step) === step) b.setAttribute('aria-current', 'step'); else b.removeAttribute('aria-current'); });
+    byId('step-title').textContent = steps[step].title;
+    byId('step-copy').textContent = steps[step].copy;
+    document.querySelectorAll('[data-from]').forEach(el => { el.hidden = step < Number(el.dataset.from); });
+    byId('back').disabled = step === 0;
+    byId('next').hidden = step === 2;
+    update();
+  }
+
+  const local = ev => { const b = canvas.getBoundingClientRect(); return { x:ev.clientX - b.left, y:ev.clientY - b.top }; };
+  function barAt(pt) {
+    const { bars } = layout(), slot = (bars.r - bars.l) / lam.length;
+    if (pt.x < bars.l || pt.x > bars.r || pt.y < bars.t - 10 || pt.y > bars.b + 10) return null;
+    return Math.min(lam.length - 1, Math.floor((pt.x - bars.l) / slot));
+  }
+  function setFromY(j, y) {
+    const { bars } = layout();
+    lam[j] = clamp(Math.round((1 - (y - bars.t) / (bars.b - bars.t)) * 20) / 20);
+    update();
+  }
+  canvas.addEventListener('pointerdown', ev => {
+    if (!ev.isPrimary || ev.button !== 0) return;
+    const pt = local(ev), j = barAt(pt); if (j === null) return;
+    drag = j; canvas.setPointerCapture(ev.pointerId); setFromY(j, pt.y);
+  });
+  canvas.addEventListener('pointermove', ev => {
+    const pt = local(ev);
+    if (drag === null) { canvas.style.cursor = barAt(pt) === null ? '' : 'ns-resize'; return; }
+    setFromY(drag, pt.y);
+  });
+  canvas.addEventListener('lostpointercapture', () => { drag = null; });
+
+  for (const id of ['k', 'mean', 'spread']) byId(id).addEventListener('input', () => { fromSliders(); update(); });
+  byId('phi').addEventListener('input', e => { phi = Number(e.target.value); update(); });
+  byId('two').addEventListener('click', () => { two = !two; update(); });
+  document.querySelectorAll('[data-preset]').forEach(b => b.addEventListener('click', () => {
+    const p = presets[b.dataset.preset]; lam = [...p.lam]; two = p.two; phi = p.phi; update();
+  }));
+  document.querySelectorAll('[data-step]').forEach(b => b.addEventListener('click', () => goTo(Number(b.dataset.step))));
+  byId('next').addEventListener('click', () => { goTo(step + 1); if (step === 2) document.querySelector('[data-step="2"]').focus(); });
+  byId('back').addEventListener('click', () => { goTo(step - 1); if (step === 0) document.querySelector('[data-step="0"]').focus(); });
+
+  document.querySelectorAll('[data-check]').forEach(b => b.addEventListener('click', () => {
+    document.querySelectorAll('[data-check]').forEach(o => o.setAttribute('aria-pressed', String(o === b)));
+    byId('check-feedback').textContent = (b.dataset.check === 'neither' ? 'Correct. ' : 'Not quite. ') +
+      'With 20 items, α = .80 needs an average inter-item correlation of only about .17, since α = kr̄ / (1 + (k − 1)r̄). And α does not test dimensionality: two related factors can give the same value.';
+  }));
+
+  goTo(0);
+  new ResizeObserver(resize).observe(canvas);
+  resize();
+})();
+</script>
+</body>
+</html>
