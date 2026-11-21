@@ -1,0 +1,412 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="An interactive lesson on optional stopping: how testing repeatedly as data come in inflates the false-positive rate.">
+<meta name="theme-color" content="#f6f5ef">
+<title>Optional Stopping | Interactive Research Methods Studio</title>
+<style>
+:root {
+  --paper:#f6f5ef; --panel:#fdfdf9; --ink:#243d32; --muted:#52665b;
+  --line:#d9dfd4; --green:#176e60; --sage:#e9f0e7; --copper:#90522f;
+  --warm:#f5ece2; --red:#ac4050; --serif:Georgia,"Times New Roman",serif;
+  --sans:system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+* { box-sizing:border-box; }
+body { margin:0; background:var(--paper); color:var(--ink); font:15px/1.55 var(--sans); }
+button,input { font:inherit; }
+a { color:inherit; text-underline-offset:4px; }
+button { color:inherit; cursor:pointer; background:var(--panel); }
+button:disabled { cursor:default; opacity:.48; }
+:focus-visible { outline:3px solid var(--green); outline-offset:4px; }
+.shell { width:min(1120px,calc(100% - 80px)); margin-inline:auto; }
+.topbar { display:flex; justify-content:space-between; align-items:center; gap:20px; padding:20px 0; border-bottom:1px solid var(--line); font-size:.82rem; }
+.topbar a { text-decoration:none; font-weight:650; }
+.topbar a:hover { text-decoration:underline; }
+.topbar span { color:var(--muted); text-align:right; }
+.hero { padding:38px 0 26px; }
+.eyebrow { margin:0 0 8px; color:var(--green); font-size:.72rem; font-weight:750; letter-spacing:.13em; text-transform:uppercase; }
+h1,h2 { font-family:var(--serif); font-weight:400; line-height:1.08; margin:0; }
+h1 { font-size:clamp(34px,5.5vw,63px); letter-spacing:-.04em; }
+h2 { font-size:clamp(23px,3vw,32px); letter-spacing:-.025em; }
+.intro { margin:12px 0 0; color:var(--muted); max-width:720px; }
+.module { border:1px solid var(--line); border-radius:12px; background:var(--panel); overflow:hidden; }
+.steps { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); background:#f1f3ec; border-bottom:1px solid var(--line); }
+.steps button { position:relative; border:0; border-right:1px solid var(--line); min-height:52px; text-align:left; padding:10px 16px; background:transparent; font-weight:650; font-size:.83rem; }
+.steps button:last-child { border-right:0; }
+.steps button[aria-current="step"] { background:var(--sage); color:var(--green); box-shadow:inset 0 -3px var(--green); }
+.steps button:focus-visible { outline-offset:-5px; }
+.step-num { margin-right:.55em; font-variant-numeric:tabular-nums; }
+.workspace { display:grid; grid-template-columns:minmax(0,1fr) minmax(240px,315px); }
+.figure-pane { min-width:0; padding:22px 24px 18px; }
+.side { display:flex; flex-direction:column; padding:24px; border-left:1px solid var(--line); background:#f8f9f3; }
+.toolbar { display:flex; flex-wrap:wrap; gap:10px; justify-content:space-between; align-items:center; }
+.presets { display:flex; flex-wrap:wrap; gap:7px; }
+.presets button,.nav-button,.small-button { min-height:40px; padding:7px 13px; border:1px solid var(--line); border-radius:6px; font-size:.82rem; font-weight:600; }
+.presets button[aria-pressed="true"] { background:var(--sage); color:#154e43; border-color:#98b7a4; }
+.presets button:hover,.nav-button:hover:not(:disabled),.small-button:hover { border-color:var(--green); }
+figure { margin:17px 0 0; }
+figcaption { margin-bottom:7px; font-size:.82rem; font-weight:650; }
+canvas { display:block; width:100%; height:430px; touch-action:none; }
+.legend { display:flex; flex-wrap:wrap; gap:8px 22px; color:var(--muted); font-size:.81rem; margin-top:6px; }
+.legend span { display:inline-flex; align-items:center; gap:7px; }
+.dot { display:inline-block; width:10px; height:10px; border-radius:50%; background:var(--green); }
+.dot.observed { background:var(--copper); }
+.dot.ghost { background:#cfe0d6; }
+.side p { color:var(--muted); margin:9px 0 16px; line-height:1.5; font-size:.9rem; }
+.metric-area { display:grid; gap:1px; border-block:1px solid var(--line); padding:6px 0; }
+.metric { display:flex; gap:10px; justify-content:space-between; align-items:baseline; padding:7px 0; font-size:.83rem; }
+.metric output { font-size:1.15rem; font-weight:700; color:var(--green); white-space:nowrap; font-variant-numeric:tabular-nums; }
+.metric.observed output { color:var(--copper); }
+.metric.total { border-top:1px solid var(--line); margin-top:2px; }
+#formula { margin:9px 0 5px; font-size:.78rem; font-variant-numeric:tabular-nums; }
+#interpretation { margin-bottom:8px; color:var(--ink); }
+.inference { color:var(--muted); margin-top:0; font-size:.75rem; }
+.nav-buttons { display:flex; flex-wrap:wrap; gap:8px; margin-top:auto; padding-top:18px; }
+.nav-button.next { background:var(--ink); color:white; border-color:var(--ink); }
+.controls { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px 22px; border-top:1px solid var(--line); padding:15px 24px; }
+.controls fieldset { min-width:0; border:0; margin:0; padding:0; }
+.controls legend { font-size:.81rem; font-weight:700; color:var(--green); padding:0; }
+.controls fieldset + fieldset legend { color:var(--copper); }
+.slider-row { display:grid; grid-template-columns:110px minmax(40px,1fr) 40px; align-items:center; gap:7px; min-height:32px; font-size:.76rem; }
+.slider-row output { text-align:right; font-variant-numeric:tabular-nums; }
+input[type="range"] { width:100%; margin:0; accent-color:var(--green); }
+fieldset + fieldset input { accent-color:var(--copper); }
+.check-section { margin-top:28px; padding:22px 0 18px; border-top:1px solid var(--line); }
+.check-section h2 { font-size:clamp(22px,2.6vw,27px); margin-bottom:8px; }
+.check-section p { color:var(--muted); margin:0 0 14px; max-width:780px; font-size:.92rem; }
+.check-options { display:flex; flex-wrap:wrap; gap:8px; }
+.check-options button { min-height:40px; padding:7px 15px; border:1px solid var(--line); border-radius:6px; font-weight:600; font-size:.85rem; }
+.check-options button:hover { border-color:var(--green); }
+.check-options button[aria-pressed="true"] { background:var(--sage); border-color:var(--green); color:#154e43; }
+.check-feedback { min-height:24px; margin-top:12px; max-width:800px; font-size:.9rem; }
+details { border-top:1px solid var(--line); padding:15px 0; font-size:.86rem; }
+summary { cursor:pointer; font-weight:650; }
+details p { color:var(--muted); max-width:880px; }
+.sources { padding-left:20px; color:var(--muted); font-size:.8rem; max-width:880px; }
+.sources li { margin:7px 0; }
+.sources a { color:var(--green); }
+footer { display:flex; gap:8px 20px; flex-wrap:wrap; justify-content:space-between; padding:17px 0 26px; color:var(--muted); font-size:.76rem; border-top:1px solid var(--line); }
+.sr-only { position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap; }
+[hidden] { display:none!important; }
+@media (max-width:760px) {
+  .shell { width:calc(100% - 28px); }
+  .workspace { grid-template-columns:1fr; }
+  .side { border-left:0; border-top:1px solid var(--line); }
+  .figure-pane,.side,.controls { padding:17px; }
+  .hero { padding:28px 0 20px; }
+}
+@media (max-width:510px) {
+  .steps button { font-size:.72rem; padding:8px; }
+  .step-num { display:block; }
+  .controls { grid-template-columns:1fr; }
+  canvas { height:300px; }
+}
+canvas { height:460px; }
+.marker { display:inline-block; width:20px; border-top:2px solid #8a968e; }
+.marker.cut { border-top:2px dashed var(--copper); }
+.marker.fpr { border-top:3px solid var(--red); }
+.dot.stop { background:var(--red); }
+.controls { grid-template-columns:repeat(3,minmax(0,1fr)); }
+.controls legend { color:var(--green)!important; }
+.controls input { accent-color:var(--green)!important; }
+.slider-row { grid-template-columns:86px minmax(40px,1fr) 40px; }
+.metric output.over { color:var(--red); }
+@media (max-width:760px) { .controls { grid-template-columns:1fr; } }
+</style>
+</head>
+<body>
+<div class="shell">
+  <header class="topbar">
+    <a href="./">← Interactive Research Methods Studio</a>
+    <span>Research practices</span>
+  </header>
+  <main>
+    <section class="hero" aria-labelledby="page-title">
+      <p class="eyebrow">An interactive teaching demo</p>
+      <h1 id="page-title">What happens if you test until p &lt; .05?</h1>
+      <p class="intro">Two groups with no true difference. A researcher adds participants in batches and runs the test after each batch, stopping as soon as p &lt; .05.</p>
+    </section>
+
+    <section class="module" aria-label="Optional stopping walkthrough">
+      <nav class="steps" aria-label="Lesson steps">
+        <button type="button" data-step="0" aria-current="step"><span class="step-num">1.</span>One planned test</button>
+        <button type="button" data-step="1"><span class="step-num">2.</span>Testing as you go</button>
+        <button type="button" data-step="2"><span class="step-num">3.</span>Many studies</button>
+      </nav>
+      <div class="workspace">
+        <div class="figure-pane">
+          <div class="toolbar">
+            <div class="presets" role="group" aria-label="Example stopping rules">
+              <button type="button" data-preset="every10" aria-pressed="true">Check every 10</button>
+              <button type="button" data-preset="every1" aria-pressed="false">Check after each person</button>
+              <button type="button" data-preset="few" aria-pressed="false">Three looks</button>
+            </div>
+            <button type="button" class="small-button" id="rerun">Run again ↻</button>
+          </div>
+          <figure aria-labelledby="chart-title">
+            <figcaption id="chart-title">p-values of 20 simulated studies as participants are added</figcaption>
+            <canvas id="chart" role="img" aria-labelledby="chart-title" aria-describedby="chart-description"></canvas>
+            <p id="chart-description" class="sr-only"></p>
+            <div class="legend">
+              <span><i class="marker" aria-hidden="true"></i>One study</span>
+              <span><i class="marker cut" aria-hidden="true"></i>p = .05</span>
+              <span id="legend-stop" hidden><i class="dot stop" aria-hidden="true"></i>Stopped with p &lt; .05</span>
+              <span id="legend-fpr" hidden><i class="marker fpr" aria-hidden="true"></i>False-positive rate (2,000 studies)</span>
+            </div>
+          </figure>
+        </div>
+        <section class="side" aria-labelledby="step-title">
+          <div id="lesson" aria-live="polite">
+            <h2 id="step-title">One planned test</h2>
+            <p id="step-copy"></p>
+            <div class="metric-area">
+              <div class="metric"><span>Planned looks</span><output id="m-looks"></output></div>
+              <div class="metric"><span>False positives, one test at the end</span><output id="m-fixed"></output></div>
+              <div class="metric" data-from="1"><span>Of the 20 shown, stopped with p &lt; .05</span><output id="m-shown"></output></div>
+              <div class="metric total" data-from="2"><span>False positives when testing as you go</span><output id="m-peek"></output></div>
+            </div>
+            <p id="interpretation"></p>
+            <div class="inference" id="inference" hidden>Sequential designs with planned looks and adjusted thresholds (for example, Pocock or O’Brien–Fleming boundaries) allow interim analyses while keeping the overall error rate at α.</div>
+          </div>
+          <div class="nav-buttons">
+            <button type="button" class="nav-button" id="back" disabled>← Back</button>
+            <button type="button" class="nav-button next" id="next">Next →</button>
+          </div>
+        </section>
+      </div>
+
+      <div class="controls" aria-label="Adjust the stopping rule">
+        <fieldset>
+          <legend>Start</legend>
+          <div class="slider-row"><label for="n0">First look at n</label><input id="n0" type="range" min="5" max="100" step="5" value="20"><output id="n0-value" for="n0"></output></div>
+        </fieldset>
+        <fieldset>
+          <legend>Batch</legend>
+          <div class="slider-row"><label for="batch">Add per look</label><input id="batch" type="range" min="1" max="50" step="1" value="10"><output id="batch-value" for="batch"></output></div>
+        </fieldset>
+        <fieldset>
+          <legend>Limit</legend>
+          <div class="slider-row"><label for="nmax">Maximum n</label><input id="nmax" type="range" min="20" max="300" step="10" value="200"><output id="nmax-value" for="nmax"></output></div>
+        </fieldset>
+      </div>
+    </section>
+    <noscript><p>Enable JavaScript to run the simulation.</p></noscript>
+
+    <section class="check-section" aria-labelledby="check-title">
+      <h2 id="check-title">Check your understanding</h2>
+      <p>A researcher tests after every 10 participants per group and stops at the first p &lt; .05. There is no true effect. What is the chance of ending with a significant result?</p>
+      <div class="check-options" role="group" aria-labelledby="check-title">
+        <button type="button" data-check="five" aria-pressed="false">About 5%</button>
+        <button type="button" data-check="higher" aria-pressed="false">Higher than 5%</button>
+        <button type="button" data-check="lower" aria-pressed="false">Lower than 5%</button>
+      </div>
+      <div class="check-feedback" id="check-feedback" role="status" aria-live="polite"></div>
+    </section>
+
+    <details>
+      <summary>Assumptions, interpretation, and references</summary>
+      <p><strong>Simulation.</strong> Each study draws observations for two groups from the same normal distribution (σ = 1), so every significant result is a false positive. At each look, a two-sided z-test compares the group means, with n participants per group. The false-positive rates are based on 2,000 simulated studies.</p>
+      <p><strong>Why the rate rises.</strong> Each look is another chance to cross the threshold, and successive tests are correlated but not identical. With unlimited looks, a study would eventually reach p &lt; .05 with probability approaching 1.</p>
+      <p><strong>Alternatives.</strong> Fix the sample size in advance, or plan a sequential design with a stated number of looks and adjusted thresholds. Preregistration makes the stopping rule visible to readers.</p>
+      <p>Data are simulated for teaching. The references below credit the methods; no figures or text from them are reproduced.</p>
+      <ol class="sources">
+        <li>Armitage, P., McPherson, C. K., &amp; Rowe, B. C. (1969). Repeated significance tests on accumulating data. <em>Journal of the Royal Statistical Society: Series A, 132</em>(2), 235–244. <a href="https://doi.org/10.2307/2343787" target="_blank" rel="noopener noreferrer">doi:10.2307/2343787 ↗</a></li>
+        <li>Simmons, J. P., Nelson, L. D., &amp; Simonsohn, U. (2011). False-positive psychology: Undisclosed flexibility in data collection and analysis allows presenting anything as significant. <em>Psychological Science, 22</em>(11), 1359–1366. <a href="https://doi.org/10.1177/0956797611417632" target="_blank" rel="noopener noreferrer">doi:10.1177/0956797611417632 ↗</a></li>
+        <li>Pocock, S. J. (1977). Group sequential methods in the design and analysis of clinical trials. <em>Biometrika, 64</em>(2), 191–199. <a href="https://doi.org/10.1093/biomet/64.2.191" target="_blank" rel="noopener noreferrer">doi:10.1093/biomet/64.2.191 ↗</a></li>
+        <li>Lakens, D. (2014). Performing high-powered studies efficiently with sequential analyses. <em>European Journal of Social Psychology, 44</em>(7), 701–710. <a href="https://doi.org/10.1002/ejsp.2023" target="_blank" rel="noopener noreferrer">doi:10.1002/ejsp.2023 ↗</a></li>
+      </ol>
+    </details>
+  </main>
+  <footer><span>Hakan Sarac</span><span>Simulated data for teaching</span></footer>
+</div>
+<script>
+'use strict';
+(() => {
+  const byId = id => document.getElementById(id);
+  const STUDIES = 2000, SHOWN = 20;
+  const presets = { every10:{ n0:20, batch:10, nmax:200 }, every1:{ n0:10, batch:1, nmax:100 }, few:{ n0:50, batch:50, nmax:150 } };
+  const steps = [
+    { title:'One planned test', copy:'If the sample size is fixed in advance and the test is run once, at the end, a study with no true effect gives p < .05 about 5% of the time. The dots on the right show the final p-values of 20 such studies.' },
+    { title:'Testing as you go', copy:'Now the researcher looks at the data after every batch. A p-value wanders as data come in, and it only has to dip below .05 once. Red dots mark studies that stopped there and would be reported as significant.' },
+    { title:'Many studies', copy:'Across 2,000 simulated studies, the lower panel shows the share that reach p < .05 by each look. The more looks, the higher the false-positive rate climbs above 5%.' }
+  ];
+  const canvas = byId('chart');
+  const ctx = canvas.getContext('2d');
+  let s = { ...presets.every10 }, seed = 3, step = 0, W = 0, H = 0;
+  let looks = [], paths = [], firstHit = [], finalSig = 0;
+
+  function phi(x) {
+    const t = 1 / (1 + .3275911 * Math.abs(x) / Math.SQRT2);
+    const e = 1 - (((((1.061405429 * t - 1.453152027) * t) + 1.421413741) * t - .284496736) * t + .254829592) * t * Math.exp(-x * x / 2);
+    return x >= 0 ? .5 * (1 + e) : .5 * (1 - e);
+  }
+  function rng(v) {
+    let a = v >>> 0, spare = null;
+    const u = () => { a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
+    return () => {
+      if (spare !== null) { const r = spare; spare = null; return r; }
+      let x = 0; while (x === 0) x = u();
+      const r = Math.sqrt(-2 * Math.log(x)), th = 2 * Math.PI * u(); spare = r * Math.sin(th); return r * Math.cos(th);
+    };
+  }
+
+  function simulate() {
+    looks = [];
+    for (let n = s.n0; n <= s.nmax; n += s.batch) looks.push(n);
+    if (!looks.length) looks = [s.nmax];
+    const normal = rng(seed * 9973 + 11), last = looks[looks.length - 1];
+    paths = []; firstHit = []; finalSig = 0;
+    for (let k = 0; k < STUDIES; k++) {
+      let sa = 0, sb = 0, li = 0, hit = Infinity;
+      const ps = k < SHOWN ? [] : null;
+      for (let n = 1; n <= last; n++) {
+        sa += normal(); sb += normal();
+        if (n === looks[li]) {
+          const z = (sa - sb) / n / Math.sqrt(2 / n), p = 2 * (1 - phi(Math.abs(z)));
+          if (ps) ps.push(p);
+          if (p < .05 && hit === Infinity) hit = li;
+          if (li === looks.length - 1 && p < .05) finalSig++;
+          li++;
+        }
+      }
+      firstHit.push(hit);
+      if (ps) paths.push(ps);
+    }
+  }
+  const fprByLook = () => looks.map((_, j) => firstHit.filter(h => h <= j).length / STUDIES);
+  const pct = v => (100 * v).toFixed(1) + '%';
+
+  function layout() {
+    const l = 46, r = 16;
+    if (step < 2) return { l, r, top:{ t:12, b:H - 34 }, bot:null };
+    return { l, r, top:{ t:12, b:H * .52 }, bot:{ t:H * .52 + 30, b:H - 34 } };
+  }
+
+  function paint() {
+    if (!W || !looks.length) return;
+    ctx.clearRect(0, 0, W, H);
+    ctx.font = '11px system-ui';
+    const L = layout(), right = W - L.r, last = looks[looks.length - 1];
+    const x = n => L.l + (n - 0) / last * (right - L.l);
+    const y = p => L.top.t + (1 - p) * (L.top.b - L.top.t);
+    for (const p of [0, .25, .5, .75, 1]) {
+      ctx.strokeStyle = p === 0 ? '#9eaba0' : '#eef1ea'; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(L.l, y(p)); ctx.lineTo(right, y(p)); ctx.stroke();
+      ctx.fillStyle = '#52665b'; ctx.textAlign = 'right'; ctx.fillText(p.toFixed(2), L.l - 6, y(p) + 4);
+    }
+    ctx.save(); ctx.translate(12, (L.top.t + L.top.b) / 2); ctx.rotate(-Math.PI / 2); ctx.textAlign = 'center'; ctx.fillText('p-value', 0, 0); ctx.restore();
+    const tick = last > 150 ? 50 : last > 60 ? 20 : 10;
+    ctx.textAlign = 'center';
+    for (let n = tick; n <= last; n += tick) ctx.fillText(n, x(n), (L.bot ? L.top.b : L.top.b) + 15);
+    if (!L.bot) ctx.fillText('Participants per group', (L.l + right) / 2, H - 4);
+    ctx.strokeStyle = '#90522f'; ctx.lineWidth = 1.5; ctx.setLineDash([6, 4]);
+    ctx.beginPath(); ctx.moveTo(L.l, y(.05)); ctx.lineTo(right, y(.05)); ctx.stroke(); ctx.setLineDash([]);
+
+    paths.forEach((ps, k) => {
+      if (step === 0) {
+        const p = ps[ps.length - 1];
+        ctx.beginPath(); ctx.arc(x(last), y(p), 4.5, 0, Math.PI * 2);
+        ctx.fillStyle = p < .05 ? '#ac4050' : '#8a968e'; ctx.fill();
+        return;
+      }
+      const stopAt = firstHit[k];
+      const end = stopAt === Infinity ? ps.length - 1 : stopAt;
+      ctx.strokeStyle = stopAt === Infinity ? 'rgba(125,138,128,.55)' : 'rgba(172,64,80,.75)';
+      ctx.lineWidth = stopAt === Infinity ? 1.2 : 1.6;
+      ctx.beginPath();
+      for (let j = 0; j <= end; j++) { const px = x(looks[j]), py = y(ps[j]); j ? ctx.lineTo(px, py) : ctx.moveTo(px, py); }
+      ctx.stroke();
+      if (looks.length === 1 || end === 0) { ctx.beginPath(); ctx.arc(x(looks[end]), y(ps[end]), 2.5, 0, Math.PI * 2); ctx.fillStyle = ctx.strokeStyle; ctx.fill(); }
+      if (stopAt !== Infinity) { ctx.beginPath(); ctx.arc(x(looks[end]), y(ps[end]), 4.5, 0, Math.PI * 2); ctx.fillStyle = '#ac4050'; ctx.fill(); }
+    });
+    ctx.strokeStyle = '#9eaba0'; ctx.lineWidth = 1; ctx.strokeRect(L.l, L.top.t, right - L.l, L.top.b - L.top.t);
+
+    if (L.bot) {
+      const f = fprByLook(), ymax = Math.max(.1, Math.ceil(f[f.length - 1] * 10 + .5) / 10);
+      const by = v => L.bot.b - v / ymax * (L.bot.b - L.bot.t);
+      const stepY = ymax > .3 ? .1 : .05;
+      for (let v = 0; v <= ymax + 1e-9; v += stepY) {
+        ctx.strokeStyle = v === 0 ? '#9eaba0' : '#eef1ea'; ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.moveTo(L.l, by(v)); ctx.lineTo(right, by(v)); ctx.stroke();
+        ctx.fillStyle = '#52665b'; ctx.textAlign = 'right'; ctx.fillText(Math.round(v * 100) + '%', L.l - 6, by(v) + 4);
+      }
+      ctx.strokeStyle = '#90522f'; ctx.lineWidth = 1.5; ctx.setLineDash([6, 4]);
+      ctx.beginPath(); ctx.moveTo(L.l, by(.05)); ctx.lineTo(right, by(.05)); ctx.stroke(); ctx.setLineDash([]);
+      ctx.strokeStyle = '#ac4050'; ctx.lineWidth = 2.5; ctx.beginPath();
+      f.forEach((v, j) => { const px = x(looks[j]), py = by(v); j ? ctx.lineTo(px, py) : ctx.moveTo(px, py); });
+      ctx.stroke();
+      if (f.length <= 30) f.forEach((v, j) => { ctx.beginPath(); ctx.arc(x(looks[j]), by(v), 3, 0, Math.PI * 2); ctx.fillStyle = '#ac4050'; ctx.fill(); });
+      ctx.textAlign = 'center'; ctx.fillStyle = '#52665b';
+      for (let n = tick; n <= last; n += tick) ctx.fillText(n, x(n), L.bot.b + 15);
+      ctx.fillText('Participants per group at each look', (L.l + right) / 2, H - 4);
+      ctx.save(); ctx.translate(12, (L.bot.t + L.bot.b) / 2); ctx.rotate(-Math.PI / 2); ctx.fillText('False positives', 0, 0); ctx.restore();
+      ctx.strokeStyle = '#9eaba0'; ctx.lineWidth = 1; ctx.strokeRect(L.l, L.bot.t, right - L.l, L.bot.b - L.bot.t);
+    }
+  }
+
+  function resize() {
+    const b = canvas.getBoundingClientRect(), sc = devicePixelRatio || 1;
+    W = b.width; H = b.height; canvas.width = Math.round(W * sc); canvas.height = Math.round(H * sc);
+    ctx.setTransform(sc, 0, 0, sc, 0, 0); paint();
+  }
+
+  function update() {
+    for (const k of ['n0', 'batch', 'nmax']) { byId(k).value = s[k]; byId(k + '-value').textContent = s[k]; }
+    document.querySelectorAll('[data-preset]').forEach(btn => {
+      const p = presets[btn.dataset.preset];
+      btn.setAttribute('aria-pressed', String(p.n0 === s.n0 && p.batch === s.batch && p.nmax === s.nmax));
+    });
+    const peek = firstHit.filter(h => h !== Infinity).length / STUDIES;
+    const shown = firstHit.slice(0, SHOWN).filter(h => h !== Infinity).length;
+    byId('m-looks').textContent = looks.length;
+    byId('m-fixed').textContent = pct(finalSig / STUDIES);
+    byId('m-shown').textContent = shown + ' of ' + SHOWN;
+    byId('m-peek').textContent = pct(peek);
+    byId('m-peek').className = peek > .07 ? 'over' : '';
+    let msg;
+    if (step === 0) msg = 'With one test at n = ' + looks[looks.length - 1] + ' per group, ' + pct(finalSig / STUDIES) + ' of 2,000 studies give p < .05, close to the nominal 5%.';
+    else if (step === 1) msg = shown + ' of the 20 studies shown would stop early and report a significant difference that does not exist.';
+    else msg = looks.length === 1 ? 'With a single look, the rate stays near 5%.' : 'With ' + looks.length + ' looks, ' + pct(peek) + ' of studies end with p < .05, about ' + (peek / .05).toFixed(1) + ' times the nominal rate.';
+    byId('interpretation').textContent = msg;
+    byId('chart-description').textContent = looks.length + ' looks from n = ' + s.n0 + ' to ' + looks[looks.length - 1] + ' per group. False-positive rate with one final test: ' + pct(finalSig / STUDIES) + '; when testing at every look: ' + pct(peek) + '.';
+    paint();
+  }
+
+  function goTo(next) {
+    step = Math.max(0, Math.min(2, next));
+    document.querySelectorAll('[data-step]').forEach(b => { if (Number(b.dataset.step) === step) b.setAttribute('aria-current', 'step'); else b.removeAttribute('aria-current'); });
+    byId('step-title').textContent = steps[step].title;
+    byId('step-copy').textContent = steps[step].copy;
+    document.querySelectorAll('[data-from]').forEach(el => { el.hidden = step < Number(el.dataset.from); });
+    byId('legend-stop').hidden = step !== 1 && step !== 2;
+    byId('legend-fpr').hidden = step !== 2;
+    byId('inference').hidden = step !== 2;
+    byId('back').disabled = step === 0;
+    byId('next').hidden = step === 2;
+    update();
+  }
+
+  function run() { if (s.n0 > s.nmax) s.nmax = Math.ceil(s.n0 / 10) * 10; simulate(); update(); }
+  for (const k of ['n0', 'batch', 'nmax']) byId(k).addEventListener('input', e => { s[k] = Number(e.target.value); run(); });
+  document.querySelectorAll('[data-preset]').forEach(b => b.addEventListener('click', () => { s = { ...presets[b.dataset.preset] }; run(); }));
+  byId('rerun').addEventListener('click', () => { seed++; run(); });
+  document.querySelectorAll('[data-step]').forEach(b => b.addEventListener('click', () => goTo(Number(b.dataset.step))));
+  byId('next').addEventListener('click', () => { goTo(step + 1); if (step === 2) document.querySelector('[data-step="2"]').focus(); });
+  byId('back').addEventListener('click', () => { goTo(step - 1); if (step === 0) document.querySelector('[data-step="0"]').focus(); });
+
+  document.querySelectorAll('[data-check]').forEach(b => b.addEventListener('click', () => {
+    document.querySelectorAll('[data-check]').forEach(o => o.setAttribute('aria-pressed', String(o === b)));
+    byId('check-feedback').textContent = (b.dataset.check === 'higher' ? 'Correct. ' : 'Not quite. ') +
+      'Each look is another chance to cross .05. With looks from 20 to 200 in steps of 10 (19 looks), roughly one in five studies with no true effect end up significant. Choose “Check every 10” and go to step 3 to see the exact share in this simulation.';
+  }));
+
+  simulate();
+  goTo(0);
+  new ResizeObserver(resize).observe(canvas);
+  resize();
+})();
+</script>
+</body>
+</html>
